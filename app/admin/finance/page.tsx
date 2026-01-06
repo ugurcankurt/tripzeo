@@ -25,7 +25,7 @@ export default async function AdminFinancePage() {
     const today = new Date()
     for (let i = 5; i >= 0; i--) {
         const d = new Date(today.getFullYear(), today.getMonth() - i, 1)
-        const monthKey = d.toLocaleString('en-US', { month: 'short' })
+        const monthKey = d.toLocaleString('en-US', { month: 'short', year: '2-digit' })
         monthlyStats[monthKey] = {
             name: monthKey,
             revenue: 0,
@@ -37,7 +37,7 @@ export default async function AdminFinancePage() {
     // Aggregate data
     bookings?.forEach(booking => {
         const date = new Date(booking.booking_date)
-        const monthKey = date.toLocaleString('en-US', { month: 'short' })
+        const monthKey = date.toLocaleString('en-US', { month: 'short', year: '2-digit' })
 
         // Only count if it falls within our tracked months
         if (monthlyStats[monthKey]) {

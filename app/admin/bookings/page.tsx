@@ -36,7 +36,7 @@ export default async function AdminBookingsPage() {
 
     return (
         <div className="space-y-6">
-            <AdminPageHeader heading="Booking Management" />
+            <AdminPageHeader heading="Booking Management" text="View and manage all booking requests, statuses, and payments." />
 
             <div className="rounded-md border bg-white">
                 <Table>
@@ -68,7 +68,7 @@ export default async function AdminBookingsPage() {
                                     />
                                 </TableCell>
                                 <TableCell>
-                                    <BookingStatusBadge status={booking.status} />
+                                    <BookingStatusBadge status={booking.status || 'pending'} />
                                 </TableCell>
                                 <TableCell>${booking.total_amount}</TableCell>
                                 <TableCell className="text-right">

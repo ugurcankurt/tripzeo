@@ -154,7 +154,7 @@ export function AppSidebar({ userRole = 'user' }: { userRole?: 'user' | 'host' |
                                         <SidebarMenuButton asChild isActive={pathname === "/vendor"} className="w-full justify-start">
                                             <Link href="/vendor">
                                                 <Briefcase className="mr-2 h-4 w-4" />
-                                                My Shop
+                                                Host Dashboard
                                             </Link>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>

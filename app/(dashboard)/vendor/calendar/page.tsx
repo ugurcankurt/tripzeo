@@ -30,11 +30,13 @@ export default async function VendorCalendarPage() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight">Availability Calendar</h1>
-                <p className="text-muted-foreground mt-2">
-                    Manage your schedule, block dates, and view upcoming bookings.
-                </p>
+            <div className="flex items-center justify-between">
+                <div>
+                    <h2 className="text-3xl font-bold tracking-tight">Availability Calendar</h2>
+                    <p className="text-muted-foreground">
+                        Manage your schedule, block dates, and view upcoming bookings.
+                    </p>
+                </div>
             </div>
 
             <Suspense fallback={<div className="flex justify-center p-12"><Loader2 className="h-8 w-8 animate-spin" /></div>}>

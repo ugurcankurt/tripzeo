@@ -25,7 +25,7 @@ export default async function AdminUsersPage() {
 
     return (
         <div className="space-y-6">
-            <AdminPageHeader heading="User Management" />
+            <AdminPageHeader heading="User Management" text="Manage user accounts, roles, and verification statuses." />
 
             <div className="rounded-md border bg-white">
                 <Table>

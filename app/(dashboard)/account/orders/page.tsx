@@ -38,11 +38,13 @@ export default async function OrdersPage() {
     if (!bookings || bookings.length === 0) {
         return (
             <div className="space-y-6">
-                <div>
-                    <h3 className="text-lg font-medium">My Bookings</h3>
-                    <p className="text-sm text-muted-foreground">
-                        Your past and upcoming travel plans.
-                    </p>
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h2 className="text-3xl font-bold tracking-tight">My Bookings</h2>
+                        <p className="text-muted-foreground">
+                            Track your upcoming experiences and past adventures.
+                        </p>
+                    </div>
                 </div>
                 <Card className="bg-muted/50 border-dashed">
                     <CardContent className="flex flex-col items-center justify-center py-16 text-center space-y-4">
@@ -50,9 +52,9 @@ export default async function OrdersPage() {
                             <Ticket className="h-8 w-8 text-muted-foreground" />
                         </div>
                         <div>
-                            <h3 className="font-semibold text-lg">You don't have any travel plans yet</h3>
+                            <h3 className="font-semibold text-lg">No experiences booked yet</h3>
                             <p className="text-muted-foreground max-w-sm mx-auto mt-2">
-                                Start discovering unique experiences from the best hosts around the world.
+                                Explore unique activities and book your next adventure.
                             </p>
                         </div>
                         <Button asChild>
@@ -66,11 +68,13 @@ export default async function OrdersPage() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h3 className="text-lg font-medium">My Bookings</h3>
-                <p className="text-sm text-muted-foreground">
-                    Your past and upcoming travel plans.
-                </p>
+            <div className="flex items-center justify-between">
+                <div>
+                    <h2 className="text-3xl font-bold tracking-tight">My Bookings</h2>
+                    <p className="text-muted-foreground">
+                        Track your upcoming experiences and past adventures.
+                    </p>
+                </div>
             </div>
 
             <div className="rounded-md border bg-card">

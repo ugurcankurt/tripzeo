@@ -11,7 +11,7 @@ export default async function SettingsPage() {
 
     return (
         <div className="space-y-6">
-            <AdminPageHeader heading="Platform Settings" />
+            <AdminPageHeader heading="Platform Settings" text="Configure global platform settings, commissions, and service fees." />
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <Card className="col-span-4">

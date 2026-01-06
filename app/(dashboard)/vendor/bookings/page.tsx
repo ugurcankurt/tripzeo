@@ -77,7 +77,12 @@ export default async function VendorBookingsPage() {
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
-                <h2 className="text-3xl font-bold tracking-tight">Incoming Orders</h2>
+                <div>
+                    <h2 className="text-3xl font-bold tracking-tight">Incoming Orders</h2>
+                    <p className="text-muted-foreground">
+                        Manage your booking requests and view order details.
+                    </p>
+                </div>
                 <div className="flex items-center gap-2">
                     <Badge variant="outline" className="text-base px-3 py-1">
                         Total: {bookings?.length || 0}

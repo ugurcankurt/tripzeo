@@ -47,7 +47,12 @@ export default async function VendorPage() {
         return (
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                    <h2 className="text-3xl font-bold tracking-tight">My Shop</h2>
+                    <div>
+                        <h2 className="text-3xl font-bold tracking-tight">Host Dashboard</h2>
+                        <p className="text-muted-foreground">
+                            Overview of your listings, performance, and revenue.
+                        </p>
+                    </div>
                     <Button asChild>
                         <Link href="/vendor/products/new">Add New Experience</Link>
                     </Button>
@@ -121,7 +126,7 @@ export default async function VendorPage() {
             <div className="space-y-2">
                 <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">Ready to Become a Host?</h1>
                 <p className="text-xl text-muted-foreground">
-                    Turn your skills into income. Open your shop on Tripzeo and reach thousands of travelers.
+                    Turn your passions into income. Create experiences on Tripzeo and reach thousands of travelers.
                 </p>
             </div>
 

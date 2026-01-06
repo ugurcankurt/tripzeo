@@ -30,7 +30,7 @@ export function BecomeHostButton() {
             onClick={handleRequest}
             disabled={isPending}
         >
-            {isPending ? "Submitting..." : "Open My Shop & Start 🚀"}
+            {isPending ? "Submitting..." : "Start Hosting & Earn 🚀"}
         </Button>
     )
 }

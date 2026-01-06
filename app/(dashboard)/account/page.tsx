@@ -35,12 +35,14 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
         .returns<Tables<'categories'>[]>()
 
     return (
-        <div className="space-y-6 max-w-4xl">
-            <div>
-                <h3 className="text-lg font-medium">Profile Settings</h3>
-                <p className="text-sm text-muted-foreground">
-                    Manage your personal information and appearance on Tripzeo.
-                </p>
+        <div className="space-y-6">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h2 className="text-3xl font-bold tracking-tight">Profile Settings</h2>
+                    <p className="text-muted-foreground">
+                        Manage your personal information and appearance on Tripzeo.
+                    </p>
+                </div>
             </div>
 
             {error === 'incomplete_profile' && (
