@@ -4,6 +4,7 @@ import { BookingConfirmationForm } from "@/modules/bookings/components/booking-c
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import Image from "next/image"
+import Link from "next/link"
 import { format } from "date-fns"
 import {
     Breadcrumb,
@@ -108,7 +109,7 @@ export default async function BookPage({ searchParams }: { searchParams: Promise
                                 <div>
                                     <div className="flex justify-between items-center mb-2">
                                         <p className="text-sm text-muted-foreground">Billing Address</p>
-                                        <a href="/account" className="text-xs text-primary hover:underline">Edit</a>
+                                        <Link href="/account" className="text-xs text-primary hover:underline">Edit</Link>
                                     </div>
                                     {userProfile?.address ? (
                                         <div className="text-sm">
@@ -119,7 +120,7 @@ export default async function BookPage({ searchParams }: { searchParams: Promise
                                     ) : (
                                         <div className="text-sm text-amber-600 flex items-center gap-2">
                                             <span>Missing address info.</span>
-                                            <a href="/account" className="underline font-medium">Add Address</a>
+                                            <Link href="/account" className="underline font-medium">Add Address</Link>
                                         </div>
                                     )}
                                 </div>
@@ -172,28 +173,28 @@ export default async function BookPage({ searchParams }: { searchParams: Promise
 
                             <div className="flex justify-between">
                                 <span className="text-muted-foreground">${experience.price} x {numPeople} people</span>
-                                <span>${subtotal.toFixed(2)}</span>
+                                <span className="">${subtotal.toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-muted-foreground">Service Fee</span>
-                                <span>${serviceFee.toFixed(2)}</span>
+                                <span className="">${serviceFee.toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-muted-foreground">Date</span>
-                                <span>{format(new Date(date), 'PPP')}</span>
+                                <span className="">{format(new Date(date), 'PPP')}</span>
                             </div>
 
                             {experience.start_time && experience.end_time && (
                                 <div className="flex justify-between">
                                     <span className="text-muted-foreground">Time</span>
-                                    <span>{experience.start_time.slice(0, 5)} - {experience.end_time.slice(0, 5)}</span>
+                                    <span className="">{experience.start_time.slice(0, 5)} - {experience.end_time.slice(0, 5)}</span>
                                 </div>
                             )}
 
                             {experience.duration_minutes && (
                                 <div className="flex justify-between">
                                     <span className="text-muted-foreground">Duration</span>
-                                    <span>{experience.duration_minutes} Mins</span>
+                                    <span className="">{experience.duration_minutes} Mins</span>
                                 </div>
                             )}
 
@@ -201,7 +202,7 @@ export default async function BookPage({ searchParams }: { searchParams: Promise
 
                             <div className="flex justify-between font-bold text-xl">
                                 <span>Total (USD)</span>
-                                <span>${total.toFixed(2)}</span>
+                                <span className="">${total.toFixed(2)}</span>
                             </div>
                         </CardContent>
                     </Card>

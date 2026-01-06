@@ -7,7 +7,6 @@ import { Grid } from "lucide-react"
 import {
     Dialog,
     DialogContent,
-    DialogTrigger,
     DialogTitle,
     DialogDescription,
 } from "@/components/ui/dialog"

@@ -1,9 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use server'
 
 import { createClient } from "@/lib/supabase/server"
 import { experienceSchema } from "./schema"
 import { revalidatePath } from "next/cache"
-import { redirect } from "next/navigation"
 
 export async function createExperience(data: any) {
     const supabase = await createClient()

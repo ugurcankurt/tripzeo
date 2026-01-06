@@ -132,7 +132,7 @@ export function VendorExperienceCard({ experience }: VendorExperienceCardProps) 
                                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                                 <AlertDialogDescription>
                                     This action cannot be undone. This will permanently delete
-                                    <b> "{experience.title}"</b> and remove it from our servers.
+                                    <b> &quot;{experience.title}&quot;</b> and remove it from our servers.
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>

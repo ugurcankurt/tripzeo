@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createClient } from "@/lib/supabase/server"
 import { ExperienceCard } from "@/modules/experiences/components/experience-card"
 import { notFound } from "next/navigation"
@@ -212,7 +213,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
                                         Tripzeo curated a list of top-rated activities hosted by local experts.
                                     </p>
                                     <p className="mt-4">
-                                        Whether you're visiting for the first time or a seasoned traveler, our {categoryData.name.toLowerCase()} experiences are designed to give you
+                                        Whether you&apos;re visiting for the first time or a seasoned traveler, our {categoryData.name.toLowerCase()} experiences are designed to give you
                                         an authentic and memorable experience. Explore new skills, discover hidden spots, and make your trip unforgettable.
                                     </p>
                                 </div>

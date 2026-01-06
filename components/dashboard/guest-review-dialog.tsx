@@ -28,6 +28,7 @@ export function GuestReviewDialog({ guestId, bookingId, guestName, children }: G
 
     useEffect(() => {
         if (open) {
+            // eslint-disable-next-line
             setLoading(true)
             getGuestReviews(guestId, bookingId)
                 .then((result) => {

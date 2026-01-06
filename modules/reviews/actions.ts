@@ -8,7 +8,7 @@ import { Tables } from "@/types/supabase"
 export async function getGuestReviews(guestId: string, bookingId?: string) {
     const supabase = await createClient()
 
-    let query = supabase
+    const query = supabase
         .from('reviews')
         .select(`
             *,

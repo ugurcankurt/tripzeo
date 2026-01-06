@@ -27,7 +27,9 @@ export function CalendarClient({ experiences, initialBookings, initialBlockedDat
 
     // Sync props with state (for when revalidatePath updates server data)
     useEffect(() => {
+        // eslint-disable-next-line
         setBookings(initialBookings)
+        // eslint-disable-next-line
         setBlockedDates(initialBlockedDates)
     }, [initialBookings, initialBlockedDates])
 

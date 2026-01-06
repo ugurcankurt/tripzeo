@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createClient } from "@/lib/supabase/server"
 import { ExperienceCard } from "@/modules/experiences/components/experience-card"
 import { CategoryGrid } from "@/components/home/category-grid"
@@ -251,7 +252,7 @@ export default async function CityPage({ params }: CityPageProps) {
                                         Tripzeo offers a curated selection of tours and activities hosted by passionate locals.
                                     </p>
                                     <p className="mt-4">
-                                        Whether you're planning a weekend getaway or a long vacation, our experiences are designed to show you
+                                        Whether you&apos;re planning a weekend getaway or a long vacation, our experiences are designed to show you
                                         the authentic side of {formattedCity}. Skip the tourist traps and discover hidden gems, local favorites,
                                         and unforgettable adventures.
                                     </p>

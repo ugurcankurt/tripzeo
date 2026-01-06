@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
 import * as React from "react"
@@ -124,7 +125,7 @@ export function BookingForm({ price, serviceFeeRate, experienceId, blockedDates 
                     filter: `experience_id=eq.${experienceId}`
                 },
                 (payload) => {
-                    const newBooking = payload.new as any
+                    // const newBooking = payload.new as any
                     // Only care if confirmed? Or pending too? 
                     // Usually pending blocks it temporarily or we wait for confirm.
                     // For now, let's assume if a booking is inserted and status is confirmed/paid/etc
@@ -293,7 +294,7 @@ export function BookingForm({ price, serviceFeeRate, experienceId, blockedDates 
                 </Button>
 
                 <p className="text-center text-xs text-muted-foreground mt-2">
-                    You won't be charged yet
+                    You won&apos;t be charged yet
                 </p>
 
                 <div className="space-y-3 pt-2">

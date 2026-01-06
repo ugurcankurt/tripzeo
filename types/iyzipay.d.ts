@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 declare module 'iyzipay' {
     export interface IyzipayConfig {
         apiKey: string;

@@ -39,6 +39,7 @@ export default async function HomePage() {
             title: exp.title,
             image: exp.images![0]
         }))
+        // eslint-disable-next-line
         .sort(() => 0.5 - Math.random())
         .slice(0, 5)
 

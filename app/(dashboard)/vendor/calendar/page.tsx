@@ -4,6 +4,7 @@ import { getHostExperiences, getCalendarData } from "@/modules/calendar/actions"
 import { Loader2 } from "lucide-react"
 import { requireHost } from "@/lib/auth/guards"
 import { CalendarBooking, CalendarBlockedDate } from "@/modules/calendar/types"
+import Link from "next/link"
 
 export const metadata = {
     title: "Availability Calendar | Vendor Dashboard",
@@ -36,12 +37,12 @@ export default async function VendorCalendarPage() {
                 </div>
                 <h2 className="text-2xl font-bold tracking-tight">No Experiences Found</h2>
                 <p className="text-muted-foreground max-w-md">
-                    You haven't listed any experiences yet. Create an experience to start managing your availability.
+                    You haven&apos;t listed any experiences yet. Create an experience to start managing your availability.
                 </p>
                 <div className="pt-4">
-                    <a href="/vendor/products/new" className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+                    <Link href="/vendor/products/new" className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
                         Create Experience
-                    </a>
+                    </Link>
                 </div>
             </div>
         )
@@ -69,4 +70,3 @@ export default async function VendorCalendarPage() {
         </div>
     )
 }
-

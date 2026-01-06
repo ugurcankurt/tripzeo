@@ -112,7 +112,7 @@ export async function fetchReceiptData(transferId: string) {
         }
 
         // Check for manual receipt URL in metadata
-        const metadata = transaction.metadata as any
+        const metadata = transaction.metadata as Record<string, unknown>
         const receiptUrl = metadata?.receipt_url
 
         return {

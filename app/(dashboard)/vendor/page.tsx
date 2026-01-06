@@ -107,7 +107,7 @@ export default async function VendorPage() {
                     </CardHeader>
                     <CardContent>
                         <p className="text-muted-foreground">
-                            This process usually takes 24-48 hours. Don't forget to complete your profile in the meantime.
+                            This process usually takes 24-48 hours. Don&apos;t forget to complete your profile in the meantime.
                         </p>
                     </CardContent>
                     <CardFooter className="justify-center">
