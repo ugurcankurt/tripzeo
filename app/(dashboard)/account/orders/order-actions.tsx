@@ -30,15 +30,62 @@ import { Star } from "lucide-react"
 
 import { Database } from "@/types/supabase"
 
-export function OrderActions({ bookingId, status, hasReviewed = false }: {
-    bookingId: string,
-    status: Database['public']['Enums']['booking_status'] | string,
+export function OrderActions({ bookingId, status, hasReviewed = false, bookingDate, startTime }: {
+    bookingId: string
+    status: Database['public']['Enums']['booking_status'] | string
     hasReviewed?: boolean
+    bookingDate: string
+    startTime: string | null
 }) {
     const router = useRouter()
     const [open, setOpen] = useState(false)
     const [reviewOpen, setReviewOpen] = useState(false)
     const [loading, setLoading] = useState(false)
+
+    // Calculate cancellation eligibility
+    // Calculate cancellation eligibility
+    const canCancel = () => {
+        try {
+            if (!bookingDate) return true // Should not happen, but safe default
+
+            // Handle date parsing safely. bookingDate is likely YYYY-MM-DD or ISO
+            let targetDate = new Date(bookingDate)
+
+            // If it's pure date string (YYYY-MM-DD), Date() parses as UTC. 
+            // We need to be careful. Ideally we combine string before parsing.
+            if (startTime) {
+                // Assuming startTime is "HH:MM:SS"
+                const [h, m] = startTime.split(':')
+                // Reset to that time on the target date. 
+                // Note: This relies on browser's local timezone interpretation use setHours if basic Date(YYYY-MM-DD) was UTC
+                // Better approach: string concat if standard format YYYY-MM-DD
+                const datePart = bookingDate.split('T')[0] // Ensure we get YYYY-MM-DD
+                const finalStr = `${datePart}T${h}:${m}:00`
+                const TEST_DATE = new Date(finalStr)
+
+                // If valid date from string concat, use it (browser parses ISO-like usually as Local or UTC depending on browser, but typically local if no Z)
+                // But simplest is manual setHours on a date object created from YMD
+
+                if (!isNaN(TEST_DATE.getTime())) {
+                    targetDate = TEST_DATE
+                } else {
+                    // Fallback manual manipulation
+                    targetDate.setHours(Number(h), Number(m), 0, 0)
+                }
+            }
+
+            const now = new Date()
+            const diffInHours = (targetDate.getTime() - now.getTime()) / (1000 * 60 * 60)
+
+            // If diffInHours is negative (past) or less than 24, we block cancellation
+            return diffInHours >= 24
+        } catch (e) {
+            console.error("Date parse error", e)
+            return false // Default to blocking if unsure to avoid system gaming
+        }
+    }
+
+    const showCancelButton = canCancel()
 
     const handleCancel = async (e: React.MouseEvent) => {
         e.preventDefault() // Otomatik kapanmayı engelle
@@ -92,6 +139,20 @@ export function OrderActions({ bookingId, status, hasReviewed = false }: {
     // Disable cancel for completed/paid out bookings if they already reviewed (or if logic falls through)
     if (status === 'completed' || status === 'paid_out') {
         return null
+    }
+
+    if (!showCancelButton) {
+        return (
+            <Button
+                variant="ghost"
+                size="sm"
+                className="ml-2 text-muted-foreground cursor-not-allowed"
+                disabled
+                title="Cancellation not allowed within 24 hours of start time"
+            >
+                Non-refundable
+            </Button>
+        )
     }
 
     return (

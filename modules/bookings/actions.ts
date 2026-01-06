@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { Database } from '@/types/supabase'
+import { createNotification } from "@/modules/notifications/actions"
 
 export async function createBooking(prevState: unknown, formData: FormData) {
     const supabase = await createClient()
@@ -26,7 +27,7 @@ export async function createBooking(prevState: unknown, formData: FormData) {
         // 2. Fetch Experience Data
         const { data: experience, error: expError } = await supabase
             .from('experiences')
-            .select('price, host_id, is_active, duration_minutes, start_time, end_time')
+            .select('title, price, host_id, is_active, duration_minutes, start_time, end_time')
             .eq('id', experienceId)
             .single()
 
@@ -79,33 +80,82 @@ export async function createBooking(prevState: unknown, formData: FormData) {
         }
 
         // 5. Insert Booking
-        const { data: booking, error: bookingError } = await supabase
+        // 5. Check for Existing Pending Booking (Idempotency)
+        const { data: existingBooking } = await supabase
             .from('bookings')
-            .insert({
-                user_id: user.id,
-                experience_id: experienceId,
-                host_id: experience.host_id,
-                booking_date: new Date(dateString).toISOString(),
-                attendees_count: guests,
-                total_amount: totalAmount,
-                host_earnings: hostEarnings,
-                service_fee: serviceFee,
-                commission_amount: commissionAmount,
-                status: 'pending_payment',
-                duration_minutes: experience.duration_minutes,
-                start_time: experience.start_time,
-                end_time: experience.end_time
-            })
             .select('id')
+            .eq('user_id', user.id)
+            .eq('experience_id', experienceId)
+            .eq('booking_date', new Date(dateString).toISOString())
+            .eq('status', 'pending_payment')
             .single()
 
-        if (bookingError) {
-            console.error("Booking Error:", bookingError)
-            return { error: "Failed to create booking. Please try again." }
+        let bookingId: string
+
+        if (existingBooking) {
+            // Update existing booking
+            const { error: updateError } = await supabase
+                .from('bookings')
+                .update({
+                    attendees_count: guests,
+                    total_amount: totalAmount,
+                    host_earnings: hostEarnings,
+                    service_fee: serviceFee,
+                    commission_amount: commissionAmount,
+                    // Update metadata in case it changed (though unlikely for same exp)
+                    duration_minutes: experience.duration_minutes,
+                    start_time: experience.start_time,
+                    end_time: experience.end_time
+                })
+                .eq('id', existingBooking.id)
+
+            if (updateError) {
+                console.error("Booking Update Error:", updateError)
+                return { error: "Failed to update existing booking." }
+            }
+            bookingId = existingBooking.id
+        } else {
+            // Insert new booking
+            const { data: booking, error: bookingError } = await supabase
+                .from('bookings')
+                .insert({
+                    user_id: user.id,
+                    experience_id: experienceId,
+                    host_id: experience.host_id,
+                    booking_date: new Date(dateString).toISOString(),
+                    attendees_count: guests,
+                    total_amount: totalAmount,
+                    host_earnings: hostEarnings,
+                    service_fee: serviceFee,
+                    commission_amount: commissionAmount,
+                    status: 'pending_payment',
+                    duration_minutes: experience.duration_minutes,
+                    start_time: experience.start_time,
+                    end_time: experience.end_time
+                })
+                .select('id')
+                .single()
+
+            if (bookingError) {
+                console.error("Booking Create Error:", bookingError)
+                return { error: "Failed to create booking. Please try again." }
+            }
+            bookingId = booking.id
+
+            // Notify Host
+            await createNotification({
+                userId: experience.host_id, // Host ID from experience fetch
+                title: "New Booking Request",
+                message: `You have received a new booking request for ${experience.title}.`,
+                link: "/vendor/bookings",
+                type: "info"
+            })
         }
 
         // Return booking ID for client-side redirection
-        return { success: true, bookingId: booking.id }
+        return { success: true, bookingId }
+
+
 
     } catch (error) {
         console.error("Create Booking Exception:", error)
@@ -140,7 +190,7 @@ export async function approveBooking(bookingId: string) {
     // 2. Fetch Booking
     const { data: booking, error: fetchError } = await supabase
         .from('bookings')
-        .select('*, experience:experiences(currency)')
+        .select('*, experience:experiences(title, currency)')
         .eq('id', bookingId)
         .single()
 
@@ -202,6 +252,17 @@ export async function approveBooking(bookingId: string) {
 
     revalidatePath('/admin/bookings')
     revalidatePath('/vendor/bookings')
+
+    // Notify Guest
+    if (booking.user_id) {
+        await createNotification({
+            userId: booking.user_id,
+            title: "Booking Confirmed",
+            message: `Your booking for ${booking.experience?.title || 'your trip'} has been confirmed!`,
+            link: "/account/orders",
+            type: "success"
+        })
+    }
     return { success: "Booking approved and payment captured" }
 }
 
@@ -210,7 +271,7 @@ export async function rejectBooking(bookingId: string) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return { error: "Unauthorized" }
 
-    const { data: booking } = await supabase.from('bookings').select('*').eq('id', bookingId).single()
+    const { data: booking } = await supabase.from('bookings').select('*, experience:experiences(title)').eq('id', bookingId).single()
     if (!booking) return { error: "Booking not found" }
 
     // PERMISSION CHECK: Host or Admin
@@ -251,6 +312,16 @@ export async function rejectBooking(bookingId: string) {
     await adminSupabase.from('bookings').update({ status: 'cancelled_by_host' }).eq('id', bookingId)
     revalidatePath('/admin/bookings')
     revalidatePath('/vendor/bookings')
+
+    if (booking.user_id) {
+        await createNotification({
+            userId: booking.user_id,
+            title: "Booking Rejected",
+            message: `Your booking for ${booking.experience?.title || 'an experience'} was declined by the host.`,
+            link: "/account/orders",
+            type: "error"
+        })
+    }
     return { success: "Booking rejected successfully" }
 }
 
@@ -261,7 +332,7 @@ export async function refundBooking(bookingId: string) {
 
     const { data: booking } = await supabase
         .from('bookings')
-        .select('*, experience:experiences(currency)')
+        .select('*, experience:experiences(title, currency)')
         .eq('id', bookingId)
         .single()
     if (!booking) return { error: "Booking not found" }
@@ -306,6 +377,16 @@ export async function refundBooking(bookingId: string) {
     await adminSupabase.from('bookings').update({ status: 'cancelled_by_host' }).eq('id', bookingId) // Or 'refunded' if that status exists
     revalidatePath('/admin/bookings')
     revalidatePath('/vendor/bookings')
+
+    if (booking.user_id) {
+        await createNotification({
+            userId: booking.user_id,
+            title: "Booking Refunded",
+            message: `Your booking for ${booking.experience?.title || 'an experience'} has been cancelled and refunded by the host.`,
+            link: "/account/orders",
+            type: "warning"
+        })
+    }
     return { success: "Booking refunded successfully" }
 }
 
@@ -314,7 +395,7 @@ export async function completeBooking(bookingId: string) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return { error: "Unauthorized" }
 
-    const { data: booking } = await supabase.from('bookings').select('*').eq('id', bookingId).single()
+    const { data: booking } = await supabase.from('bookings').select('*, experience:experiences(title)').eq('id', bookingId).single()
     if (!booking) return { error: "Booking not found" }
 
     // PERMISSION CHECK: Admin only for manual completion usually, or Host if date passed? 
@@ -336,6 +417,16 @@ export async function completeBooking(bookingId: string) {
 
     revalidatePath('/admin/bookings')
     revalidatePath('/vendor/bookings')
+
+    if (booking.user_id) {
+        await createNotification({
+            userId: booking.user_id,
+            title: "How was your trip?",
+            message: `Your experience ${booking.experience?.title || ''} is complete. Please leave a review!`,
+            link: "/account/orders",
+            type: "info"
+        })
+    }
     return { success: "Booking marked as completed" }
 }
 
@@ -352,7 +443,7 @@ export async function cancelBooking(bookingId: string) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return { error: "Unauthorized" }
 
-    const { data: booking } = await supabase.from('bookings').select('*').eq('id', bookingId).single()
+    const { data: booking } = await supabase.from('bookings').select('*, experience:experiences(title)').eq('id', bookingId).single()
     if (!booking) return { error: "Booking not found" }
 
     // Allow user to cancel their own booking
@@ -360,6 +451,24 @@ export async function cancelBooking(bookingId: string) {
 
     // Logic: If 'pending_host_approval' -> Iyzipay Cancel (Void)
     // If 'confirmed' -> Iyzipay Refund (Refund)
+
+    // PROHIBIT CANCELLATION WITHIN LAST 24 HOURS
+    const bookingDate = new Date(booking.booking_date)
+    // Parse start_time (assuming "HH:MM:SS" format from Postgres time column)
+    // If start_time is null, use bookingDate (midnight)
+    let bookingDateTime = new Date(bookingDate)
+
+    if (booking.start_time) {
+        const [hours, minutes] = booking.start_time.split(':').map(Number)
+        bookingDateTime.setHours(hours, minutes, 0, 0)
+    }
+
+    const timeDiff = bookingDateTime.getTime() - Date.now()
+    const hoursDiff = timeDiff / (1000 * 60 * 60)
+
+    if (hoursDiff < 24) {
+        return { error: "Cancellation is not allowed within 24 hours of the experience start time. No refund available." }
+    }
 
     if (booking.status === 'pending_host_approval' && booking.payment_id) {
         // Void Pre-Auth
@@ -409,5 +518,15 @@ export async function cancelBooking(bookingId: string) {
 
     await adminSupabase.from('bookings').update({ status: 'cancelled_by_user' }).eq('id', bookingId)
     revalidatePath('/account/orders')
+
+    if (booking.host_id) {
+        await createNotification({
+            userId: booking.host_id,
+            title: "Booking Cancelled",
+            message: `The booking for ${booking.experience?.title || 'an experience'} has been cancelled by the guest.`,
+            link: `/vendor/bookings`,
+            type: "warning"
+        })
+    }
     return { success: "Booking canceled successfully" }
 }

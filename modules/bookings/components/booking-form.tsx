@@ -231,7 +231,7 @@ export function BookingForm({ price, serviceFeeRate, experienceId, blockedDates 
                                 {date ? format(date, "PPP") : <span>Pick a date</span>}
                             </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
+                        <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="center">
                             <Calendar
                                 mode="single"
                                 selected={date}
@@ -241,6 +241,7 @@ export function BookingForm({ price, serviceFeeRate, experienceId, blockedDates 
                                 }}
                                 disabled={(date) => date < new Date() || isDateBlocked(date)}
                                 initialFocus
+                                className="w-full"
                             />
                         </PopoverContent>
                     </Popover>
@@ -253,7 +254,7 @@ export function BookingForm({ price, serviceFeeRate, experienceId, blockedDates 
                                 <ChevronDown className="h-4 w-4 opacity-50" />
                             </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-full p-4" align="start">
+                        <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-4" align="center">
                             <div className="flex items-center justify-between">
                                 <span className="font-medium">Guests</span>
                                 <div className="flex items-center gap-3">

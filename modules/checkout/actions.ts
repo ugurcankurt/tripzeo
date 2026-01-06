@@ -110,6 +110,7 @@ export async function initializePayment(bookingId: string) {
             return { error: result.errorMessage }
         }
 
+        console.log("Iyzipay Init Success. Form Content Length:", result.checkoutFormContent?.length)
         return { htmlContent: result.checkoutFormContent }
     } catch (error: unknown) {
         console.error("Iyzipay Exception:", error)

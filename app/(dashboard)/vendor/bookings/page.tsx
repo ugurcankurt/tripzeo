@@ -8,24 +8,40 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { User, Mail, DollarSign } from "lucide-react"
+import { User, Mail, DollarSign, MessageSquare } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { BookingActions } from "@/components/dashboard/booking-actions"
 import { GuestReviewDialog } from "@/components/dashboard/guest-review-dialog"
 import { BookingTimeInfo } from "@/modules/bookings/components/booking-time-info"
 import { BookingStatusBadge } from "@/modules/bookings/components/booking-status-badge"
+// import { ChatSheet } from "@/components/messaging/chat-sheet" // Deprecated
 import { requireHost } from "@/lib/auth/guards"
 import { ErrorState } from "@/components/shared/error-state"
 import { EmptyState } from "@/components/shared/empty-state"
 import { Tables } from "@/types/supabase"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { redirect } from "next/navigation"
 
 type VendorBookingData = Tables<'bookings'> & {
     experience: Pick<Tables<'experiences'>, 'title' | 'images'> | null
-    guest: Pick<Tables<'profiles'>, 'full_name' | 'email' | 'avatar_url'> | null
+    guest: Pick<Tables<'profiles'>, 'full_name' | 'email' | 'avatar_url' | 'phone'> | null
     reviews: Pick<Tables<'reviews'>, 'reviewer_id'>[]
 }
 
-export default async function VendorBookingsPage() {
+export default async function VendorBookingsPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
+    const params = await searchParams
+    const chatBookingId = typeof params.chat === 'string' ? params.chat : null
+
+    // Redirect removed to support GlobalChatWidget overlay
+    // if (chatBookingId) {
+    //     redirect(`/vendor/messages?chat=${chatBookingId}`)
+    // }
+
     let user, profile
 
     try {
@@ -58,7 +74,7 @@ export default async function VendorBookingsPage() {
         .select(`
         *,
         experience:experiences(title, images),
-        guest:profiles!user_id(full_name, email, avatar_url),
+        guest:profiles!user_id(full_name, email, avatar_url, phone),
         reviews(reviewer_id)
     `)
         .eq('host_id', user.id)
@@ -90,7 +106,8 @@ export default async function VendorBookingsPage() {
                 </div>
             </div>
 
-            <div className="rounded-md border bg-card">
+            {/* Desktop View: Table */}
+            <div className="hidden md:block rounded-md border bg-card">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -119,10 +136,8 @@ export default async function VendorBookingsPage() {
                                                 <span className="font-medium text-sm">
                                                     {booking.guest?.full_name || 'Guest'}
                                                 </span>
-                                                <div className="flex items-center text-xs text-muted-foreground gap-1">
-                                                    <Mail className="h-3 w-3" />
-                                                    {booking.guest?.email}
-                                                </div>
+                                                {/* Contact info hidden by default - only name shown */}
+                                                {/* <span className="text-xs text-muted-foreground italic">View details</span> */}
                                             </div>
                                         </div>
                                     </GuestReviewDialog>
@@ -163,11 +178,105 @@ export default async function VendorBookingsPage() {
                                             hasReviewed={booking.reviews?.some((r) => r.reviewer_id === user?.id)}
                                         />
                                     )}
+                                    <div className="mt-2">
+                                        <div className="mt-2">
+                                            <div className="mt-2">
+                                                <Link href={`?chat=${booking.id}`} scroll={false}>
+                                                    <Button variant="outline" size="sm" className="gap-2 w-full">
+                                                        <MessageSquare className="h-4 w-4" />
+                                                        Chat
+                                                    </Button>
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
+            </div>
+
+            {/* Mobile View: Cards */}
+            <div className="md:hidden space-y-4">
+                {bookings?.map((booking) => (
+                    <div key={booking.id} className="rounded-lg border bg-card text-card-foreground shadow-sm">
+                        <div className="p-4 space-y-4">
+                            {/* Header: Guest Info & Status */}
+                            <div className="flex items-start justify-between">
+                                <GuestReviewDialog guestId={booking.user_id} bookingId={booking.id} guestName={booking.guest?.full_name || undefined}>
+                                    <div className="flex items-center gap-3 cursor-pointer">
+                                        <Avatar className="h-10 w-10 border">
+                                            <AvatarImage src={booking.guest?.avatar_url || ''} />
+                                            <AvatarFallback>
+                                                {booking.guest?.full_name?.charAt(0) || 'M'}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        <div>
+                                            <p className="font-medium text-sm leading-none">
+                                                {booking.guest?.full_name || 'Guest'}
+                                            </p>
+                                            {/* Contact info hidden by default - only name shown */}
+                                        </div>
+                                    </div>
+                                </GuestReviewDialog>
+                                <BookingStatusBadge status={booking.status || 'pending_payment'} />
+                            </div>
+
+                            {/* Details Grid */}
+                            <div className="grid grid-cols-2 gap-3 py-3 border-t border-b border-dashed">
+                                <div>
+                                    <p className="text-xs text-muted-foreground mb-1">Experience</p>
+                                    <p className="font-medium text-sm line-clamp-2 leading-snug">
+                                        {booking.experience?.title}
+                                    </p>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-xs text-muted-foreground mb-1">Earnings</p>
+                                    <p className="font-bold text-green-600 flex items-center justify-end gap-1">
+                                        <DollarSign className="h-3 w-3" />
+                                        {booking.host_earnings}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-muted-foreground mb-1">Date & Time</p>
+                                    <BookingTimeInfo
+                                        bookingDate={booking.booking_date}
+                                        startTime={booking.start_time}
+                                        endTime={booking.end_time}
+                                        durationMinutes={booking.duration_minutes}
+                                    />
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-xs text-muted-foreground mb-1">Guests</p>
+                                    <p className="font-medium text-sm flex items-center justify-end gap-1">
+                                        <User className="h-3 w-3" />
+                                        {booking.attendees_count} People
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Actions Footer */}
+                            {(booking.status === 'pending_host_approval' || booking.status === 'confirmed' || booking.status === 'completed' || booking.status === 'paid_out') && (
+                                <div className="flex justify-end pt-1">
+                                    <BookingActions
+                                        bookingId={booking.id}
+                                        status={booking.status}
+                                        hasReviewed={booking.reviews?.some((r) => r.reviewer_id === user?.id)}
+                                    />
+                                </div>
+                            )}
+                            <div className="flex justify-end pt-1">
+                                <Link href={`?chat=${booking.id}`} scroll={false}>
+                                    <Button variant="outline" size="sm" className="gap-2">
+                                        <MessageSquare className="h-4 w-4" />
+                                        Chat
+                                    </Button>
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                ))}
             </div>
         </div>
     )

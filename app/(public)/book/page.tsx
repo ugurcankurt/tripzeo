@@ -93,10 +93,10 @@ export default async function BookPage({ searchParams }: { searchParams: Promise
 
             <h1 className="text-3xl font-bold mb-8">Confirm and Pay</h1>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-12">
                 {/* LEFT: Guest Details & Payment Info */}
-                <div>
-                    <div className="mb-8">
+                <div className="order-last lg:order-none">
+                    <div className="lg:mb-8">
                         <h2 className="text-xl font-semibold mb-4">Your Details</h2>
                         {user ? (
                             <div className="p-4 bg-muted/50 rounded-lg border mb-6 space-y-4">
@@ -145,8 +145,8 @@ export default async function BookPage({ searchParams }: { searchParams: Promise
                 </div>
 
                 {/* RIGHT: Order Summary */}
-                <div>
-                    <Card className="sticky top-24">
+                <div className="order-first lg:order-none">
+                    <Card className="lg:sticky lg:top-24">
                         <CardHeader>
                             <div className="flex gap-4">
 

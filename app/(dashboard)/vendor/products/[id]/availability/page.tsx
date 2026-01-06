@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { Tables } from "@/types/supabase"
 import { requireAuth } from "@/lib/auth/guards"
 import { notFound, redirect } from "next/navigation"
-import { AvailabilityCalendar } from "@/modules/availability/components/availability-calendar"
+// import { AvailabilityCalendar } from "@/modules/availability/components/availability-calendar"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
@@ -16,16 +16,7 @@ export default async function AvailabilityPage({ params }: { params: { id: strin
         .from('experiences')
         .select('title, host_id')
         .eq('id', id)
-        .single() // .single returns T not T[] so returns<T>() is correct? No, returns check generic. Usually returns<Type>() is for rows. .single() transforms to single. Correct way is .returns<Type>() where Type is the Row shape.
-        // Actually supabase js client types: .returns<T>() sets data type to T (if single, T; if list, T[]). Wait, typically T represents the row.
-        // Let's use Pick<Tables<'experiences'>, 'title' | 'host_id'>
-        // BUT: for single() it might expect the single object type? 
-        // No, returns() overrides the R generic which is usually result array or single based on method chain. 
-        // If I put returns<T>(), and use single(), data will be T. 
-        // If I put returns<T[]>(), and use single(), data might be T (types are smart). 
-        // Let's try returns<Pick...>() without array brackets because .select() usually returns array, but single makes it object. 
-        // Safe bet: .returns<Pick<Tables<'experiences'>, 'title' | 'host_id'>>() 
-        // Wait, strict mode usually wants the row type passed to returns.
+        .single()
         .returns<Pick<Tables<'experiences'>, 'title' | 'host_id'>>()
 
     if (!experience) notFound()
@@ -44,7 +35,10 @@ export default async function AvailabilityPage({ params }: { params: { id: strin
                 <p className="text-muted-foreground">Manage Availability</p>
             </div>
 
-            <AvailabilityCalendar experienceId={id} />
+            {/* <AvailabilityCalendar experienceId={id} /> */}
+            <div className="p-10 text-center border border-dashed rounded-lg bg-muted/50">
+                <p className="text-muted-foreground">Availability Calendar component is missing. Please restore module.</p>
+            </div>
         </div>
     )
 }

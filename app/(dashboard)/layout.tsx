@@ -4,6 +4,8 @@ import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/s
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { requireAuth } from "@/lib/auth/guards"
+import { NotificationBell } from "@/components/dashboard/notification-bell"
+import { GlobalChatWidget } from "@/components/messaging/global-chat-widget"
 
 export default async function DashboardLayout({
     children,
@@ -33,10 +35,14 @@ export default async function DashboardLayout({
                         <div className="mr-4 hidden md:flex">
                             <span className="text-sm text-muted-foreground">Welcome, <span className="font-medium text-foreground">{user.user_metadata.full_name || user.email}</span></span>
                         </div>
+                        <div className="ml-auto flex items-center gap-2">
+                            <NotificationBell />
+                        </div>
                     </header>
-                    <main className="flex-1 p-4 md:p-8">
+                    <main className="flex-1 p-4 md:p-8 relative">
                         {children}
                     </main>
+                    <GlobalChatWidget currentUserId={user.id} />
                 </SidebarInset>
             </div>
         </SidebarProvider>

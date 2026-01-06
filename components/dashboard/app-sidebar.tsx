@@ -1,6 +1,6 @@
 'use client'
 
-import { Gauge, User, ShoppingBag, LogOut, Briefcase, CreditCard, FileText, Calendar, Users, ChartLine, Settings, Tags } from "lucide-react"
+import { Gauge, User, ShoppingBag, LogOut, Briefcase, CreditCard, FileText, Calendar, Users, ChartLine, Settings, Tags, MessageSquare } from "lucide-react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
@@ -134,14 +134,18 @@ export function AppSidebar({ userRole = 'user' }: { userRole?: 'user' | 'host' |
                             </SidebarMenuItem>
 
                             {!pathname.startsWith('/vendor') && (
-                                <SidebarMenuItem>
-                                    <SidebarMenuButton asChild isActive={pathname === "/account/orders"} className="w-full justify-start">
-                                        <Link href="/account/orders">
-                                            <ShoppingBag className="mr-2 h-4 w-4" />
-                                            My Bookings
-                                        </Link>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
+                                <>
+                                    <SidebarMenuItem>
+                                        <SidebarMenuButton asChild isActive={pathname === "/account/orders"} className="w-full justify-start">
+                                            <Link href="/account/orders">
+                                                <ShoppingBag className="mr-2 h-4 w-4" />
+                                                My Bookings
+                                            </Link>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+
+                                    {/* Messages link removed - Replaced by Global Widget */}
+                                </>
                             )}
 
                             {/* Usta/Vendor Menüsü */}
@@ -166,6 +170,7 @@ export function AppSidebar({ userRole = 'user' }: { userRole?: 'user' | 'host' |
                                             </Link>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
+                                    {/* Messages link removed - Replaced by Global Widget */}
                                     <SidebarMenuItem>
                                         <SidebarMenuButton asChild isActive={pathname === "/vendor/calendar"} className="w-full justify-start">
                                             <Link href="/vendor/calendar">

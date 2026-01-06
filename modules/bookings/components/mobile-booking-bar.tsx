@@ -5,6 +5,9 @@ import {
     Sheet,
     SheetContent,
     SheetTrigger,
+    SheetTitle,
+    SheetHeader,
+    SheetDescription,
 } from "@/components/ui/sheet"
 import { BookingForm } from "./booking-form"
 import Link from "next/link"
@@ -31,7 +34,7 @@ export function MobileBookingBar(props: MobileBookingBarProps) {
     }).format(price || 0)
 
     return (
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t z-50 lg:hidden safe-area-bottom shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t z-[60] lg:hidden safe-area-bottom">
             <div className="flex items-center justify-between max-w-7xl mx-auto gap-4">
                 <div className="flex flex-col">
                     <span className="font-bold text-lg">{formattedPrice}</span>
@@ -58,10 +61,17 @@ export function MobileBookingBar(props: MobileBookingBarProps) {
                                 Request to Book
                             </Button>
                         </SheetTrigger>
-                        <SheetContent side="bottom" className="h-[85vh] rounded-t-xl overflow-y-auto px-4 py-6">
-                            <div className="max-w-md mx-auto">
-                                <h3 className="text-lg font-bold mb-4">Complete your booking</h3>
-                                <BookingForm {...props} />
+                        <SheetContent side="bottom" className="h-[100dvh] rounded-none p-0 overflow-y-auto w-full max-w-none border-none z-50">
+                            <div className="h-full flex flex-col max-w-md mx-auto w-full px-4 py-6 pb-32">
+                                <SheetHeader className="mb-6 text-left p-0">
+                                    <SheetTitle className="text-2xl font-bold">Complete your booking</SheetTitle>
+                                    <SheetDescription className="text-sm text-muted-foreground">
+                                        Select your dates and guests to proceed with the booking.
+                                    </SheetDescription>
+                                </SheetHeader>
+                                <div className="flex-1">
+                                    <BookingForm {...props} />
+                                </div>
                             </div>
                         </SheetContent>
                     </Sheet>
