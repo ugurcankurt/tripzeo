@@ -21,9 +21,9 @@ export default async function TicketPage({ params }: { params: { id: string } })
         .from('bookings')
         .select(`
             *,
-            experience:experiences(title, duration_minutes, location_city, images, location_address, currency),
-            host:profiles!bookings_host_id_fkey(full_name, email, avatar_url, phone),
-            guest:profiles!bookings_user_id_fkey(full_name, email)
+            experience:experiences(*),
+            host:profiles!bookings_host_id_fkey(*),
+            guest:profiles!bookings_user_id_fkey(*)
         `)
         .eq('id', id)
         .single() // ... existing lines
