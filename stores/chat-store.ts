@@ -96,11 +96,11 @@ export const useChatStore = create<ChatState>((set, get) => ({
                 })
 
                 // Calculate unread count
-                const unreadCount = formatted.reduce((acc, conv) => {
-                    if (conv.last_message && !conv.last_message.is_read && conv.last_message.sender_id !== userId) {
-                        return acc + 1 // This is "unread threads", not total messages. Naive but standard.
-                    }
-                    return acc
+
+                // Calculate unread count (Total unread messages)
+                const unreadCount = data.reduce((total: number, conv: any) => {
+                    const threadUnread = (conv.messages || []).filter((m: any) => !m.is_read && m.sender_id !== userId).length
+                    return total + threadUnread
                 }, 0)
 
                 set({ conversations: formatted, totalUnreadCount: unreadCount, initialized: true })
@@ -312,11 +312,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
                 }
             })
 
-            const unreadCount = formatted.reduce((acc, conv) => {
-                if (conv.last_message && !conv.last_message.is_read && conv.last_message.sender_id !== user.id) {
-                    return acc + 1
-                }
-                return acc
+
+            const unreadCount = data.reduce((total: number, conv: any) => {
+                const threadUnread = (conv.messages || []).filter((m: any) => !m.is_read && m.sender_id !== user.id).length
+                return total + threadUnread
             }, 0)
 
             set({ conversations: formatted, totalUnreadCount: unreadCount })

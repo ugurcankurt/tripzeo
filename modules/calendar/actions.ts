@@ -39,8 +39,6 @@ export async function getCalendarData(monthStart: Date, monthEnd: Date, experien
     if (bookingsError) throw bookingsError
 
     // 2. Fetch Blocked Dates
-    // Note: experience_availability stores simple dates (YYYY-MM-DD)
-    // We filter by date range.
     let availabilityQuery = supabase
         .from('experience_availability')
         .select(`
@@ -53,10 +51,6 @@ export async function getCalendarData(monthStart: Date, monthEnd: Date, experien
                 title
             )
         `)
-        // Logic: Find entries where date is within range
-        // Since 'date' is a date type, casting might be needed if comparing with ISO string directly, 
-        // but Supabase usually handles YYYY-MM-DD vs Timestamp well.
-        // Let's use string comparison for safety.
         .gte('date', startStr.split('T')[0])
         .lte('date', endStr.split('T')[0])
         .eq('is_blocked', true)
@@ -64,14 +58,24 @@ export async function getCalendarData(monthStart: Date, monthEnd: Date, experien
     if (experienceId && experienceId !== 'all') {
         availabilityQuery = availabilityQuery.eq('experience_id', experienceId)
     } else {
-        // If getting all, ensure we only get this host's experiences
-        // Doing a join filter
-        // "experiences.host_id" must be user.id
-        // Filter by inner join is tricky in simple syntax, 
-        // easiest is to verify ownership or trust RLS policies.
-        // We trust RLS, but for performance, we might want to filter?
-        // Let's rely on RLS: "Hosts can manage their own experience availability."
-        // That policy ensures we only see our own.
+        // SECURITY FIX: Explicitly filter by this host's experiences to prevent data leak
+        // Fetch all experience IDs for this host first
+        const { data: myExperiences } = await supabase
+            .from('experiences')
+            .select('id')
+            .eq('host_id', user.id)
+
+        const myExperienceIds = myExperiences?.map(e => e.id) || []
+
+        // If no experiences, return empty blocked dates
+        if (myExperienceIds.length === 0) {
+            return {
+                bookings,
+                blockedDates: []
+            }
+        }
+
+        availabilityQuery = availabilityQuery.in('experience_id', myExperienceIds)
     }
 
     const { data: blockedDates, error: availabilityError } = await availabilityQuery.returns<CalendarBlockedDate[]>()

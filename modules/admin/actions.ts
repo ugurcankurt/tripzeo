@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
+import { createNotification } from "@/modules/notifications/actions"
 
 export async function approveVendor(vendorId: string) {
     const supabase = await createClient()
@@ -23,6 +24,15 @@ export async function approveVendor(vendorId: string) {
 
     revalidatePath('/admin/applications')
     revalidatePath(`/admin/users/${vendorId}`) // Optional: if there's a detail page
+
+    // Notify User
+    await createNotification({
+        userId: vendorId,
+        title: "Application Approved",
+        message: "Congratulations! Your application to become a host has been approved. You can now start listing your experiences.",
+        link: "/vendor",
+        type: "success"
+    })
 }
 
 export async function rejectVendor(vendorId: string) {
@@ -43,6 +53,15 @@ export async function rejectVendor(vendorId: string) {
     }
 
     revalidatePath('/admin/applications')
+
+    // Notify User
+    await createNotification({
+        userId: vendorId,
+        title: "Application Status",
+        message: "Your application to become a host has been rejected.",
+        link: "/",
+        type: "error"
+    })
 }
 export async function getVendorDetails(vendorId: string) {
     const supabase = await createClient()

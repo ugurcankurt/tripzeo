@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from "react"
-import { Bell } from "lucide-react"
+import { Bell, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
     Popover,
@@ -21,7 +21,8 @@ export function NotificationBell() {
         unreadCount,
         initialize,
         markAsRead,
-        markAllAsRead
+        markAllAsRead,
+        removeNotification
     } = useNotificationStore()
 
     const [userId, setUserId] = useState<string | null>(null)
@@ -47,6 +48,11 @@ export function NotificationBell() {
             setOpen(false)
             router.push(notification.link)
         }
+    }
+
+    const handleDelete = (e: React.MouseEvent, id: string) => {
+        e.stopPropagation()
+        removeNotification(id)
     }
 
     if (!userId) return null
@@ -84,32 +90,41 @@ export function NotificationBell() {
                     ) : (
                         <div className="flex flex-col divide-y">
                             {notifications.map((notification) => (
-                                <button
-                                    key={notification.id}
-                                    className={cn(
-                                        "flex flex-col items-start gap-1 p-4 text-left hover:bg-muted/50 transition-colors",
-                                        !notification.is_read && "bg-muted/20"
-                                    )}
-                                    onClick={() => handleNotificationClick(notification)}
-                                >
-                                    <div className="flex items-center gap-2 w-full">
-                                        <span className={cn(
-                                            "font-medium text-sm flex-1",
-                                            !notification.is_read && "text-foreground"
-                                        )}>
-                                            {notification.title}
-                                        </span>
-                                        {!notification.is_read && (
-                                            <span className="h-2 w-2 rounded-full bg-blue-600" />
+                                <div key={notification.id} className="group relative w-full hover:bg-muted/50 transition-colors">
+                                    <button
+                                        className={cn(
+                                            "flex flex-col items-start gap-1 p-4 text-left w-full",
+                                            !notification.is_read && "bg-muted/20"
                                         )}
-                                    </div>
-                                    <p className="text-sm text-muted-foreground line-clamp-2">
-                                        {notification.message}
-                                    </p>
-                                    <span className="text-xs text-muted-foreground mt-1">
-                                        {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
-                                    </span>
-                                </button>
+                                        onClick={() => handleNotificationClick(notification)}
+                                    >
+                                        <div className="flex items-center gap-2 w-full pr-6">
+                                            <span className={cn(
+                                                "font-medium text-sm flex-1",
+                                                !notification.is_read && "text-foreground"
+                                            )}>
+                                                {notification.title}
+                                            </span>
+                                            {!notification.is_read && (
+                                                <span className="h-2 w-2 rounded-full bg-blue-600 flex-shrink-0" />
+                                            )}
+                                        </div>
+                                        <p className="text-sm text-muted-foreground line-clamp-2">
+                                            {notification.message}
+                                        </p>
+                                        <span className="text-xs text-muted-foreground mt-1">
+                                            {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
+                                        </span>
+                                    </button>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="absolute top-2 right-2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-red-600 hover:bg-transparent"
+                                        onClick={(e) => handleDelete(e, notification.id)}
+                                    >
+                                        <Trash2 className="h-3 w-3" />
+                                    </Button>
+                                </div>
                             ))}
                         </div>
                     )}

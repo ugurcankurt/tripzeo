@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import { requireAuth } from "@/lib/auth/guards"
+import { createNotification } from "@/modules/notifications/actions"
 
 export async function processPayout(bookingId: string, receiptUrl?: string) {
     try {
@@ -74,6 +75,16 @@ export async function processPayout(bookingId: string, receiptUrl?: string) {
         }
 
         revalidatePath('/admin/payouts')
+
+        // Notify Host
+        await createNotification({
+            userId: booking.host_id,
+            title: "Payout Processed",
+            message: `A payout of ${booking.host_earnings} USD for booking #${bookingId.slice(0, 8)} has been processed.`,
+            link: "/vendor/finance",
+            type: "success"
+        })
+
         return { success: true }
 
     } catch (error) {

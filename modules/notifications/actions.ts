@@ -54,3 +54,25 @@ export async function markNotificationAsRead(id: string) {
 
     return { success: true }
 }
+
+export async function deleteNotification(id: string) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+        return { error: "Unauthorized" }
+    }
+
+    const { error } = await supabase
+        .from('notifications')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', user.id) // Ensure ownership
+
+    if (error) {
+        console.error("Failed to delete notification:", error)
+        return { error: "Failed to delete notification" }
+    }
+
+    return { success: true }
+}

@@ -28,6 +28,25 @@ export default async function VendorCalendarPage() {
         getCalendarData(today, nextYear)
     ])
 
+    if (!experiences || experiences.length === 0) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
+                <div className="p-4 rounded-full bg-muted">
+                    <Loader2 className="h-8 w-8 text-muted-foreground" />
+                </div>
+                <h2 className="text-2xl font-bold tracking-tight">No Experiences Found</h2>
+                <p className="text-muted-foreground max-w-md">
+                    You haven't listed any experiences yet. Create an experience to start managing your availability.
+                </p>
+                <div className="pt-4">
+                    <a href="/vendor/products/new" className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+                        Create Experience
+                    </a>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">

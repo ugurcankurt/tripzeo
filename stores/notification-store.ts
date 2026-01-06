@@ -14,6 +14,7 @@ interface NotificationState {
     markAsRead: (id: string) => Promise<void>
     markAllAsRead: () => Promise<void>
     addNotification: (notification: Notification) => void
+    removeNotification: (id: string) => Promise<void>
 }
 
 export const useNotificationStore = create<NotificationState>((set, get) => ({
@@ -117,5 +118,26 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
             .from('notifications')
             .update({ is_read: true })
             .in('id', ids)
+    },
+
+    removeNotification: async (id: string) => {
+        // Optimistic update
+        const state = get()
+        const notification = state.notifications.find(n => n.id === id)
+        const wasUnread = notification && !notification.is_read
+
+        set(state => ({
+            notifications: state.notifications.filter(n => n.id !== id),
+            unreadCount: wasUnread ? Math.max(0, state.unreadCount - 1) : state.unreadCount
+        }))
+
+        // Call Server Action
+        const { deleteNotification } = await import('@/modules/notifications/actions')
+        const result = await deleteNotification(id)
+
+        if (result.error) {
+            console.error("Error removing notification in store:", result.error)
+            // Revert? (Optional: fetch again or add back)
+        }
     }
 }))

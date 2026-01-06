@@ -30,7 +30,7 @@ export default async function DashboardLayout({
             <div className="flex min-h-screen w-full">
                 <AppSidebar userRole={userRole} />
                 <SidebarInset className="flex w-full flex-col">
-                    <header className="flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
+                    <header className="flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4 sticky top-0 z-10">
                         <SidebarTrigger className="-ml-1" />
                         <div className="mr-4 hidden md:flex">
                             <span className="text-sm text-muted-foreground">Welcome, <span className="font-medium text-foreground">{user.user_metadata.full_name || user.email}</span></span>
