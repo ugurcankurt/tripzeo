@@ -6,7 +6,7 @@ import { Download } from "lucide-react"
 import { Tables } from "@/types/supabase"
 
 type PayoutWithHost = Pick<Tables<'bookings'>, 'id' | 'host_earnings' | 'status'> & {
-    host: Tables<'profiles'>
+    host: Pick<Tables<'profiles'>, 'full_name' | 'email' | 'iban' | 'bank_name' | 'account_holder' | 'routing_number' | 'account_number' | 'bank_code' | 'bank_country'> | null
 }
 
 export function ExportPayoutsButton({ payouts }: { payouts: PayoutWithHost[] }) {
@@ -31,22 +31,25 @@ export function ExportPayoutsButton({ payouts }: { payouts: PayoutWithHost[] }) 
             "Bank Name"
         ]
 
-        const rows = payouts.filter(p => p.status !== 'paid_out').map(p => {
-            const host = p.host;
-            return [
-                `"${host.account_holder || host.full_name}"`, // Quote for safety
-                "USD", // Payout Currency
-                p.host_earnings.toFixed(2),
-                `"${p.id}"`, // Reference
-                host.email,
-                host.bank_country || "TR",
-                host.iban || "",
-                host.bank_code || "",
-                host.routing_number || "", // Exclusive to US
-                host.account_number || "", // Exclusive to US
-                `"${host.bank_name || ""}"`
-            ].join(",")
-        })
+        // Filter out items without host before mapping
+        const rows = payouts
+            .filter(p => p.status !== 'paid_out' && p.host)
+            .map(p => {
+                const host = p.host!;
+                return [
+                    `"${host.account_holder || host.full_name}"`, // Quote for safety
+                    "USD", // Payout Currency
+                    p.host_earnings.toFixed(2),
+                    `"${p.id}"`, // Reference
+                    host.email,
+                    host.bank_country || "TR",
+                    host.iban || "",
+                    host.bank_code || "",
+                    host.routing_number || "", // Exclusive to US
+                    host.account_number || "", // Exclusive to US
+                    `"${host.bank_name || ""}"`
+                ].join(",")
+            })
 
         const csvContent = headers.join(",") + "\n" + rows.join("\n");
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
