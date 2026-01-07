@@ -101,7 +101,8 @@ export async function initializePayment(bookingId: string) {
         const result = await new Promise<any>((resolve, reject) => {
             // Use PreAuth initialization endpoint
             if (!iyzipay) {
-                return reject(new Error("Payment configuration missing"))
+                const debugInfo = `API_KEY=${!!process.env.IYZIPAY_API_KEY}, SECRET=${!!process.env.IYZIPAY_SECRET_KEY}, URI=${!!process.env.IYZIPAY_URI}`
+                return reject(new Error(`Payment configuration missing. Env Status: ${debugInfo}`))
             }
             iyzipay.checkoutFormInitializePreAuth.create(request, (err: any, result: any) => {
                 if (err) reject(err)
