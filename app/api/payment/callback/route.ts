@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
-import iyzipay from '@/lib/iyzipay'
+import { iyzipayClient } from '@/lib/iyzipay-client'
 import { Database } from '@/types/supabase'
 
 export async function POST(request: NextRequest) {
@@ -14,18 +14,10 @@ export async function POST(request: NextRequest) {
 
         // Iyzipay'den sonucu sorgula
         // Promise wrapper kullanıyoruz çünkü iyzipay callback tabanlı
-        const result = await new Promise<any>((resolve, reject) => {
-            if (!iyzipay) {
-                return reject(new Error("Payment configuration missing"))
-            }
-            iyzipay.checkoutForm.retrieve({
-                locale: 'en',
-                token: token
-            }, (err: any, result: any) => {
-                if (err) reject(err)
-                else resolve(result)
-            })
-        })
+        const result = await iyzipayClient.post('/payment/iyzipay/checkoutform/auth/ecom/detail', {
+            locale: 'en',
+            token: token
+        });
 
         if (result.status !== 'success' || result.paymentStatus !== 'SUCCESS') {
             // Ödeme başarısız

@@ -164,7 +164,7 @@ export async function createBooking(prevState: unknown, formData: FormData) {
     }
 }
 
-import iyzipay from "@/lib/iyzipay"
+import { iyzipayClient } from "@/lib/iyzipay-client"
 
 import { User } from "@supabase/supabase-js"
 import { Tables } from "@/types/supabase"
@@ -217,15 +217,7 @@ export async function approveBooking(bookingId: string) {
             }
 
             // Call Iyzipay Post-Auth (Capture)
-            if (!iyzipay) {
-                return { error: "Payment configuration missing. Cannot capture payment." }
-            }
-            const result = await new Promise<any>((resolve, reject) => {
-                iyzipay!.paymentPostAuth.create(request, (err: any, result: any) => {
-                    if (err) reject(err)
-                    else resolve(result)
-                })
-            })
+            const result = await iyzipayClient.post('/payment/iyzipay/auth/postauth', request);
 
             if (result.status !== 'success') {
                 console.error("Iyzipay Capture Error:", result.errorMessage)
@@ -291,15 +283,7 @@ export async function rejectBooking(bookingId: string) {
                 paymentId: booking.payment_id,
                 ip: '85.34.78.112',
             }
-            const result = await new Promise<any>((resolve, reject) => {
-                if (!iyzipay) {
-                    return reject(new Error("Payment configuration missing"))
-                }
-                iyzipay.cancel.create(request, (err: any, result: any) => {
-                    if (err) reject(err)
-                    else resolve(result)
-                })
-            })
+            const result = await iyzipayClient.post('/payment/iyzipay/auth/cancel', request);
 
             if (result.status !== 'success') {
                 console.error("Iyzipay Cancel Error:", result.errorMessage)
@@ -359,15 +343,7 @@ export async function refundBooking(bookingId: string) {
                 ip: '85.34.78.112',
                 currency: booking.experience?.currency || 'USD'
             }
-            const result = await new Promise<any>((resolve, reject) => {
-                if (!iyzipay) {
-                    return reject(new Error("Payment configuration missing"))
-                }
-                iyzipay.refund.create(request, (err: any, result: any) => {
-                    if (err) reject(err)
-                    else resolve(result)
-                })
-            })
+            const result = await iyzipayClient.post('/payment/iyzipay/auth/refund', request);
 
             if (result.status !== 'success') {
                 console.error("Iyzipay Refund Error:", result.errorMessage)
@@ -494,15 +470,7 @@ export async function cancelBooking(bookingId: string) {
                 paymentId: booking.payment_id,
                 ip: '85.34.78.112',
             }
-            const result = await new Promise<any>((resolve, reject) => {
-                if (!iyzipay) {
-                    return reject(new Error("Payment configuration missing"))
-                }
-                iyzipay.cancel.create(request, (err: any, result: any) => {
-                    if (err) reject(err)
-                    else resolve(result)
-                })
-            })
+            const result = await iyzipayClient.post('/payment/iyzipay/auth/cancel', request);
             if (result.status !== 'success') console.error("Cancel Error", result.errorMessage)
         } catch (e) {
             console.error("Cancel Exception", e)
@@ -517,15 +485,7 @@ export async function cancelBooking(bookingId: string) {
                 price: booking.total_amount.toString(),
                 ip: '85.34.78.112',
             }
-            const result = await new Promise<any>((resolve, reject) => {
-                if (!iyzipay) {
-                    return reject(new Error("Payment configuration missing"))
-                }
-                iyzipay.refund.create(request, (err: any, result: any) => {
-                    if (err) reject(err)
-                    else resolve(result)
-                })
-            })
+            const result = await iyzipayClient.post('/payment/iyzipay/auth/refund', request);
             if (result.status !== 'success') console.error("Refund Error", result.errorMessage)
         } catch (e) {
             console.error("Refund Exception", e)

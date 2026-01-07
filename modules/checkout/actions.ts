@@ -2,7 +2,7 @@
 'use server'
 
 import { createClient } from "@/lib/supabase/server"
-import iyzipay, { initializationError } from "@/lib/iyzipay"
+import { iyzipayClient } from "@/lib/iyzipay-client"
 import { headers } from "next/headers"
 
 export async function initializePayment(bookingId: string) {
@@ -98,17 +98,7 @@ export async function initializePayment(bookingId: string) {
 
     // 3. Call Iyzipay (Pre-Authorization)
     try {
-        const result = await new Promise<any>((resolve, reject) => {
-            // Use PreAuth initialization endpoint
-            if (!iyzipay) {
-                const debugInfo = `API_KEY=${!!process.env.IYZIPAY_API_KEY}, SECRET=${!!process.env.IYZIPAY_SECRET_KEY}, URI=${!!process.env.IYZIPAY_URI}, ERROR=${initializationError}`
-                return reject(new Error(`Payment configuration missing. Env Status: ${debugInfo}`))
-            }
-            iyzipay.checkoutFormInitializePreAuth.create(request, (err: any, result: any) => {
-                if (err) reject(err)
-                else resolve(result)
-            })
-        })
+        const result = await iyzipayClient.post('/payment/iyzipay/checkoutform/initialize', request);
 
         if (result.status !== 'success') {
             console.error('Iyzipay Init Error:', result.errorMessage)
