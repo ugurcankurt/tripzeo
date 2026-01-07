@@ -1,4 +1,9 @@
 import type { NextConfig } from "next";
+import path from "path";
+
+// Resolve the actual physical path of iyzipay resources, bypassing symlinks
+const iyzipayLibPath = path.dirname(require.resolve('iyzipay'));
+const iyzipayResourcesGlob = path.join(iyzipayLibPath, 'resources/**/*');
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -9,7 +14,12 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '2mb',
     },
   },
+  outputFileTracingIncludes: {
+    '/payment/**/*': [iyzipayResourcesGlob],
+    '/api/**/*': [iyzipayResourcesGlob],
+  },
   images: {
+
     remotePatterns: [
       {
         protocol: 'https',
