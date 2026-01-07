@@ -19,13 +19,15 @@ export class IyzipayClient {
         const bodyStr = body ? JSON.stringify(body) : '';
         const dataToHash = randomKey + uriPath + bodyStr;
 
-        const hash = crypto
+        // IMPORTANT: The official SDK uses hex digest, not base64!
+        const signature = crypto
             .createHmac('sha256', this.secretKey)
             .update(dataToHash)
-            .digest('base64');
+            .digest('hex');
 
-        const authString = `${this.apiKey}:${randomKey}:${hash}`;
-        return `IYZWSv2 ${Buffer.from(authString).toString('base64')}`;
+        // Official SDK format: apiKey:[value]&randomKey:[value]&signature:[value]
+        const authPayload = `apiKey:${this.apiKey}&randomKey:${randomKey}&signature:${signature}`;
+        return `IYZWSv2 ${Buffer.from(authPayload).toString('base64')}`;
     }
 
     async post(path: string, body: any) {
