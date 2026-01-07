@@ -217,7 +217,7 @@ export async function approveBooking(bookingId: string) {
             }
 
             // Call Iyzipay Post-Auth (Capture)
-            const result = await iyzipayClient.post('/payment/iyzipay/auth/postauth', request);
+            const result = await iyzipayClient.post('/payment/postauth', request);
 
             if (result.status !== 'success') {
                 console.error("Iyzipay Capture Error:", result.errorMessage)

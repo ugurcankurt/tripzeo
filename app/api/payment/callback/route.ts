@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
 
         // Iyzipay'den sonucu sorgula
         // Promise wrapper kullanıyoruz çünkü iyzipay callback tabanlı
-        const result = await iyzipayClient.post('/payment/iyzipay/checkoutform/auth/ecom/detail', {
+        const result = await iyzipayClient.post('/payment/iyzipos/checkoutform/auth/ecom/detail', {
             locale: 'en',
             token: token
         });

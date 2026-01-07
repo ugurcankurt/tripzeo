@@ -98,7 +98,7 @@ export async function initializePayment(bookingId: string) {
 
     // 3. Call Iyzipay (Pre-Authorization)
     try {
-        const result = await iyzipayClient.post('/payment/iyzipay/checkoutform/initialize', request);
+        const result = await iyzipayClient.post('/payment/iyzipos/checkoutform/initialize/preauth/ecom', request);
 
         if (result.status !== 'success') {
             console.error('Iyzipay Init Error:', result.errorMessage)
