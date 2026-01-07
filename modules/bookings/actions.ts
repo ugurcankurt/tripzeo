@@ -217,8 +217,11 @@ export async function approveBooking(bookingId: string) {
             }
 
             // Call Iyzipay Post-Auth (Capture)
+            if (!iyzipay) {
+                return { error: "Payment configuration missing. Cannot capture payment." }
+            }
             const result = await new Promise<any>((resolve, reject) => {
-                iyzipay.paymentPostAuth.create(request, (err: any, result: any) => {
+                iyzipay!.paymentPostAuth.create(request, (err: any, result: any) => {
                     if (err) reject(err)
                     else resolve(result)
                 })
@@ -289,6 +292,9 @@ export async function rejectBooking(bookingId: string) {
                 ip: '85.34.78.112',
             }
             const result = await new Promise<any>((resolve, reject) => {
+                if (!iyzipay) {
+                    return reject(new Error("Payment configuration missing"))
+                }
                 iyzipay.cancel.create(request, (err: any, result: any) => {
                     if (err) reject(err)
                     else resolve(result)
@@ -354,6 +360,9 @@ export async function refundBooking(bookingId: string) {
                 currency: booking.experience?.currency || 'USD'
             }
             const result = await new Promise<any>((resolve, reject) => {
+                if (!iyzipay) {
+                    return reject(new Error("Payment configuration missing"))
+                }
                 iyzipay.refund.create(request, (err: any, result: any) => {
                     if (err) reject(err)
                     else resolve(result)
@@ -486,6 +495,9 @@ export async function cancelBooking(bookingId: string) {
                 ip: '85.34.78.112',
             }
             const result = await new Promise<any>((resolve, reject) => {
+                if (!iyzipay) {
+                    return reject(new Error("Payment configuration missing"))
+                }
                 iyzipay.cancel.create(request, (err: any, result: any) => {
                     if (err) reject(err)
                     else resolve(result)
@@ -506,6 +518,9 @@ export async function cancelBooking(bookingId: string) {
                 ip: '85.34.78.112',
             }
             const result = await new Promise<any>((resolve, reject) => {
+                if (!iyzipay) {
+                    return reject(new Error("Payment configuration missing"))
+                }
                 iyzipay.refund.create(request, (err: any, result: any) => {
                     if (err) reject(err)
                     else resolve(result)
