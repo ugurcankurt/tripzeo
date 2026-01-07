@@ -283,7 +283,7 @@ export async function rejectBooking(bookingId: string) {
                 paymentId: booking.payment_id,
                 ip: '85.34.78.112',
             }
-            const result = await iyzipayClient.post('/payment/iyzipay/auth/cancel', request);
+            const result = await iyzipayClient.post('/payment/cancel', request);
 
             if (result.status !== 'success') {
                 console.error("Iyzipay Cancel Error:", result.errorMessage)
@@ -343,7 +343,7 @@ export async function refundBooking(bookingId: string) {
                 ip: '85.34.78.112',
                 currency: booking.experience?.currency || 'USD'
             }
-            const result = await iyzipayClient.post('/payment/iyzipay/auth/refund', request);
+            const result = await iyzipayClient.post('/payment/refund', request);
 
             if (result.status !== 'success') {
                 console.error("Iyzipay Refund Error:", result.errorMessage)
@@ -470,7 +470,7 @@ export async function cancelBooking(bookingId: string) {
                 paymentId: booking.payment_id,
                 ip: '85.34.78.112',
             }
-            const result = await iyzipayClient.post('/payment/iyzipay/auth/cancel', request);
+            const result = await iyzipayClient.post('/payment/cancel', request);
             if (result.status !== 'success') console.error("Cancel Error", result.errorMessage)
         } catch (e) {
             console.error("Cancel Exception", e)
@@ -485,7 +485,7 @@ export async function cancelBooking(bookingId: string) {
                 price: booking.total_amount.toString(),
                 ip: '85.34.78.112',
             }
-            const result = await iyzipayClient.post('/payment/iyzipay/auth/refund', request);
+            const result = await iyzipayClient.post('/payment/refund', request);
             if (result.status !== 'success') console.error("Refund Error", result.errorMessage)
         } catch (e) {
             console.error("Refund Exception", e)
