@@ -138,58 +138,70 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     },
 
     markAsRead: async (id: string) => {
-        // Optimistic update
-        set(state => ({
-            notifications: state.notifications.map(n =>
-                n.id === id ? { ...n, is_read: true } : n
-            ),
-            unreadCount: Math.max(0, state.unreadCount - 1)
-        }))
+        try {
+            // Optimistic update
+            set(state => ({
+                notifications: state.notifications.map(n =>
+                    n.id === id ? { ...n, is_read: true } : n
+                ),
+                unreadCount: Math.max(0, state.unreadCount - 1)
+            }))
 
-        // Call Server Action
-        const { markNotificationAsRead } = await import('@/modules/notifications/actions')
-        const result = await markNotificationAsRead(id)
+            // Call Server Action
+            const { markNotificationAsRead } = await import('@/modules/notifications/actions')
+            const result = await markNotificationAsRead(id)
 
-        if (result.error) {
-            console.error("Error marking as read in store:", result.error)
+            if (result.error) {
+                console.error("Error marking as read in store:", result.error)
+            }
+        } catch (error) {
+            console.error("Failed to mark as read (Network/Server error):", error)
         }
     },
 
     markAllAsRead: async () => {
-        const supabase = createClient()
-        const currentUnread = get().notifications.filter(n => !n.is_read)
+        try {
+            const supabase = createClient()
+            const currentUnread = get().notifications.filter(n => !n.is_read)
 
-        if (currentUnread.length === 0) return
+            if (currentUnread.length === 0) return
 
-        set(state => ({
-            notifications: state.notifications.map(n => ({ ...n, is_read: true })),
-            unreadCount: 0
-        }))
+            set(state => ({
+                notifications: state.notifications.map(n => ({ ...n, is_read: true })),
+                unreadCount: 0
+            }))
 
-        const ids = currentUnread.map(n => n.id)
-        if (ids.length > 0) {
-            await supabase
-                .from('notifications')
-                .update({ is_read: true })
-                .in('id', ids)
+            const ids = currentUnread.map(n => n.id)
+            if (ids.length > 0) {
+                await supabase
+                    .from('notifications')
+                    .update({ is_read: true })
+                    .in('id', ids)
+            }
+        } catch (error) {
+            console.error("Failed to mark all as read:", error)
         }
     },
 
     removeNotification: async (id: string) => {
-        const state = get()
-        const notification = state.notifications.find(n => n.id === id)
-        const wasUnread = notification && !notification.is_read
+        try {
+            const state = get()
+            const notification = state.notifications.find(n => n.id === id)
+            const wasUnread = notification && !notification.is_read
 
-        set(state => ({
-            notifications: state.notifications.filter(n => n.id !== id),
-            unreadCount: wasUnread ? Math.max(0, state.unreadCount - 1) : state.unreadCount
-        }))
+            set(state => ({
+                notifications: state.notifications.filter(n => n.id !== id),
+                unreadCount: wasUnread ? Math.max(0, state.unreadCount - 1) : state.unreadCount
+            }))
 
-        const { deleteNotification } = await import('@/modules/notifications/actions')
-        const result = await deleteNotification(id)
+            const { deleteNotification } = await import('@/modules/notifications/actions')
+            const result = await deleteNotification(id)
 
-        if (result.error) {
-            console.error("Error removing notification in store:", result.error)
+            if (result.error) {
+                console.error("Error removing notification in store:", result.error)
+            }
+        } catch (error) {
+            console.error("Failed to remove notification:", error)
         }
     },
 
