@@ -4,6 +4,9 @@ const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
   serverExternalPackages: ['iyzipay'],
+  outputFileTracingIncludes: {
+    '/**/*': ['./node_modules/iyzipay/lib/resources/**/*'],
+  },
   experimental: {
     serverActions: {
       bodySizeLimit: '2mb',
