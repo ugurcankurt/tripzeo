@@ -6,14 +6,16 @@ export class IyzipayClient {
     private uri: string;
 
     constructor() {
-        this.apiKey = process.env.IYZIPAY_API_KEY!;
-        this.secretKey = process.env.IYZIPAY_SECRET_KEY!;
-        this.uri = process.env.IYZIPAY_URI!;
+        this.apiKey = (process.env.IYZIPAY_API_KEY || '').trim();
+        this.secretKey = (process.env.IYZIPAY_SECRET_KEY || '').trim();
+        this.uri = (process.env.IYZIPAY_URI || '').trim().replace(/\/$/, '');
+
+        if (!this.apiKey || !this.secretKey || !this.uri) {
+            console.warn('IyzipayClient: Missing environment variables');
+        }
     }
 
     private generateAuthorization(randomKey: string, uriPath: string, body?: any): string {
-        // Iyzico requires price fields to NOT have trailing .00
-        // We'll trust the caller to provide clean strings for now as in current actions
         const bodyStr = body ? JSON.stringify(body) : '';
         const dataToHash = randomKey + uriPath + bodyStr;
 
@@ -40,17 +42,23 @@ export class IyzipayClient {
             body: JSON.stringify(body)
         });
 
+        const responseText = await response.text();
+
         if (!response.ok) {
-            const errorText = await response.text();
-            console.error(`Iyzipay API Error (${path}):`, errorText);
+            console.error(`Iyzipay API HTTP Error (${path}):`, response.status, responseText);
             try {
-                return JSON.parse(errorText);
+                return JSON.parse(responseText);
             } catch {
-                throw new Error(`Iyzipay API error: ${response.statusText}`);
+                throw new Error(`Iyzipay API error: ${response.statusText} - ${responseText}`);
             }
         }
 
-        return response.json();
+        try {
+            return JSON.parse(responseText);
+        } catch (e) {
+            console.error('Iyzipay JSON Parse Error:', e, responseText);
+            throw new Error(`Invalid JSON response from Iyzipay: ${responseText.substring(0, 100)}`);
+        }
     }
 }
 
