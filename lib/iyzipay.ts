@@ -10,7 +10,11 @@ try {
             uri: process.env.IYZIPAY_URI
         })
     } else {
-        console.warn('Iyzipay environment variables missing. Payment features will be disabled.')
+        console.warn('Iyzipay environment variables missing. Payment features will be disabled.', {
+            IYZIPAY_API_KEY: !!process.env.IYZIPAY_API_KEY,
+            IYZIPAY_SECRET_KEY: !!process.env.IYZIPAY_SECRET_KEY,
+            IYZIPAY_URI: !!process.env.IYZIPAY_URI
+        })
     }
 } catch (error) {
     console.error('Failed to initialize Iyzipay:', error)
