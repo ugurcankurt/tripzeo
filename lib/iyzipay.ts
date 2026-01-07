@@ -1,6 +1,7 @@
 import Iyzipay from 'iyzipay'
 
 let iyzipay: Iyzipay | null = null
+export let initializationError: any = null
 
 try {
     if (process.env.IYZIPAY_API_KEY && process.env.IYZIPAY_SECRET_KEY && process.env.IYZIPAY_URI) {
@@ -18,6 +19,7 @@ try {
     }
 } catch (error) {
     console.error('Failed to initialize Iyzipay:', error)
+    initializationError = error
 }
 
 export default iyzipay
