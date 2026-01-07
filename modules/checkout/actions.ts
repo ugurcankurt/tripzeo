@@ -118,6 +118,6 @@ export async function initializePayment(bookingId: string) {
         return { htmlContent: result.checkoutFormContent }
     } catch (error: unknown) {
         console.error("Iyzipay Exception:", error)
-        return { error: "Payment initialization failed." }
+        return { error: error instanceof Error ? error.message : "Payment initialization failed." }
     }
 }
