@@ -4,5 +4,13 @@
             "path": "/api/cron/process-bookings",
             "schedule": "0 * * * *"
         }
-    ]
+    ],
+    "functions": {
+        "app/api/**/*": {
+            "includeFiles": "node_modules/iyzipay/lib/resources/**"
+        },
+        "app/payment/**/*": {
+            "includeFiles": "node_modules/iyzipay/lib/resources/**"
+        }
+    }
 }

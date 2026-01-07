@@ -9,10 +9,6 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '2mb',
     },
   },
-  outputFileTracingIncludes: {
-    '/payment/**/*': ['./node_modules/iyzipay/lib/resources/**/*'],
-    '/api/**/*': ['./node_modules/iyzipay/lib/resources/**/*'],
-  },
   images: {
     remotePatterns: [
       {
