@@ -15,6 +15,9 @@ export async function POST(request: NextRequest) {
         // Iyzipay'den sonucu sorgula
         // Promise wrapper kullanıyoruz çünkü iyzipay callback tabanlı
         const result = await new Promise<any>((resolve, reject) => {
+            if (!iyzipay) {
+                return reject(new Error("Payment configuration missing"))
+            }
             iyzipay.checkoutForm.retrieve({
                 locale: 'en',
                 token: token
