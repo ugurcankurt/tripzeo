@@ -432,11 +432,16 @@ export async function completeBooking(bookingId: string) {
 }
 
 export async function getPendingBookingsCount() {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return 0
-    const { count } = await supabase.from('bookings').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'pending_payment')
-    return count || 0
+    try {
+        const supabase = await createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return 0
+        const { count } = await supabase.from('bookings').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'pending_payment')
+        return count || 0
+    } catch (error) {
+        console.error("Failed to get pending bookings count:", error)
+        return 0
+    }
 }
 
 export async function cancelBooking(bookingId: string) {
