@@ -30,16 +30,38 @@ export function NotificationBell() {
     const router = useRouter()
 
     // Init store on mount
+    // Init store on mount
     useEffect(() => {
         async function init() {
             const supabase = createClient()
             const { data: { user } } = await supabase.auth.getUser()
+
             if (user) {
                 setUserId(user.id)
                 initialize(user.id)
+            } else {
+                setUserId(null)
+                // Reset store if no user (logout)
+                useNotificationStore.getState().reset()
             }
         }
+
+        // Listen for auth changes
+        const { data: { subscription } } = createClient().auth.onAuthStateChange((event, session) => {
+            if (session?.user) {
+                setUserId(session.user.id)
+                initialize(session.user.id)
+            } else {
+                setUserId(null)
+                useNotificationStore.getState().reset()
+            }
+        })
+
         init()
+
+        return () => {
+            subscription.unsubscribe()
+        }
     }, [initialize])
 
     const handleNotificationClick = (notification: any) => {

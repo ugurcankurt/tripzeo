@@ -12,14 +12,14 @@ export async function createNotification(input: CreateNotificationInput) {
     }
 
     const { userId, title, message, link } = result.data
-    const supabase = await createClient()
 
-    // Since this is often called from other server actions (system events), 
-    // we bypass RLS by using service role logic IF NEEDED, 
-    // but typically standard client is fine if the TRIGGERING user has permission 
-    // to insert (which we handled via 'authenticated' insert policy).
-    // However, sending a notification to ANYONE usually implies system privilege.
-    // Our RLS allows 'authenticated' to INSERT. That works for now.
+    // Use Admin Client (Service Role) to bypass RLS
+    // This allows sending notifications to ANY user regardless of who is logged in.
+    const { createClient: createAdminClient } = await import('@supabase/supabase-js')
+    const supabase = createAdminClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
 
     const { error } = await supabase
         .from('notifications')
