@@ -106,7 +106,7 @@ export function ExperienceGallery({ images, title }: ExperienceGalleryProps) {
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
 
                     {/* "View All" Button Overlay on the last image */}
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors flex items-end justify-end p-6">
                         <Button variant="secondary" size="sm" className="font-semibold shadow-sm pointer-events-none">
                             <Grid className="w-4 h-4 mr-2" />
                             Show all photos

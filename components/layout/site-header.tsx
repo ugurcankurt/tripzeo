@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/server"
 import { Briefcase } from "lucide-react"
@@ -24,7 +25,16 @@ export async function SiteHeader() {
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="container mx-auto px-4 h-16 flex items-center justify-between">
                 <div className="flex items-center gap-8">
-                    <Link href="/" className="font-bold text-2xl tracking-tighter">tripzeo</Link>
+                    <Link href="/" className="flex items-center gap-2 font-bold text-2xl tracking-tighter text-primary">
+                        <Image
+                            src="/tripzeo.svg"
+                            alt="tripzeo logo"
+                            width={32}
+                            height={32}
+                            className="w-8 h-8"
+                        />
+                        tripzeo
+                    </Link>
 
                     <HeaderSearch />
                 </div>
