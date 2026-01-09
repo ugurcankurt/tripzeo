@@ -29,7 +29,7 @@ export function BookingStatusBadge({ status }: { status: Database['public']['Enu
             className: "bg-red-100 text-red-800 hover:bg-red-100 border-red-200"
         },
         cancelled_by_user: {
-            label: "Cancelled by Traveler",
+            label: "Cancelled by Guest",
             className: "bg-gray-100 text-gray-800 hover:bg-gray-100 border-gray-200"
         },
         payment_failed: {
