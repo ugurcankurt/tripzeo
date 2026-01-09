@@ -20,6 +20,8 @@ export const NotificationEmail = ({
     link,
     userName,
 }: NotificationEmailProps) => {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://tripzeo.com";
+
     return (
         <TripZeoEmailLayout preview={title}>
             <Section className="px-[20px]">
@@ -37,7 +39,7 @@ export const NotificationEmail = ({
                     <Section className="text-center mt-[32px] mb-[32px]">
                         <Button
                             className="bg-[#000000] rounded text-white text-[12px] font-semibold no-underline text-center px-5 py-3"
-                            href={`${process.env.NEXT_PUBLIC_APP_URL}${link}`}
+                            href={`${baseUrl}${link}`}
                         >
                             View Details
                         </Button>

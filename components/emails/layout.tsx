@@ -23,6 +23,8 @@ export const TripZeoEmailLayout = ({
     preview,
     children,
 }: TripZeoEmailLayoutProps) => {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+
     return (
         <Tailwind>
             <Html>
@@ -33,7 +35,7 @@ export const TripZeoEmailLayout = ({
                         <Section className="mt-[32px] mb-[32px]">
                             <div className="flex items-center justify-center gap-1.5">
                                 <Img
-                                    src={`${process.env.NEXT_PUBLIC_APP_URL}/tripzeo.svg`}
+                                    src={`${baseUrl}/tripzeo.svg`}
                                     width="28"
                                     height="28"
                                     alt="TripZeo"
@@ -54,7 +56,7 @@ export const TripZeoEmailLayout = ({
                                 This email was sent by the TripZeo platform.
                             </Text>
                             <Text className="text-[#666666] text-[12px] leading-[24px]">
-                                <Link href={process.env.NEXT_PUBLIC_APP_URL} className="text-blue-600 no-underline">
+                                <Link href={baseUrl} className="text-blue-600 no-underline">
                                     TripZeo
                                 </Link>{" "}
                                 - Discover and share your experiences.

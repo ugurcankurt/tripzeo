@@ -8,7 +8,6 @@ import {
     Hr,
     Link,
 } from "@react-email/components";
-import * as React from "react";
 import TripZeoEmailLayout from "./layout";
 
 interface BookingConfirmedEmailProps {
@@ -38,6 +37,8 @@ export const BookingConfirmedEmail = ({
     hostEmail,
     hostPhone,
 }: BookingConfirmedEmailProps) => {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://tripzeo.com";
+
     return (
         <TripZeoEmailLayout preview="Booking Confirmed">
             <Section className="px-[20px]">
@@ -115,7 +116,7 @@ export const BookingConfirmedEmail = ({
                 <Section className="text-center mt-[32px] mb-[32px]">
                     <Button
                         className="bg-[#000000] rounded text-white text-[12px] font-semibold no-underline text-center px-5 py-3 w-full sm:w-auto"
-                        href={`${process.env.NEXT_PUBLIC_APP_URL}/account/orders`}
+                        href={`${baseUrl}/account/orders`}
                     >
                         View Details
                     </Button>
