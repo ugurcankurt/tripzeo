@@ -24,10 +24,10 @@ export const TripZeoEmailLayout = ({
     children,
 }: TripZeoEmailLayoutProps) => {
     return (
-        <Html>
-            <Tailwind>
+        <Tailwind>
+            <Html>
                 <Head />
-                <Preview>{preview}</Preview>
+                <Preview>{[preview || ""]}</Preview>
                 <Body className="bg-white my-auto mx-auto font-sans px-2">
                     <Container className="border border-solid border-[#eaeaea] rounded my-[40px] mx-auto p-[20px] max-w-[465px]">
                         <Section className="mt-[32px] mb-[32px]">
@@ -62,8 +62,8 @@ export const TripZeoEmailLayout = ({
                         </Section>
                     </Container>
                 </Body>
-            </Tailwind>
-        </Html>
+            </Html>
+        </Tailwind>
     );
 };
 
