@@ -6,6 +6,7 @@ export const createNotificationSchema = z.object({
     message: z.string().min(1, "Message is required"),
     link: z.string().optional(),
     type: z.enum(['info', 'success', 'warning', 'error']).optional().default('info'), // Future proofing
+    skipEmail: z.boolean().optional().default(false),
 })
 
-export type CreateNotificationInput = z.infer<typeof createNotificationSchema>
+export type CreateNotificationInput = z.input<typeof createNotificationSchema>

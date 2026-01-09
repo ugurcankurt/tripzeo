@@ -21,6 +21,7 @@ export async function createNotification(input: CreateNotificationInput) {
         process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
+
     const { error } = await supabase
         .from('notifications')
         .insert({
@@ -35,6 +36,31 @@ export async function createNotification(input: CreateNotificationInput) {
         console.error("Failed to create notification:", error)
         return { error: "Failed to create notification" }
     }
+
+    // --- SEND EMAIL (Fire and Forget) ---
+    // We don't await this to avoid blocking the UI
+    (async () => {
+        try {
+            // 1. Fetch user email & name
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('email, full_name')
+                .eq('id', userId)
+                .single()
+
+            if (profile?.email && !result.data.skipEmail) {
+                const { sendNotificationEmail } = await import('@/lib/email')
+                await sendNotificationEmail(profile.email, {
+                    title,
+                    message,
+                    link,
+                    userName: profile.full_name
+                })
+            }
+        } catch (err) {
+            console.error("Failed to trigger email notification:", err)
+        }
+    })()
 
     return { success: true }
 }

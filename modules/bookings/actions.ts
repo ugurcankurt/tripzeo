@@ -198,7 +198,7 @@ export async function approveBooking(bookingId: string) {
     // 2. Fetch Booking
     const { data: booking, error: fetchError } = await supabase
         .from('bookings')
-        .select('*, experience:experiences(title, currency)')
+        .select('*, experience:experiences(title, currency, location_address, location_city, duration_minutes), host:profiles!bookings_host_id_fkey(full_name, email, phone)')
         .eq('id', bookingId)
         .single()
 
@@ -214,12 +214,14 @@ export async function approveBooking(bookingId: string) {
     // 3. Capture Payment (Post-Auth)
     if (booking.payment_transaction_id) {
         try {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const exp = booking.experience as any
             const request = {
                 locale: 'en',
                 conversationId: bookingId,
                 paymentId: booking.payment_id, // Required for PostAuth
                 price: booking.total_amount.toString(),
-                currency: booking.experience?.currency || 'TRY',
+                currency: exp?.currency || 'TRY',
                 ip: '85.34.78.112',
             }
 
@@ -258,13 +260,58 @@ export async function approveBooking(bookingId: string) {
 
     // Notify Guest
     if (booking.user_id) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const exp = booking.experience as any
+
+        // Send In-App Notification (but skip generic email)
         await createNotification({
             userId: booking.user_id,
             title: "Booking Confirmed",
-            message: `Your booking for ${booking.experience?.title || 'your trip'} has been confirmed!`,
+            message: `Your booking for ${exp?.title || 'your trip'} has been confirmed!`,
             link: "/account/orders",
-            type: "success"
+            type: "success",
+            skipEmail: true
         })
+
+        // Send Rich Email using Admin Context (to reach email service)
+        // We know we are admin or host here.
+        // We need user email and name.
+        const { data: userProfile } = await supabase.from('profiles').select('email, full_name').eq('id', booking.user_id).single()
+
+        if (userProfile?.email) {
+            const { sendBookingConfirmedEmail } = await import('@/lib/email')
+
+            // Format Date
+            const dateObj = new Date(booking.booking_date)
+            const formattedDate = dateObj.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+
+            // Format Price
+            const formattedPrice = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: booking.experience?.currency || 'USD'
+            }).format(Number(booking.total_amount))
+
+            // Address
+            const address = exp?.location_address || exp?.location_city || 'Istanbul'
+
+            // Host Details
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const host = booking.host as any
+
+            await sendBookingConfirmedEmail(userProfile.email, {
+                userName: userProfile.full_name || 'Traveler',
+                experienceTitle: exp?.title || 'TripZeo Experience',
+                bookingDate: formattedDate,
+                startTime: booking.start_time?.slice(0, 5) || '12:00', // HH:MM
+                guests: booking.attendees_count || 1,
+                location: address,
+                bookingId: booking.id.slice(0, 8).toUpperCase(),
+                price: formattedPrice,
+                hostName: host?.full_name || 'TripZeo Host',
+                hostEmail: host?.email || 'support@tripzeo.com',
+                hostPhone: host?.phone || '-'
+            })
+        }
     }
     return { success: "Booking approved and payment captured" }
 }
