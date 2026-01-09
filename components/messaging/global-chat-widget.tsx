@@ -100,8 +100,13 @@ export function GlobalChatWidget({ currentUserId }: GlobalChatWidgetProps) {
                                     <ChevronLeft className="h-5 w-5" />
                                 </Button>
                                 <div className="flex items-center gap-2">
-                                    <Avatar className="h-8 w-8 border">
-                                        <AvatarImage src={conversations.find(c => c.booking_id === selectedBookingId)?.other_user?.avatar_url || ''} />
+                                    <Avatar className="h-8 w-8 border bg-muted">
+                                        <AvatarImage
+                                            src={conversations.find(c => c.booking_id === selectedBookingId)?.other_user?.avatar_url || conversations.find(c => c.booking_id === selectedBookingId)?.other_user?.category?.icon || ''}
+                                            className={cn(
+                                                conversations.find(c => c.booking_id === selectedBookingId)?.other_user?.avatar_url ? "object-cover" : "object-contain p-1 opacity-70"
+                                            )}
+                                        />
                                         <AvatarFallback>{conversations.find(c => c.booking_id === selectedBookingId)?.other_user?.full_name?.[0]}</AvatarFallback>
                                     </Avatar>
                                     <span className="font-semibold text-sm">
@@ -149,8 +154,13 @@ export function GlobalChatWidget({ currentUserId }: GlobalChatWidgetProps) {
                                                 onClick={() => handleSelectConversation(conv.booking_id)}
                                                 className="flex items-center gap-3 p-3 text-left bg-white hover:bg-gray-50 border border-transparent hover:border-gray-100 rounded-xl transition-all shadow-sm group"
                                             >
-                                                <Avatar className="h-10 w-10 border border-gray-100">
-                                                    <AvatarImage src={conv.other_user?.avatar_url || ''} />
+                                                <Avatar className="h-10 w-10 border border-gray-100 bg-muted">
+                                                    <AvatarImage
+                                                        src={conv.other_user?.avatar_url || conv.other_user?.category?.icon || ''}
+                                                        className={cn(
+                                                            conv.other_user?.avatar_url ? "object-cover" : "object-contain p-1.5 opacity-70"
+                                                        )}
+                                                    />
                                                     <AvatarFallback className="bg-orange-100 text-orange-600 font-medium">
                                                         {conv.other_user?.full_name?.[0]}
                                                     </AvatarFallback>

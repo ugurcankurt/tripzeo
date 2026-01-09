@@ -3,7 +3,6 @@ import { create } from 'zustand'
 import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/types/supabase'
 import type { ConversationItem } from '@/modules/messaging/actions'
-import { getUserConversations } from '@/modules/messaging/actions'
 
 type Message = Database['public']['Tables']['messages']['Row']
 type Conversation = Database['public']['Tables']['conversations']['Row']
@@ -57,8 +56,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
                         user_id,
                         host_id,
                         status,
-                        guest:profiles!bookings_user_id_fkey(id, full_name, avatar_url),
-                        host:profiles!bookings_host_id_fkey(id, full_name, avatar_url)
+                        guest:profiles!bookings_user_id_fkey(id, full_name, avatar_url, category:categories(icon)),
+                        host:profiles!bookings_host_id_fkey(id, full_name, avatar_url, category:categories(icon))
                     ),
                     messages (
                         content,
@@ -86,7 +85,11 @@ export const useChatStore = create<ChatState>((set, get) => ({
                         booking: {
                             status: conv.booking.status
                         },
-                        other_user: otherProfile,
+                        other_user: otherProfile ? {
+                            full_name: otherProfile.full_name,
+                            avatar_url: otherProfile.avatar_url,
+                            category: otherProfile.category
+                        } : null,
                         last_message: lastMsg ? {
                             content: lastMsg.content,
                             created_at: lastMsg.created_at,
@@ -277,8 +280,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
                     user_id,
                     host_id,
                     status,
-                    guest:profiles!bookings_user_id_fkey(id, full_name, avatar_url),
-                    host:profiles!bookings_host_id_fkey(id, full_name, avatar_url)
+                    guest:profiles!bookings_user_id_fkey(id, full_name, avatar_url, category:categories(icon)),
+                    host:profiles!bookings_host_id_fkey(id, full_name, avatar_url, category:categories(icon))
                 ),
                 messages (
                     content,
@@ -303,7 +306,11 @@ export const useChatStore = create<ChatState>((set, get) => ({
                     booking_id: conv.booking_id,
                     updated_at: conv.updated_at,
                     booking: { status: conv.booking.status },
-                    other_user: otherProfile,
+                    other_user: otherProfile ? {
+                        full_name: otherProfile.full_name,
+                        avatar_url: otherProfile.avatar_url,
+                        category: otherProfile.category
+                    } : null,
                     last_message: lastMsg ? {
                         content: lastMsg.content,
                         created_at: lastMsg.created_at,

@@ -1,7 +1,8 @@
+import { getExperienceUrl } from "@/lib/utils"
 import { createClient } from "@/lib/supabase/server"
 import { notFound, redirect } from "next/navigation"
 import { BookingConfirmationForm } from "@/modules/bookings/components/booking-confirmation-form"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import Image from "next/image"
 import Link from "next/link"
@@ -14,6 +15,13 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
+import { Tables } from "@/types/supabase"
+
+type BookingExperience = Pick<Tables<'experiences'>,
+    'id' | 'title' | 'price' | 'images' | 'location_city' | 'location_country' | 'duration_minutes' | 'start_time' | 'end_time'
+> & {
+    host: Pick<Tables<'profiles'>, 'full_name'> | null
+}
 
 export default async function BookPage({ searchParams }: { searchParams: Promise<{ experienceId: string; date: string; people: string }> }) {
     const supabase = await createClient()
@@ -25,7 +33,7 @@ export default async function BookPage({ searchParams }: { searchParams: Promise
 
     const { data: { user } } = await supabase.auth.getUser()
 
-    let userProfile = null
+    let userProfile: Tables<'profiles'> | null = null
     if (user) {
         const { data } = await supabase
             .from('profiles')
@@ -36,7 +44,7 @@ export default async function BookPage({ searchParams }: { searchParams: Promise
     }
 
     // Fetch Experience
-    const { data: experience } = await supabase
+    const { data } = await supabase
         .from('experiences')
         .select(`
             id,
@@ -44,6 +52,7 @@ export default async function BookPage({ searchParams }: { searchParams: Promise
             price,
             images,
             location_city,
+            location_country,
             duration_minutes,
             start_time,
             end_time,
@@ -52,7 +61,9 @@ export default async function BookPage({ searchParams }: { searchParams: Promise
         .eq('id', experienceId)
         .single()
 
-    if (!experience) notFound()
+    if (!data) notFound()
+
+    const experience = data as unknown as BookingExperience
 
 
     // Fetch Service Fee Rate
@@ -148,24 +159,28 @@ export default async function BookPage({ searchParams }: { searchParams: Promise
                 {/* RIGHT: Order Summary */}
                 <div className="order-first lg:order-none">
                     <Card className="lg:sticky lg:top-24">
-                        <CardHeader>
-                            <div className="flex gap-4">
-
-
-                                <div className="relative w-24 h-24 rounded-lg overflow-hidden bg-muted">
+                        <CardHeader className="p-4">
+                            <Link href={getExperienceUrl(experience)} target="_blank" className="flex gap-4 group hover:opacity-90 transition-opacity">
+                                <div className="relative w-28 h-28 shrink-0 rounded-lg overflow-hidden bg-muted border">
                                     <Image
-                                        src={experience.images?.[0] || '/images/placeholders/experience-placeholder.jpg'} // Assuming we have a placeholder or use a safe default
+                                        src={experience.images?.[0] || '/images/placeholders/experience-placeholder.jpg'}
                                         alt={experience.title}
                                         fill
-                                        className="object-cover"
+                                        className="object-cover group-hover:scale-105 transition-transform duration-300"
                                     />
                                 </div>
-                                <div className="flex-1">
-                                    <p className="text-sm text-muted-foreground">{experience.location_city}</p>
-                                    <h3 className="font-medium line-clamp-2">{experience.title}</h3>
-                                    <p className="text-sm mt-1">Hosted by {experience.host?.full_name}</p>
+                                <div className="flex flex-col justify-center space-y-1">
+                                    <p className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                                        {experience.location_city}, {experience.location_country || 'Turkey'}
+                                    </p>
+                                    <h3 className="font-bold text-lg leading-tight line-clamp-2 group-hover:underline decoration-primary underline-offset-4">
+                                        {experience.title}
+                                    </h3>
+                                    <p className="text-sm text-muted-foreground">
+                                        Hosted by <span className="text-foreground font-medium">{experience.host?.full_name}</span>
+                                    </p>
                                 </div>
-                            </div>
+                            </Link>
                         </CardHeader>
                         <Separator />
                         <CardContent className="pt-6 space-y-4">

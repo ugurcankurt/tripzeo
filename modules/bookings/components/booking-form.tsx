@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
 import * as React from "react"
@@ -71,7 +70,7 @@ export function BookingForm({ price, serviceFeeRate, experienceId, blockedDates 
 
         const params = new URLSearchParams({
             experienceId,
-            date: date.toISOString(),
+            date: format(date, "yyyy-MM-dd"),
             people: guests.toString()
         })
 
@@ -232,7 +231,7 @@ export function BookingForm({ price, serviceFeeRate, experienceId, blockedDates 
                                 {date ? format(date, "PPP") : <span>Pick a date</span>}
                             </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="center">
+                        <PopoverContent className="w-auto min-w-[var(--radix-popover-trigger-width)] p-0 z-[60]" align="center" collisionPadding={16}>
                             <Calendar
                                 mode="single"
                                 selected={date}
@@ -242,7 +241,11 @@ export function BookingForm({ price, serviceFeeRate, experienceId, blockedDates 
                                 }}
                                 disabled={(date) => date < new Date() || isDateBlocked(date)}
                                 initialFocus
-                                className="w-full"
+                                className="w-full p-2"
+                                classNames={{
+                                    day: "w-full h-9",
+                                    cell: "w-full p-0"
+                                }}
                             />
                         </PopoverContent>
                     </Popover>

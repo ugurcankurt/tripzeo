@@ -146,6 +146,7 @@ export type ConversationItem = {
     other_user: {
         full_name: string | null
         avatar_url: string | null
+        category: { icon: string | null } | null
     } | null
     last_message: {
         content: string
@@ -177,8 +178,8 @@ export async function getUserConversations() {
                 user_id,
                 host_id,
                 status,
-                guest:profiles!bookings_user_id_fkey(id, full_name, avatar_url),
-                host:profiles!bookings_host_id_fkey(id, full_name, avatar_url)
+                guest:profiles!bookings_user_id_fkey(id, full_name, avatar_url, category:categories(icon)),
+                host:profiles!bookings_host_id_fkey(id, full_name, avatar_url, category:categories(icon))
             ),
             messages (
                 content,
@@ -219,7 +220,11 @@ export async function getUserConversations() {
             booking: {
                 status: conv.booking.status
             },
-            other_user: otherProfile,
+            other_user: otherProfile ? {
+                full_name: otherProfile.full_name,
+                avatar_url: otherProfile.avatar_url,
+                category: otherProfile.category
+            } : null,
             last_message: lastMsg ? {
                 content: lastMsg.content,
                 created_at: lastMsg.created_at,

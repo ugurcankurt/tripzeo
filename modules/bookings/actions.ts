@@ -80,6 +80,13 @@ export async function createBooking(prevState: unknown, formData: FormData) {
             }
         }
 
+        // Normalize date to UTC Noon to prevent timezone shifts
+        // If format is YYYY-MM-DD, append T12:00:00Z. If ISO, use as is (but ISO is legacy now).
+        // We prefer YYYY-MM-DD input.
+        const normalizedDate = dateString.includes('T')
+            ? new Date(dateString).toISOString()
+            : new Date(`${dateString}T12:00:00Z`).toISOString()
+
         // 5. Insert Booking
         // 5. Check for Existing Pending Booking (Idempotency)
         const { data: existingBooking } = await supabase
@@ -87,7 +94,7 @@ export async function createBooking(prevState: unknown, formData: FormData) {
             .select('id')
             .eq('user_id', user.id)
             .eq('experience_id', experienceId)
-            .eq('booking_date', new Date(dateString).toISOString())
+            .eq('booking_date', normalizedDate)
             .eq('status', 'pending_payment')
             .single()
 
@@ -123,7 +130,7 @@ export async function createBooking(prevState: unknown, formData: FormData) {
                     user_id: user.id,
                     experience_id: experienceId,
                     host_id: experience.host_id,
-                    booking_date: new Date(dateString).toISOString(),
+                    booking_date: normalizedDate,
                     attendees_count: guests,
                     total_amount: totalAmount,
                     host_earnings: hostEarnings,
