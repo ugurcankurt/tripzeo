@@ -563,5 +563,19 @@ export async function cancelBooking(bookingId: string) {
             type: "warning"
         })
     }
+
+    // Notify the user (guest) as well
+    const formattedRefund = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+    }).format(Number(booking.total_amount))
+
+    await createNotification({
+        userId: user.id,
+        title: "Booking Cancelled",
+        message: `You have successfully cancelled your booking for ${booking.experience?.title || 'an experience'}. The payment of ${formattedRefund} has been refunded to your card.`,
+        link: `/account/orders`,
+        type: "info"
+    })
     return { success: "Booking canceled successfully" }
 }
