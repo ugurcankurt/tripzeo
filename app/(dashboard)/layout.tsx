@@ -6,6 +6,7 @@ import { redirect } from "next/navigation"
 import { requireAuth } from "@/lib/auth/guards"
 import { NotificationBell } from "@/components/dashboard/notification-bell"
 import { GlobalChatWidget } from "@/components/messaging/global-chat-widget"
+import { FavoritesSyncer } from "@/components/favorites/favorites-syncer"
 
 export default async function DashboardLayout({
     children,
@@ -27,9 +28,10 @@ export default async function DashboardLayout({
 
     return (
         <SidebarProvider defaultOpen={defaultOpen}>
+            <FavoritesSyncer />
             <div className="flex min-h-screen w-full">
                 <AppSidebar userRole={userRole} />
-                <SidebarInset className="flex w-full flex-col">
+                <SidebarInset className="flex w-full flex-col overflow-hidden">
                     <header className="flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4 sticky top-0 z-10">
                         <SidebarTrigger className="-ml-1" />
                         <div className="mr-4 hidden md:flex">

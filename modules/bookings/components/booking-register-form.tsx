@@ -132,7 +132,7 @@ export function BookingRegisterForm({ onSuccess }: BookingRegisterFormProps) {
                             <Label htmlFor="full_name">Full Name</Label>
                             <Input
                                 id="full_name"
-                                placeholder="John Doe"
+                                placeholder="Name and Surname"
                                 {...register("full_name")}
                             />
                             {errors.full_name && (
@@ -144,7 +144,7 @@ export function BookingRegisterForm({ onSuccess }: BookingRegisterFormProps) {
                             <Input
                                 id="email"
                                 type="email"
-                                placeholder="name@example.com"
+                                placeholder="Email"
                                 {...register("email")}
                             />
                             {errors.email && (

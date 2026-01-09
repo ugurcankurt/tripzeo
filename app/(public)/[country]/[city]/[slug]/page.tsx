@@ -66,7 +66,12 @@ export default async function ExperiencePage({ params }: { params: Promise<{ cou
         .from('experiences')
         .select(`
         *,
-        host:profiles(full_name, avatar_url, bio)
+        host:profiles(
+            full_name, 
+            avatar_url, 
+            bio,
+            category:categories(icon)
+        )
     `)
         .eq('id', experienceId)
         .single()
@@ -227,13 +232,14 @@ export default async function ExperiencePage({ params }: { params: Promise<{ cou
                     <div className="flex items-start gap-4">
                         <Link href={`/host/${slugify(experience.host?.full_name || 'host')}-${experience.host_id}`}>
                             <Avatar className="h-16 w-16 border hover:opacity-80 transition-opacity">
-                                <AvatarImage src={experience.host?.avatar_url || ''} />
+                                {/* @ts-ignore - nested join type inference */}
+                                <AvatarImage src={experience.host?.avatar_url || experience.host?.category?.icon || ''} className="object-contain" />
                                 <AvatarFallback>{experience.host?.full_name?.charAt(0) || 'U'}</AvatarFallback>
                             </Avatar>
                         </Link>
                         <div>
                             <Link href={`/host/${slugify(experience.host?.full_name || 'host')}-${experience.host_id}`} className="hover:underline">
-                                <h3 className="font-semibold text-lg">Host: {experience.host?.full_name}</h3>
+                                <h3 className="font-semibold text-lg">{experience.host?.full_name}</h3>
                             </Link>
                             <p className="text-muted-foreground text-sm line-clamp-3">
                                 {experience.host?.bio || "This host hasn't written a bio yet, but they're great at what they do!"}

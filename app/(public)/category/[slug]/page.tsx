@@ -2,6 +2,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { ExperienceCard } from "@/modules/experiences/components/experience-card"
 import { notFound } from "next/navigation"
+import Image from "next/image"
 import { Card, CardContent } from "@/components/ui/card"
 import { Sparkles, MapPin } from "lucide-react"
 import {
@@ -72,7 +73,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     // 1. Get Category Details
     const { data: categoryData } = await supabase
         .from('categories')
-        .select('id, name, slug')
+        .select('id, name, slug, icon')
         .eq('slug', slug)
         .single()
 
@@ -190,24 +191,32 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
             {/* SEO Content Section */}
             {experiences && experiences.length > 0 && (
                 <div className="mt-24">
-                    <Card className="bg-gradient-to-br from-muted/50 via-muted/30 to-background border-muted/60 shadow-sm overflow-hidden relative">
-                        {/* Decorative background element */}
-                        <div className="absolute -top-24 -right-24 opacity-[0.03] pointer-events-none">
-                            <MapPin className="w-96 h-96" />
-                        </div>
+                    <Card className="bg-muted/40 border-none shadow-sm overflow-visible relative mt-20 rounded-3xl">
+                        {/* Decorative background element - Removed MapPin, Added Category Image */}
+                        {categoryData.icon && (categoryData.icon.startsWith('http') || categoryData.icon.startsWith('/')) ? (
+                            <div className="absolute -top-12 -right-2 md:-top-24 md:right-12 w-40 h-40 md:w-80 md:h-80 z-20 pointer-events-none opacity-100">
+                                <Image
+                                    src={categoryData.icon}
+                                    alt={categoryData.name}
+                                    fill
+                                    className="object-contain object-bottom drop-shadow-2xl"
+                                    sizes="(max-width: 768px) 256px, 320px"
+                                />
+                            </div>
+                        ) : null}
 
                         <CardContent className="p-8 md:p-12 relative z-10">
-                            <div className="max-w-3xl">
-                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
+                            <div className="max-w-xl">
+                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-bold mb-6">
                                     <Sparkles className="w-4 h-4" />
-                                    <span>Travel Inspire</span>
+                                    <span>Curated Experience</span>
                                 </div>
 
-                                <h2 className="text-3xl font-bold mb-6 tracking-tight">
+                                <h2 className="text-3xl md:text-4xl font-extrabold mb-6 tracking-tight text-foreground">
                                     Why Book <span className="text-primary">{categoryData.name}</span> with Tripzeo?
                                 </h2>
 
-                                <div className="prose prose-lg text-muted-foreground/90 leading-relaxed">
+                                <div className="prose prose-lg text-muted-foreground leading-relaxed">
                                     <p>
                                         Looking for the best <span className="font-semibold text-foreground">{categoryData.name.toLowerCase()}</span> experiences?
                                         Tripzeo curated a list of top-rated activities hosted by local experts.

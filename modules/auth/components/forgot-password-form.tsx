@@ -148,7 +148,7 @@ export function ForgotPasswordForm() {
                             <Input
                                 id="email"
                                 type="email"
-                                placeholder="name@example.com"
+                                placeholder="Email"
                                 {...emailForm.register("email")}
                             />
                             {emailForm.formState.errors.email && (

@@ -29,7 +29,7 @@ export default async function HostProfilePage({ params }: { params: { slug: stri
         .select(`
             *,
             experiences:experiences(count),
-            category:categories(name)
+            category:categories(name, icon)
         `)
         .eq('id', hostId)
         .single()
@@ -148,7 +148,8 @@ export default async function HostProfilePage({ params }: { params: { slug: stri
                     <Card className="sticky top-24 border-none shadow-lg bg-card/50 backdrop-blur-sm">
                         <CardContent className="pt-6 flex flex-col items-center text-center space-y-4">
                             <Avatar className="h-32 w-32 border-4 border-background shadow-md">
-                                <AvatarImage src={profile.avatar_url || ''} />
+                                {/* @ts-ignore - Supabase join type inference */}
+                                <AvatarImage src={profile.avatar_url || profile.category?.icon || ''} className="object-contain" />
                                 <AvatarFallback className="text-2xl">{profile.full_name?.charAt(0) || 'H'}</AvatarFallback>
                             </Avatar>
 

@@ -26,7 +26,7 @@ import { Tables } from "@/types/supabase"
 interface ProfileFormProps {
     profile: Tables<'profiles'> | null
     userEmail?: string
-    categories: Pick<Tables<'categories'>, 'id' | 'name'>[]
+    categories: Pick<Tables<'categories'>, 'id' | 'name' | 'icon'>[]
 }
 
 export function ProfileForm({ profile, userEmail, categories }: ProfileFormProps) {
@@ -36,6 +36,18 @@ export function ProfileForm({ profile, userEmail, categories }: ProfileFormProps
     const [selectedCategory, setSelectedCategory] = useState<string>(profile?.category_id || "")
     const [phone, setPhone] = useState(profile?.phone || '')
     const supabase = createClient()
+
+    // Find selected category data to get the icon
+    const selectedCategoryData = categories.find(c => c.id === selectedCategory)
+
+    // ... (rest of state definitions) ...
+    // Note: I will need to insert the selectedCategoryData calculation at the top, but since I can't overwrite the whole file, I'll do this in chunks or targeting specific lines. 
+    // Actually, I can replace the interface and the component start.
+
+    // Changing the interface and component start
+    // I will skip replacing the whole function body and just target the interface and the Image logic.
+    // But first, let's update the interface.
+
 
     // Email Change State
     const [isChangingEmail, setIsChangingEmail] = useState(false)
@@ -181,7 +193,7 @@ export function ProfileForm({ profile, userEmail, categories }: ProfileFormProps
 
             <div className="flex items-center gap-4 mb-6">
                 <Avatar className="h-20 w-20">
-                    <AvatarImage src={avatarUrl || ''} />
+                    <AvatarImage src={avatarUrl || selectedCategoryData?.icon || ''} className="object-contain" />
                     <AvatarFallback>{profile?.full_name?.charAt(0) || 'U'}</AvatarFallback>
                 </Avatar>
                 <div className="relative">
@@ -247,7 +259,7 @@ export function ProfileForm({ profile, userEmail, categories }: ProfileFormProps
                                                 id="newEmail"
                                                 value={newEmail}
                                                 onChange={(e) => setNewEmail(e.target.value)}
-                                                placeholder="new@example.com"
+                                                placeholder="New Email"
                                                 autoComplete="off"
                                             />
                                         </div>
@@ -383,7 +395,7 @@ export function ProfileForm({ profile, userEmail, categories }: ProfileFormProps
                     )}
 
                     <h3 className="font-medium flex items-center gap-2 pt-2">
-                        <MapPin className="h-4 w-4" /> Address Locations
+                        <MapPin className="h-4 w-4" /> Address
                     </h3>
                     <div className="grid gap-4 md:grid-cols-2">
                         <div className="space-y-2">

@@ -1,7 +1,8 @@
 'use client'
 
-import { Gauge, User, ShoppingBag, LogOut, Briefcase, CreditCard, FileText, Calendar, Users, ChartLine, Settings, Tags, MessageSquare } from "lucide-react"
+import { Gauge, User, ShoppingBag, LogOut, Briefcase, CreditCard, FileText, Calendar, Users, ChartLine, Settings, Tags, MessageSquare, Heart } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
@@ -15,6 +16,7 @@ import {
     SidebarMenuItem,
     SidebarMenuButton,
     SidebarRail,
+    useSidebar,
 } from "@/components/ui/sidebar"
 import { signout } from "@/modules/auth/actions"
 
@@ -25,11 +27,27 @@ export function AppSidebar({ userRole = 'user' }: { userRole?: 'user' | 'host' |
     const router = useRouter()
 
     const isAdminPage = pathname.startsWith('/admin')
+    const { isMobile, setOpenMobile } = useSidebar()
+
+    const handleLinkClick = () => {
+        if (isMobile) {
+            setOpenMobile(false)
+        }
+    }
 
     return (
         <Sidebar className="border-r">
             <SidebarHeader className="h-16 border-b px-6 flex items-center">
-                <Link href="/" className="font-bold text-xl tracking-tight">tripzeo</Link>
+                <Link href="/" className="flex items-center gap-1.5 font-semibold text-2xl tracking-tighter text-primary" onClick={handleLinkClick}>
+                    <Image
+                        src="/tripzeo.svg"
+                        alt="tripzeo logo"
+                        width={28}
+                        height={28}
+                        className="w-7 h-7"
+                    />
+                    tripzeo
+                </Link>
             </SidebarHeader>
             <SidebarContent>
                 <SidebarMenu className="px-4 py-4 space-y-1">
@@ -42,7 +60,7 @@ export function AppSidebar({ userRole = 'user' }: { userRole?: 'user' | 'host' |
                             </div>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild isActive={pathname === "/admin"} className="w-full justify-start">
-                                    <Link href="/admin">
+                                    <Link href="/admin" onClick={handleLinkClick}>
                                         <Gauge className="mr-2 h-4 w-4" />
                                         Overview
                                     </Link>
@@ -50,7 +68,7 @@ export function AppSidebar({ userRole = 'user' }: { userRole?: 'user' | 'host' |
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild isActive={pathname === "/admin/finance"} className="w-full justify-start">
-                                    <Link href="/admin/finance">
+                                    <Link href="/admin/finance" onClick={handleLinkClick}>
                                         <ChartLine className="mr-2 h-4 w-4" />
                                         Finance Reports
                                     </Link>
@@ -58,7 +76,7 @@ export function AppSidebar({ userRole = 'user' }: { userRole?: 'user' | 'host' |
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild isActive={pathname === "/admin/categories"} className="w-full justify-start">
-                                    <Link href="/admin/categories">
+                                    <Link href="/admin/categories" onClick={handleLinkClick}>
                                         <Tags className="mr-2 h-4 w-4" />
                                         Categories
                                     </Link>
@@ -66,7 +84,7 @@ export function AppSidebar({ userRole = 'user' }: { userRole?: 'user' | 'host' |
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild isActive={pathname === "/admin/applications"} className="w-full justify-start">
-                                    <Link href="/admin/applications">
+                                    <Link href="/admin/applications" onClick={handleLinkClick}>
                                         <FileText className="mr-2 h-4 w-4" />
                                         Applications
                                     </Link>
@@ -74,7 +92,7 @@ export function AppSidebar({ userRole = 'user' }: { userRole?: 'user' | 'host' |
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild isActive={pathname === "/admin/reviews"} className="w-full justify-start">
-                                    <Link href="/admin/reviews">
+                                    <Link href="/admin/reviews" onClick={handleLinkClick}>
                                         <Users className="mr-2 h-4 w-4" />
                                         Reviews
                                     </Link>
@@ -82,7 +100,7 @@ export function AppSidebar({ userRole = 'user' }: { userRole?: 'user' | 'host' |
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild isActive={pathname === "/admin/bookings"} className="w-full justify-start">
-                                    <Link href="/admin/bookings">
+                                    <Link href="/admin/bookings" onClick={handleLinkClick}>
                                         <Calendar className="mr-2 h-4 w-4" />
                                         Bookings
                                     </Link>
@@ -90,7 +108,7 @@ export function AppSidebar({ userRole = 'user' }: { userRole?: 'user' | 'host' |
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild isActive={pathname === "/admin/users"} className="w-full justify-start">
-                                    <Link href="/admin/users">
+                                    <Link href="/admin/users" onClick={handleLinkClick}>
                                         <Users className="mr-2 h-4 w-4" />
                                         Users
                                     </Link>
@@ -98,7 +116,7 @@ export function AppSidebar({ userRole = 'user' }: { userRole?: 'user' | 'host' |
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild isActive={pathname === "/admin/payouts"} className="w-full justify-start">
-                                    <Link href="/admin/payouts">
+                                    <Link href="/admin/payouts" onClick={handleLinkClick}>
                                         <CreditCard className="mr-2 h-4 w-4" />
                                         Payouts & Payments
                                     </Link>
@@ -106,7 +124,7 @@ export function AppSidebar({ userRole = 'user' }: { userRole?: 'user' | 'host' |
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild isActive={pathname === "/admin/settings"} className="w-full justify-start">
-                                    <Link href="/admin/settings">
+                                    <Link href="/admin/settings" onClick={handleLinkClick}>
                                         <Settings className="mr-2 h-4 w-4" />
                                         Platform Settings
                                     </Link>
@@ -114,7 +132,7 @@ export function AppSidebar({ userRole = 'user' }: { userRole?: 'user' | 'host' |
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild className="w-full justify-start mt-4 text-muted-foreground hover:text-foreground">
-                                    <Link href="/dashboard">
+                                    <Link href="/dashboard" onClick={handleLinkClick}>
                                         <LogOut className="mr-2 h-4 w-4" />
                                         Back to Site
                                     </Link>
@@ -126,7 +144,7 @@ export function AppSidebar({ userRole = 'user' }: { userRole?: 'user' | 'host' |
                         <>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild isActive={pathname === "/account"} className="w-full justify-start">
-                                    <Link href="/account">
+                                    <Link href="/account" onClick={handleLinkClick}>
                                         <User className="mr-2 h-4 w-4" />
                                         My Account
                                     </Link>
@@ -137,9 +155,17 @@ export function AppSidebar({ userRole = 'user' }: { userRole?: 'user' | 'host' |
                                 <>
                                     <SidebarMenuItem>
                                         <SidebarMenuButton asChild isActive={pathname === "/account/orders"} className="w-full justify-start">
-                                            <Link href="/account/orders">
+                                            <Link href="/account/orders" onClick={handleLinkClick}>
                                                 <ShoppingBag className="mr-2 h-4 w-4" />
                                                 My Bookings
+                                            </Link>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                    <SidebarMenuItem>
+                                        <SidebarMenuButton asChild isActive={pathname === "/account/favorites"} className="w-full justify-start">
+                                            <Link href="/account/favorites" onClick={handleLinkClick}>
+                                                <Heart className="mr-2 h-4 w-4" />
+                                                My Favorites
                                             </Link>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
@@ -156,7 +182,7 @@ export function AppSidebar({ userRole = 'user' }: { userRole?: 'user' | 'host' |
                                     </div>
                                     <SidebarMenuItem>
                                         <SidebarMenuButton asChild isActive={pathname === "/vendor"} className="w-full justify-start">
-                                            <Link href="/vendor">
+                                            <Link href="/vendor" onClick={handleLinkClick}>
                                                 <Briefcase className="mr-2 h-4 w-4" />
                                                 Host Dashboard
                                             </Link>
@@ -164,7 +190,7 @@ export function AppSidebar({ userRole = 'user' }: { userRole?: 'user' | 'host' |
                                     </SidebarMenuItem>
                                     <SidebarMenuItem>
                                         <SidebarMenuButton asChild isActive={pathname === "/vendor/bookings"} className="w-full justify-start">
-                                            <Link href="/vendor/bookings">
+                                            <Link href="/vendor/bookings" onClick={handleLinkClick}>
                                                 <ShoppingBag className="mr-2 h-4 w-4" />
                                                 Incoming Orders
                                             </Link>
@@ -173,7 +199,7 @@ export function AppSidebar({ userRole = 'user' }: { userRole?: 'user' | 'host' |
                                     {/* Messages link removed - Replaced by Global Widget */}
                                     <SidebarMenuItem>
                                         <SidebarMenuButton asChild isActive={pathname === "/vendor/calendar"} className="w-full justify-start">
-                                            <Link href="/vendor/calendar">
+                                            <Link href="/vendor/calendar" onClick={handleLinkClick}>
                                                 <Calendar className="mr-2 h-4 w-4" />
                                                 Availability Calendar
                                             </Link>
@@ -181,7 +207,7 @@ export function AppSidebar({ userRole = 'user' }: { userRole?: 'user' | 'host' |
                                     </SidebarMenuItem>
                                     <SidebarMenuItem>
                                         <SidebarMenuButton asChild isActive={pathname === "/vendor/finance"} className="w-full justify-start">
-                                            <Link href="/vendor/finance">
+                                            <Link href="/vendor/finance" onClick={handleLinkClick}>
                                                 <CreditCard className="mr-2 h-4 w-4" />
                                                 Finance & Earnings
                                             </Link>
@@ -194,7 +220,7 @@ export function AppSidebar({ userRole = 'user' }: { userRole?: 'user' | 'host' |
                             {userRole === 'user' && (
                                 <SidebarMenuItem className="mt-6">
                                     <SidebarMenuButton asChild className="w-full justify-start border border-dashed border-primary/40 bg-primary/5 hover:bg-primary/10 text-primary font-medium py-6">
-                                        <Link href="/vendor">
+                                        <Link href="/vendor" onClick={handleLinkClick}>
                                             <Briefcase className="mr-2 h-5 w-5" />
                                             <span>Become a Host & Earn</span>
                                         </Link>

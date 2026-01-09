@@ -6,7 +6,11 @@ import { CategoryGrid } from "@/components/home/category-grid"
 export default async function HomePage() {
     const supabase = await createClient()
 
-    // Fetch latest active experiences
+    // Calculate date for 5 days ago
+    const fiveDaysAgo = new Date()
+    fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5)
+
+    // Fetch latest active experiences (last 5 days)
     const { data: experiences } = await supabase
         .from('experiences')
         .select(`
@@ -21,13 +25,24 @@ export default async function HomePage() {
             review_count
         `)
         .eq('is_active', true)
+        .gte('created_at', fiveDaysAgo.toISOString())
         .order('created_at', { ascending: false })
-        .limit(10)
+        .limit(4)
 
     // Fetch random experiences for Hero Slider
     const { data: heroExperiencesData } = await supabase
         .from('experiences')
-        .select('id, title, images')
+        .select(`
+            id,
+            title,
+            price,
+            currency,
+            location_city,
+            location_country,
+            images,
+            rating,
+            review_count
+        `)
         .eq('is_active', true)
         .not('images', 'is', null)
         .limit(20)
@@ -43,6 +58,11 @@ export default async function HomePage() {
         .sort(() => 0.5 - Math.random())
         .slice(0, 5)
 
+    // Pick one experience to be the "Featured" one in the UI
+    const featuredExperience = heroExperiencesData && heroExperiencesData.length > 0
+        ? heroExperiencesData[0]
+        : null
+
     // Fetch Categories for Hero
     const { data: categoriesData } = await supabase
         .from('categories')
@@ -53,7 +73,22 @@ export default async function HomePage() {
 
     const heroCategories = categoriesData || []
 
+    const { data: profiles } = await supabase
+        .from('profiles')
+        .select('avatar_url')
+        .not('avatar_url', 'is', null)
+        .limit(3)
 
+    const userAvatars = profiles?.map(p => p.avatar_url).filter(Boolean) as string[] || []
+
+    // Popular Cities Data (Top 5 Most Visited in 2025)
+    const POPULAR_CITIES = [
+        { name: "Bangkok", country: "Thailand", image: "/cities/bangkok.jpg" },
+        { name: "Hong Kong", country: "China", image: "/cities/hong-kong.jpg" },
+        { name: "London", country: "United Kingdom", image: "/cities/london.jpg" },
+        { name: "Macau", country: "China", image: "/cities/macau.jpg" },
+        { name: "Istanbul", country: "Turkey", image: "/cities/istanbul.jpg" },
+    ]
 
 
     const jsonLd = {
@@ -69,14 +104,17 @@ export default async function HomePage() {
     }
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 pb-8 pt-0">
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
             {/* Hero Section */}
             <section className="mb-12">
-                <Hero slides={heroSlides} categories={heroCategories} />
+                <Hero
+                    categories={heroCategories}
+                    userAvatars={userAvatars}
+                />
             </section>
 
             {/* Categoris Grid */}
@@ -85,10 +123,13 @@ export default async function HomePage() {
                 <CategoryGrid />
             </section>
 
-            {/* Grid */}
-            <section>
+            {/* New Arrivals Grid */}
+            <section className="mb-16">
                 <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold">New Arrivals</h2>
+                    <div>
+                        <h2 className="text-2xl font-bold">New Arrivals</h2>
+                        <p className="text-muted-foreground mt-1">Check out the latest experiences added in the last 5 days</p>
+                    </div>
                 </div>
 
                 {experiences && experiences.length > 0 ? (
@@ -99,9 +140,28 @@ export default async function HomePage() {
                     </div>
                 ) : (
                     <div className="text-center py-20 bg-muted/30 rounded-lg border border-dashed">
-                        <p className="text-muted-foreground">No experiences added yet.</p>
+                        <p className="text-muted-foreground">No new experiences added in the last 5 days.</p>
                     </div>
                 )}
+            </section>
+
+            {/* Popular Cities Section */}
+            <section>
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold">Popular Destinations</h2>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    {POPULAR_CITIES.map((city) => (
+                        <div key={city.name} className="relative group cursor-pointer overflow-hidden rounded-xl aspect-[3/4] bg-muted">
+                            {/* Placeholder generic city image since we don't have real files yet */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
+                            <div className="absolute bottom-4 left-4 z-20 text-white">
+                                <h3 className="font-bold text-lg">{city.name}</h3>
+                                <p className="text-sm opacity-80">{city.country}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </section>
         </div>
     )

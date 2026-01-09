@@ -15,7 +15,7 @@ export async function SiteHeader() {
     if (user) {
         const { data: profile } = await supabase
             .from('profiles')
-            .select('id, email, full_name, avatar_url, role')
+            .select('id, email, full_name, avatar_url, role, category:categories(icon)')
             .eq('id', user.id)
             .single()
         userProfile = profile
@@ -25,13 +25,13 @@ export async function SiteHeader() {
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="container mx-auto px-4 h-16 flex items-center justify-between">
                 <div className="flex items-center gap-8">
-                    <Link href="/" className="flex items-center gap-2 font-bold text-2xl tracking-tighter text-primary">
+                    <Link href="/" className="flex items-center gap-1.5 font-semibold text-2xl tracking-tighter text-primary">
                         <Image
                             src="/tripzeo.svg"
                             alt="tripzeo logo"
-                            width={32}
-                            height={32}
-                            className="w-8 h-8"
+                            width={28}
+                            height={28}
+                            className="w-7 h-7"
                         />
                         tripzeo
                     </Link>

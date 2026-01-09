@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { requireAuth } from "@/lib/auth/guards"
+import { getExperienceUrl } from "@/lib/utils"
 import {
     Table,
     TableBody,
@@ -12,7 +13,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { MapPin, Ticket, MessageSquare } from "lucide-react"
 import Link from "next/link"
-import { redirect } from "next/navigation"
 import { OrderActions } from "./order-actions"
 import { BookingTimeInfo } from "@/modules/bookings/components/booking-time-info"
 import { BookingStatusBadge } from "@/modules/bookings/components/booking-status-badge"
@@ -89,7 +89,7 @@ export default async function OrdersPage({
             </div>
 
             {/* Desktop View: Table */}
-            <div className="hidden md:block rounded-md border bg-card">
+            <div className="hidden md:block rounded-md border bg-card overflow-x-auto">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -107,7 +107,17 @@ export default async function OrdersPage({
                                 <TableCell>
                                     <div className="flex flex-col gap-2">
                                         <div className="flex flex-col gap-1">
-                                            <span className="font-medium">{booking.experience?.title}</span>
+                                            <Link
+                                                href={booking.experience ? getExperienceUrl({
+                                                    id: booking.experience_id, // booking has experience_id
+                                                    title: booking.experience.title,
+                                                    location_city: booking.experience.location_city,
+                                                    location_country: null // Assuming turkey or handled by util default
+                                                }) : '#'}
+                                                className="font-medium hover:underline hover:text-primary transition-colors"
+                                            >
+                                                {booking.experience?.title}
+                                            </Link>
                                             <div className="flex items-center text-xs text-muted-foreground gap-1">
                                                 <MapPin className="h-3 w-3" />
                                                 {booking.experience?.location_city}
@@ -176,9 +186,17 @@ export default async function OrdersPage({
 
                             {/* Title and Location */}
                             <div className="space-y-1">
-                                <h3 className="font-semibold line-clamp-2 leading-tight">
+                                <Link
+                                    href={booking.experience ? getExperienceUrl({
+                                        id: booking.experience_id,
+                                        title: booking.experience.title,
+                                        location_city: booking.experience.location_city,
+                                        location_country: null
+                                    }) : '#'}
+                                    className="font-semibold line-clamp-2 leading-tight hover:underline hover:text-primary transition-colors block"
+                                >
                                     {booking.experience?.title}
-                                </h3>
+                                </Link>
                                 <div className="flex items-center text-sm text-muted-foreground gap-1">
                                     <MapPin className="h-3 w-3" />
                                     {booking.experience?.location_city}

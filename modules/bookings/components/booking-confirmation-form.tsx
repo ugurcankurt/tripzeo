@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button"
 import { createBooking } from "@/modules/bookings/actions"
 import { toast } from "sonner"
 import { BookingRegisterForm } from "@/modules/bookings/components/booking-register-form"
-import { CheckCircle2, Loader2 } from "lucide-react"
+import { ChevronDown, CheckCircle2, Loader2 } from "lucide-react"
+import { useLocation } from "@/hooks/use-location"
 
 import { User } from "@supabase/supabase-js"
 import { Tables } from "@/types/supabase"
@@ -36,12 +37,29 @@ export function BookingConfirmationForm({
     currentUser,
     userProfile
 }: BookingConfirmationFormProps) {
-    const [addressData, setAddressData] = useState({
-        address: userProfile?.address || "",
-        city: userProfile?.city || "",
-        country: userProfile?.country || "",
-        zipCode: userProfile?.zip_code || "",
+    // Location Hook
+    const {
+        countries,
+        states,
+        cities,
+        selectedCountry,
+        selectedState,
+        selectedCity,
+        handleCountryChange,
+        handleStateChange,
+        setSelectedCity,
+        loadingCountries,
+        loadingStates,
+        loadingCities,
+        hasStates
+    } = useLocation({
+        initialCountry: userProfile?.country || "",
+        initialState: userProfile?.state || "",
+        initialCity: userProfile?.city || ""
     })
+
+    const [address, setAddress] = useState(userProfile?.address || "")
+    const [zipCode, setZipCode] = useState(userProfile?.zip_code || "")
     const [isLoading, setIsLoading] = useState(false)
     const router = useRouter()
 
@@ -54,11 +72,11 @@ export function BookingConfirmationForm({
             if (people) formData.append("guests", people.toString())
 
             // Append Address Info
-            if (addressData.address) formData.append("address", addressData.address)
-            if (addressData.city) formData.append("city", addressData.city)
-            if (addressData.country) formData.append("country", addressData.country)
-            if (addressData.zipCode) formData.append("zipCode", addressData.zipCode)
-            if (addressData.zipCode) formData.append("zipCode", addressData.zipCode)
+            if (address) formData.append("address", address)
+            if (selectedCity) formData.append("city", selectedCity)
+            if (selectedCountry) formData.append("country", selectedCountry)
+            if (selectedState) formData.append("state", selectedState)
+            if (zipCode) formData.append("zipCode", zipCode)
 
             const result = await createBooking(null, formData)
 
@@ -111,51 +129,81 @@ export function BookingConfirmationForm({
             {showAddressFields && (
                 <div className="space-y-4 p-4 border rounded-lg bg-muted/20">
                     <h3 className="font-medium">Billing Address & Identity Info</h3>
+
+                    {/* Country & City (& State if applicable) Row */}
+                    <div className={`grid gap-4 ${hasStates ? 'md:grid-cols-3' : 'md:grid-cols-2'}`}>
+                        <div className="space-y-2">
+                            <Label>Country</Label>
+                            <div className="relative">
+                                <select
+                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 appearance-none"
+                                    onChange={handleCountryChange}
+                                    value={selectedCountry || ''}
+                                >
+                                    <option value="">Select Country</option>
+                                    {loadingCountries ? <option disabled>Loading...</option> : countries.map(c => <option key={c} value={c}>{c}</option>)}
+                                </select>
+                                <ChevronDown className="absolute right-3 top-3 h-4 w-4 opacity-50 pointer-events-none" />
+                            </div>
+                        </div>
+
+                        {hasStates && (
+                            <div className="space-y-2">
+                                <Label>State</Label>
+                                <div className="relative">
+                                    <select
+                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 appearance-none"
+                                        onChange={handleStateChange}
+                                        value={selectedState}
+                                        disabled={loadingStates}
+                                    >
+                                        <option value="">Select State</option>
+                                        {loadingStates ? <option disabled>Loading...</option> : states.map(s => <option key={s} value={s}>{s}</option>)}
+                                    </select>
+                                    <ChevronDown className="absolute right-3 top-3 h-4 w-4 opacity-50 pointer-events-none" />
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="space-y-2">
+                            <Label>City</Label>
+                            <div className="relative">
+                                <select
+                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 appearance-none"
+                                    disabled={!selectedCountry || loadingCities}
+                                    value={selectedCity || ''}
+                                    onChange={(e) => setSelectedCity(e.target.value)}
+                                >
+                                    <option value="">Select City</option>
+                                    {loadingCities ? <option disabled>Loading...</option> : cities.map(c => <option key={c} value={c}>{c}</option>)}
+                                </select>
+                                <ChevronDown className="absolute right-3 top-3 h-4 w-4 opacity-50 pointer-events-none" />
+                            </div>
+                        </div>
+                    </div>
+
                     <div className="space-y-2">
                         <label className="text-sm font-medium">Full Address</label>
                         <input
                             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
                             placeholder="Your full address"
-                            value={addressData.address}
-                            onChange={(e) => setAddressData({ ...addressData, address: e.target.value })}
+                            value={address}
+                            onChange={(e) => setAddress(e.target.value)}
                             required
                         />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">City</label>
-                            <input
-                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
-                                placeholder="Istanbul"
-                                value={addressData.city}
-                                onChange={(e) => setAddressData({ ...addressData, city: e.target.value })}
-                                required
-                            />
-                        </div>
-                        <div className="space-y-2">
                             <label className="text-sm font-medium">Zip Code</label>
                             <input
                                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
                                 placeholder="34000"
-                                value={addressData.zipCode}
-                                onChange={(e) => setAddressData({ ...addressData, zipCode: e.target.value })}
+                                value={zipCode}
+                                onChange={(e) => setZipCode(e.target.value)}
                                 required
                             />
                         </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">Country</label>
-                            <input
-                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
-                                placeholder="Turkey"
-                                value={addressData.country}
-                                onChange={(e) => setAddressData({ ...addressData, country: e.target.value })}
-                                required
-                            />
-                        </div>
-                    </div>
-                    {/* TCK Input removed as it is now hardcoded for Iyzipay */}
                 </div>
             )}
 
@@ -163,7 +211,7 @@ export function BookingConfirmationForm({
                 className="w-full text-lg h-14"
                 size="lg"
                 onClick={handleCreateBooking}
-                disabled={isLoading || (showAddressFields && (!addressData.address || !addressData.city || !addressData.country))}
+                disabled={isLoading || (showAddressFields && (!address || !selectedCity || !selectedCountry || !zipCode))}
             >
                 {isLoading ? (
                     <>

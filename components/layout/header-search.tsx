@@ -32,13 +32,13 @@ export function HeaderSearch() {
         <>
             {/* Desktop Search */}
             <form onSubmit={handleSearch} className="hidden md:flex items-center relative w-[300px]">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary z-10" />
                 <Input
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Search for cities or experiences..."
-                    className="pl-10 pr-4 rounded-full bg-muted border-none focus-visible:ring-1"
+                    className="pl-10 pr-4 rounded-full bg-muted/20 backdrop-blur-md border-none shadow-none focus-visible:ring-1 focus-visible:ring-primary transition-all hover:bg-muted/40 focus:bg-background"
                 />
             </form>
 
@@ -62,7 +62,7 @@ export function HeaderSearch() {
                     </DialogHeader>
                     <form onSubmit={handleSearch} className="grid gap-4 py-4">
                         <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary z-10" />
                             <Input
                                 autoFocus
                                 type="text"

@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Link from "next/link"
-import { CreditCard, LayoutDashboard, LogOut, Settings, User, ShoppingBag } from "lucide-react"
+import { CreditCard, LayoutDashboard, LogOut, Settings, User, ShoppingBag, Heart } from "lucide-react"
 import { signout } from "@/modules/auth/actions"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
@@ -24,6 +24,7 @@ interface UserNavProps {
         full_name?: string | null
         avatar_url?: string | null
         role?: 'user' | 'host' | 'admin' | null
+        category?: { icon: string | null } | any
     }
 }
 
@@ -47,7 +48,7 @@ export function UserNav({ user }: UserNavProps) {
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                     <Avatar className="h-10 w-10 border border-muted">
-                        <AvatarImage src={user.avatar_url || ''} alt={user.full_name || ''} className="object-cover" />
+                        <AvatarImage src={user.avatar_url || user.category?.icon || ''} alt={user.full_name || ''} className="object-contain" />
                         <AvatarFallback className="bg-primary/10 text-primary font-medium">
                             {user.full_name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
                         </AvatarFallback>
@@ -74,7 +75,13 @@ export function UserNav({ user }: UserNavProps) {
                     <DropdownMenuItem asChild>
                         <Link href="/account/orders">
                             <ShoppingBag className="mr-2 h-4 w-4" />
-                            <span>My Orders</span>
+                            <span>My Bookings</span>
+                        </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                        <Link href="/account/favorites">
+                            <Heart className="mr-2 h-4 w-4" />
+                            <span>My Favorites</span>
                         </Link>
                     </DropdownMenuItem>
                     {/* Eğer Host ise Panel linkini göster */}

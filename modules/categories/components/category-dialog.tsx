@@ -28,6 +28,8 @@ export function CategoryDialog({ mode, category }: CategoryDialogProps) {
     const [open, setOpen] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const [name, setName] = useState(category?.name || '')
+    const [imageFile, setImageFile] = useState<File | null>(null)
+    const [currentIcon, setCurrentIcon] = useState(category?.icon || '')
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -36,6 +38,35 @@ export function CategoryDialog({ mode, category }: CategoryDialogProps) {
         try {
             const formData = new FormData()
             formData.append('name', name)
+
+            let iconUrl = currentIcon
+
+            // Handle Image Upload if a file is selected
+            if (imageFile) {
+                const supabase = await import("@/lib/supabase/client").then(mod => mod.createClient())
+                const fileExt = imageFile.name.split('.').pop()
+                const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`
+                const filePath = `categories/${fileName}`
+
+                const { error: uploadError } = await supabase.storage
+                    .from('public_assets')
+                    .upload(filePath, imageFile)
+
+                if (uploadError) {
+                    toast.error("Failed to upload image")
+                    console.error(uploadError)
+                    setIsLoading(false)
+                    return
+                }
+
+                const { data: { publicUrl } } = supabase.storage
+                    .from('public_assets')
+                    .getPublicUrl(filePath)
+
+                iconUrl = publicUrl
+            }
+
+            formData.append('icon', iconUrl)
 
             let result
             if (mode === 'create') {
@@ -50,10 +81,15 @@ export function CategoryDialog({ mode, category }: CategoryDialogProps) {
             } else {
                 toast.success(result.success)
                 setOpen(false)
-                if (mode === 'create') setName('')
+                if (mode === 'create') {
+                    setName('')
+                    setImageFile(null)
+                    setCurrentIcon('')
+                }
             }
         } catch (error) {
             toast.error("An unexpected error occurred.")
+            console.error(error)
         } finally {
             setIsLoading(false)
         }
@@ -95,6 +131,24 @@ export function CategoryDialog({ mode, category }: CategoryDialogProps) {
                                 placeholder="e.g. Food Tours"
                                 required
                             />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="image" className="text-right">
+                                Icon/Image
+                            </Label>
+                            <div className="col-span-3 space-y-2">
+                                <Input
+                                    id="image"
+                                    type="file"
+                                    accept="image/png, image/jpeg, image/webp"
+                                    onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+                                />
+                                {currentIcon && !imageFile && (
+                                    <div className="text-xs text-muted-foreground break-all">
+                                        Current: {currentIcon.startsWith('http') ? 'Image Set' : currentIcon}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="slug" className="text-right text-muted-foreground">

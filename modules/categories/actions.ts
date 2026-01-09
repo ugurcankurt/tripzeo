@@ -67,6 +67,7 @@ export async function updateCategory(id: string, prevState: any, formData: FormD
         .update({
             name,
             slug,
+            icon: formData.get('icon') as string,
             updated_at: new Date().toISOString()
         })
         .eq('id', id)
@@ -98,6 +99,7 @@ export async function createCategory(prevState: any, formData: FormData) {
         .insert({
             name,
             slug,
+            icon: formData.get('icon') as string,
             is_active: true
         })
 
