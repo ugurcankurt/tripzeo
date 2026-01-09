@@ -359,10 +359,16 @@ export async function rejectBooking(bookingId: string) {
     revalidatePath('/vendor/bookings')
 
     if (booking.user_id) {
+        // Format amount
+        const formattedAmount = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD'
+        }).format(Number(booking.total_amount))
+
         await createNotification({
             userId: booking.user_id,
             title: "Booking Rejected",
-            message: `Your booking for ${booking.experience?.title || 'an experience'} was declined by the host.`,
+            message: `Your booking for ${booking.experience?.title || 'an experience'} was declined by the host. The pre-authorization check for ${formattedAmount} has been voided.`,
             link: "/account/orders",
             type: "error"
         })
@@ -419,10 +425,16 @@ export async function refundBooking(bookingId: string) {
     revalidatePath('/vendor/bookings')
 
     if (booking.user_id) {
+        // Format amount
+        const formattedAmount = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD'
+        }).format(Number(booking.total_amount))
+
         await createNotification({
             userId: booking.user_id,
             title: "Booking Refunded",
-            message: `Your booking for ${booking.experience?.title || 'an experience'} has been cancelled and refunded by the host.`,
+            message: `Your booking for ${booking.experience?.title || 'an experience'} has been cancelled by the host. A full refund of ${formattedAmount} has been processed to your card.`,
             link: "/account/orders",
             type: "warning"
         })
