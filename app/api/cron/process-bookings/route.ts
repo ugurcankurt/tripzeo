@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { Database } from '@/types/supabase';
 
 // This is a Route Handler for Vercel Cron
-export async function POST(req: NextRequest) {
+export async function GET(req: NextRequest) {
     // 1. Verify Authentication (CRON_SECRET)
     const authHeader = req.headers.get('authorization');
     if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
