@@ -1,8 +1,8 @@
 import { ImageResponse } from 'next/og'
 import { createClient } from '@supabase/supabase-js'
 
-// Export runtime as nodejs to avoid Edge limitations with image processing/fonts
-export const runtime = 'nodejs'
+// Use Edge runtime for better performance and to avoid Node.js serverless limitations on Vercel
+export const runtime = 'edge'
 
 export const alt = 'Category Experiences'
 export const size = {
@@ -24,65 +24,77 @@ export default async function Image({ params }: { params: Promise<{ slug: string
 
         if (!supabaseUrl || !supabaseKey) {
             console.error('[OG Error] Missing Supabase Env Vars')
-            throw new Error('Supabase Env Vars missing')
+            // Don't throw to avoid 500, just fallback
         }
 
-        const supabase = createClient(supabaseUrl, supabaseKey)
-
-        // 1. Fetch Category
-        const { data: category, error: catError } = await supabase
-            .from('categories')
-            .select('name, icon')
-            .eq('slug', slug)
-            .single()
-
-        if (catError) {
-            console.error('[OG Error] Category fetch failed:', catError)
-        }
-
-        const categoryName = category?.name || 'Experiences'
-        console.log(`[OG Info] Found category: ${categoryName}`)
-
-        // 2. Fetch recent experiences
-        const { data: experiences, error: expError } = await supabase
-            .from('experiences')
-            .select('images')
-            .eq('is_active', true)
-            .eq('category', categoryName)
-            .not('images', 'is', null)
-            .order('created_at', { ascending: false })
-            .limit(5)
-
-        if (expError) {
-            console.error('[OG Error] Experiences fetch failed:', expError)
-        }
-
-        const validExperience = experiences?.find((exp: any) => exp.images && exp.images.length > 0 && typeof exp.images[0] === 'string')
-        const rawBgImage = validExperience?.images?.[0]
-
-        // Helper to get absolute URL
-        const getAbsoluteUrl = (path?: string | null) => {
-            if (!path) return null
-            if (path.startsWith('http')) return path
-            const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.tripzeo.com'
-            return `${baseUrl}${path.startsWith('/') ? '' : '/'}${path}`
-        }
-
-        const bgImageUrl = getAbsoluteUrl(rawBgImage)
-        console.log(`[OG Info] Background Image URL: ${bgImageUrl || 'None'}`)
-
-        // 3. Fetch Image Buffer (More robust than passing URL to Satori)
+        let categoryName = 'Experiences'
         let bgImageBuffer: ArrayBuffer | null = null
-        if (bgImageUrl) {
-            try {
-                const res = await fetch(bgImageUrl)
-                if (res.ok) {
-                    bgImageBuffer = await res.arrayBuffer()
-                } else {
-                    console.error(`[OG Error] Failed to fetch image: ${res.status} ${res.statusText}`)
+
+        if (supabaseUrl && supabaseKey) {
+            const supabase = createClient(supabaseUrl, supabaseKey)
+
+            // 1. Fetch Category
+            const { data: category, error: catError } = await supabase
+                .from('categories')
+                .select('name, icon')
+                .eq('slug', slug)
+                .single()
+
+            if (catError) {
+                console.error('[OG Error] Category fetch failed:', catError)
+            }
+
+            if (category?.name) {
+                categoryName = category.name
+                console.log(`[OG Info] Found category: ${categoryName}`)
+            }
+
+            // 2. Fetch recent experiences (top 5 to find one with image)
+            const { data: experiences, error: expError } = await supabase
+                .from('experiences')
+                .select('images')
+                .eq('is_active', true)
+                .eq('category', categoryName)
+                .not('images', 'is', null)
+                .order('created_at', { ascending: false })
+                .limit(5)
+
+            if (expError) {
+                console.error('[OG Error] Experiences fetch failed:', expError)
+            }
+
+            const validExperience = experiences?.find((exp: any) => exp.images && exp.images.length > 0 && typeof exp.images[0] === 'string')
+            const rawBgImage = validExperience?.images?.[0]
+
+            // Helper to get absolute URL
+            const getAbsoluteUrl = (path?: string | null) => {
+                if (!path) return null
+                if (path.startsWith('http')) return path
+                const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.tripzeo.com'
+                return `${baseUrl}${path.startsWith('/') ? '' : '/'}${path}`
+            }
+
+            const bgImageUrl = getAbsoluteUrl(rawBgImage)
+            console.log(`[OG Info] Background Image URL: ${bgImageUrl || 'None'}`)
+
+            // 3. Fetch Image Buffer
+            if (bgImageUrl) {
+                try {
+                    // Add timeout to fetch to prevent hanging in Edge
+                    const controller = new AbortController()
+                    const timeoutId = setTimeout(() => controller.abort(), 3000) // 3s timeout
+
+                    const res = await fetch(bgImageUrl, { signal: controller.signal })
+                    clearTimeout(timeoutId)
+
+                    if (res.ok) {
+                        bgImageBuffer = await res.arrayBuffer()
+                    } else {
+                        console.error(`[OG Error] Failed to fetch image: ${res.status} ${res.statusText}`)
+                    }
+                } catch (fetchError) {
+                    console.error('[OG Error] Image fetch threw:', fetchError)
                 }
-            } catch (fetchError) {
-                console.error('[OG Error] Image fetch threw:', fetchError)
             }
         }
 
@@ -209,11 +221,11 @@ export default async function Image({ params }: { params: Promise<{ slug: string
         )
     } catch (e: any) {
         console.error('OG Generation Error:', e)
+        // Fallback Response to avoid 500 error
         return new ImageResponse(
             (
-                <div style={{ width: '100%', height: '100%', background: '#1a1a1a', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 40, color: 'white' }}>
-                    <h1 style={{ color: '#ff4444', fontSize: 48, marginBottom: 20 }}>OG Error</h1>
-                    <pre style={{ fontSize: 24, whiteSpace: 'pre-wrap', textAlign: 'center' }}>{e.message}</pre>
+                <div style={{ width: '100%', height: '100%', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ fontSize: 40, color: 'white' }}>TRIPZEO</div>
                 </div>
             ),
             { ...size }
