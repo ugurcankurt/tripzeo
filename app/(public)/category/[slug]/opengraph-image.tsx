@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og'
 import { createClient } from '@supabase/supabase-js'
 
-export const dynamic = 'force-dynamic'
+export const runtime = 'edge'
 
 export const alt = 'Category Experiences'
 export const size = {
