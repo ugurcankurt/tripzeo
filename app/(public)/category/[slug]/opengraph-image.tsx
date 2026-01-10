@@ -11,159 +11,178 @@ export const size = {
 export const contentType = 'image/png'
 
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
-    const { slug } = await params
+    try {
+        const { slug } = await params
 
-    // Initialize Supabase Client directly (Edge compatible)
-    const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
+        // Initialize Supabase Client directly (Edge compatible)
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+        const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-    // 1. Fetch Category Name and Icon
-    const { data: category } = await supabase
-        .from('categories')
-        .select('name, icon')
-        .eq('slug', slug)
-        .single()
+        if (!supabaseUrl || !supabaseKey) {
+            throw new Error('Missing Supabase Environment Variables')
+        }
 
-    // Helper to ensure absolute URLs
-    const getAbsoluteUrl = (path?: string | null) => {
-        if (!path) return null
-        if (path.startsWith('http')) return path
-        // Use processing NEXT_PUBLIC_APP_URL or fall back to verified domain
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.tripzeo.com'
-        return `${baseUrl}${path.startsWith('/') ? '' : '/'}${path}`
-    }
+        const supabase = createClient(supabaseUrl, supabaseKey)
 
-    const categoryName = category?.name || 'Experiences'
-    // Ensure icon is absolute URL
-    const categoryIcon = getAbsoluteUrl(category?.icon)
+        // 1. Fetch Category Name and Icon
+        const { data: category, error: categoryError } = await supabase
+            .from('categories')
+            .select('name, icon')
+            .eq('slug', slug)
+            .single()
 
-    // 2. Fetch a representative background image
-    // Switching to created_at to ensure we get *any* valid recent image if ratings are empty
-    const { data: experiences } = await supabase
-        .from('experiences')
-        .select('images')
-        .eq('is_active', true)
-        .eq('category', categoryName)
-        .not('images', 'is', null)
-        .order('created_at', { ascending: false }) // Match page.tsx logic
-        .limit(1)
+        if (categoryError) {
+            console.error('Supabase Category Error:', categoryError)
+        }
 
-    // Strategy: Experience Image -> Category Icon -> Fallback Gradient
-    // Ensure experience image is absolute
-    const rawBgImage = experiences?.[0]?.images?.[0]
-    const bgImage = getAbsoluteUrl(rawBgImage) || categoryIcon
+        // Helper to ensure absolute URLs
+        const getAbsoluteUrl = (path?: string | null) => {
+            if (!path) return null
+            if (path.startsWith('http')) return path
+            // Use processing NEXT_PUBLIC_APP_URL or fall back to verified domain
+            const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.tripzeo.com'
+            return `${baseUrl}${path.startsWith('/') ? '' : '/'}${path}`
+        }
 
-    console.log(`OpenGraph Debug [${slug}]:`, { categoryName, bgImage, rawBgImage, categoryIcon })
+        const categoryName = category?.name || 'Experiences'
+        // Ensure icon is absolute URL
+        const categoryIcon = getAbsoluteUrl(category?.icon)
 
+        // 2. Fetch a representative background image
+        // Switching to created_at to ensure we get *any* valid recent image if ratings are empty
+        const { data: experiences } = await supabase
+            .from('experiences')
+            .select('images')
+            .eq('is_active', true)
+            .eq('category', categoryName)
+            .not('images', 'is', null)
+            .order('created_at', { ascending: false }) // Match page.tsx logic
+            .limit(1)
 
-    // Gradient overlay to ensure text readability
-    const overlayGradient = 'linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.8))'
+        // Strategy: Experience Image -> Category Icon -> Fallback Gradient
+        // Ensure experience image is absolute
+        const rawBgImage = experiences?.[0]?.images?.[0]
+        const bgImage = getAbsoluteUrl(rawBgImage) || categoryIcon
 
-    return new ImageResponse(
-        (
-            <div
-                style={{
-                    width: '100%',
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'flex-end',
-                    background: '#1a1a1a',
-                    position: 'relative',
-                }}
-            >
-                {/* Background Image */}
-                {bgImage ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                        src={bgImage}
-                        alt=""
-                        style={{
-                            position: 'absolute',
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover',
-                        }}
-                    />
-                ) : (
-                    <div
-                        style={{
-                            position: 'absolute',
-                            width: '100%',
-                            height: '100%',
-                            background: 'linear-gradient(135deg, #e64d12 0%, #c2410c 100%)', // Brand Primary Gradient
-                        }}
-                    />
-                )}
+        // Gradient overlay to ensure text readability
+        const overlayGradient = 'linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.8))'
 
-                {/* Gradient Overlay */}
+        return new ImageResponse(
+            (
                 <div
                     style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        background: overlayGradient,
-                    }}
-                />
-
-                {/* Content */}
-                <div
-                    style={{
+                        width: '100%',
+                        height: '100%',
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 10,
-                        paddingBottom: 80,
-                        textAlign: 'center',
+                        justifyContent: 'flex-end',
+                        background: '#1a1a1a',
+                        position: 'relative',
                     }}
                 >
-                    <div
-                        style={{
-                            color: '#fff',
-                            fontSize: 24,
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.1em',
-                            fontWeight: 600,
-                            marginBottom: 10,
-                            background: 'rgba(255,255,255,0.2)',
-                            padding: '8px 16px',
-                            borderRadius: 100,
-                            backdropFilter: 'blur(4px)',
-                        }}
-                    >
-                        Explore
-                    </div>
-                    <div
-                        style={{
-                            color: '#fff',
-                            fontSize: 80,
-                            fontWeight: 900,
-                            letterSpacing: '-0.03em',
-                            lineHeight: 1,
-                            textShadow: '0 4px 10px rgba(0,0,0,0.5)',
-                        }}
-                    >
-                        {categoryName}
-                    </div>
-                    <div style={{ color: 'rgba(255,255,255,0.9)', fontSize: 30, marginTop: 20, fontWeight: 500 }}>
-                        Tripzeo - Local Experiences & Tours
-                    </div>
-                </div>
+                    {/* Background Image */}
+                    {bgImage ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                            src={bgImage}
+                            alt=""
+                            style={{
+                                position: 'absolute',
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                            }}
+                        />
+                    ) : (
+                        <div
+                            style={{
+                                position: 'absolute',
+                                width: '100%',
+                                height: '100%',
+                                background: 'linear-gradient(135deg, #e64d12 0%, #c2410c 100%)', // Brand Primary Gradient
+                            }}
+                        />
+                    )}
 
-                {/* Logo mark bottom right */}
-                <div style={{ position: 'absolute', bottom: 40, right: 40, display: 'flex', zIndex: 20 }}>
-                    <div style={{ color: 'white', fontSize: 32, fontWeight: 900 }}>tripzeo</div>
+                    {/* Gradient Overlay */}
+                    <div
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            background: overlayGradient,
+                        }}
+                    />
+
+                    {/* Content */}
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            zIndex: 10,
+                            paddingBottom: 80,
+                            textAlign: 'center',
+                        }}
+                    >
+                        <div
+                            style={{
+                                color: '#fff',
+                                fontSize: 24,
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.1em',
+                                fontWeight: 600,
+                                marginBottom: 10,
+                                background: 'rgba(255,255,255,0.2)',
+                                padding: '8px 16px',
+                                borderRadius: 100,
+                                backdropFilter: 'blur(4px)',
+                            }}
+                        >
+                            Explore
+                        </div>
+                        <div
+                            style={{
+                                color: '#fff',
+                                fontSize: 80,
+                                fontWeight: 900,
+                                letterSpacing: '-0.03em',
+                                lineHeight: 1,
+                                textShadow: '0 4px 10px rgba(0,0,0,0.5)',
+                            }}
+                        >
+                            {categoryName}
+                        </div>
+                        <div style={{ color: 'rgba(255,255,255,0.9)', fontSize: 30, marginTop: 20, fontWeight: 500 }}>
+                            Tripzeo - Local Experiences & Tours
+                        </div>
+                    </div>
+
+                    {/* Logo mark bottom right */}
+                    <div style={{ position: 'absolute', bottom: 40, right: 40, display: 'flex', zIndex: 20 }}>
+                        <div style={{ color: 'white', fontSize: 32, fontWeight: 900 }}>tripzeo</div>
+                    </div>
                 </div>
-            </div>
-        ),
-        {
-            ...size,
-        }
-    )
+            ),
+            {
+                ...size,
+            }
+        )
+    } catch (e: any) {
+        console.error('OG Image Generation Error:', e)
+        return new ImageResponse(
+            (
+                <div style={{ background: 'white', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 40 }}>
+                    <h1 style={{ fontSize: 40, color: 'red', marginBottom: 20 }}>OG Image Error</h1>
+                    <p style={{ fontSize: 24, color: '#333' }}>{e.message}</p>
+                    <pre style={{ fontSize: 18, color: '#666', marginTop: 20, maxWidth: '100%', whiteSpace: 'pre-wrap' }}>{JSON.stringify(e, null, 2)}</pre>
+                </div>
+            ),
+            { ...size }
+        )
+    }
 }
