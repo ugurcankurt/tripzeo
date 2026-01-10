@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { ExperienceCard } from "@/modules/experiences/components/experience-card"
 import { Hero } from "@/components/hero"
 import { CategoryGrid } from "@/components/home/category-grid"
+import Image from "next/image"
 
 export default async function HomePage() {
     const supabase = await createClient()
@@ -81,14 +82,56 @@ export default async function HomePage() {
 
     const userAvatars = profiles?.map(p => p.avatar_url).filter(Boolean) as string[] || []
 
-    // Popular Cities Data (Top 5 Most Visited in 2025)
-    const POPULAR_CITIES = [
-        { name: "Bangkok", country: "Thailand", image: "/cities/bangkok.jpg" },
-        { name: "Hong Kong", country: "China", image: "/cities/hong-kong.jpg" },
-        { name: "London", country: "United Kingdom", image: "/cities/london.jpg" },
-        { name: "Macau", country: "China", image: "/cities/macau.jpg" },
-        { name: "Istanbul", country: "Turkey", image: "/cities/istanbul.jpg" },
-    ]
+    // 4. Popular Cities Data (Dynamic from Experience Counts)
+    // Fetch all active experiences (lightweight select) to aggregate popularity
+    // For scaling, this should eventually be a Database View or RPC function
+    const { data: allExperiences } = await supabase
+        .from('experiences')
+        .select('location_city, location_country, images')
+        .eq('is_active', true)
+
+    // Aggregate counts by city
+    const cityStats: Record<string, { count: number, country: string, image: string }> = {}
+
+    if (allExperiences) {
+        allExperiences.forEach(exp => {
+            if (exp.location_city && exp.location_country) {
+                // Normalize key for aggregation (e.g. "Istanbul-Turkey")
+                const key = `${exp.location_city}-${exp.location_country}`
+
+                if (!cityStats[key]) {
+                    cityStats[key] = {
+                        count: 0,
+                        country: exp.location_country,
+                        image: exp.images?.[0] || '/images/placeholders/city-placeholder.jpg'
+                    }
+                }
+
+                cityStats[key].count += 1
+
+                // Keep the image from the latest experience (since we loop essentially in arbitrary fetch order, 
+                // but usually CreatedAt desc if specified. Here we didn't specify order, so let's stick with first found or overwrite?)
+                // Actually, let's keep the first valid image found to ensure we have one.
+                if (cityStats[key].image.includes('placeholder') && exp.images?.[0]) {
+                    cityStats[key].image = exp.images[0]
+                }
+            }
+        })
+    }
+
+    // Convert to array, sort by count, take top 5
+    const POPULAR_CITIES = Object.entries(cityStats)
+        .map(([key, stat]) => ({
+            name: key.split('-')[0], // Extract City Name back from key or use stat (safer to use key part if consistent)
+            // Better: use the original city string split? Or just store city name in stats object.
+            // Let's refine the stats object.
+            city: key.split('-')[0],
+            country: stat.country,
+            image: stat.image,
+            count: stat.count
+        }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5)
 
 
     const jsonLd = {
@@ -152,12 +195,21 @@ export default async function HomePage() {
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                     {POPULAR_CITIES.map((city) => (
-                        <div key={city.name} className="relative group cursor-pointer overflow-hidden rounded-xl aspect-[3/4] bg-muted">
-                            {/* Placeholder generic city image since we don't have real files yet */}
+                        <div key={`${city.city}-${city.country}`} className="relative group cursor-pointer overflow-hidden rounded-xl aspect-[3/4] bg-muted">
+                            <Image
+                                src={city.image}
+                                alt={city.city}
+                                fill
+                                className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                sizes="(max-width: 768px) 50vw, 20vw"
+                            />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
                             <div className="absolute bottom-4 left-4 z-20 text-white">
-                                <h3 className="font-bold text-lg">{city.name}</h3>
+                                <h3 className="font-bold text-lg">{city.city}</h3>
                                 <p className="text-sm opacity-80">{city.country}</p>
+                                <span className="inline-block mt-2 px-2 py-0.5 bg-primary/20 backdrop-blur-sm rounded text-xs font-medium border border-primary/30 text-primary-foreground">
+                                    {city.count} Experiences
+                                </span>
                             </div>
                         </div>
                     ))}
