@@ -100,9 +100,22 @@ export default async function Image({ params }: { params: Promise<{ slug: string
                                 position: 'absolute',
                                 width: '100%',
                                 height: '100%',
-                                background: 'linear-gradient(135deg, #e64d12 0%, #c2410c 100%)', // Brand Primary Gradient
+                                background: 'linear-gradient(135deg, #e64d12 0%, #c2410c 100%)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                padding: 40,
+                                color: 'rgba(255,255,255,0.5)',
+                                fontSize: 20
                             }}
-                        />
+                        >
+                            {/* Visual Debug Info for User/Dev */}
+                            <div>DEBUG INFO:</div>
+                            <div>Slug: {slug}</div>
+                            <div>Category: {categoryName}</div>
+                            <div>Icon: {categoryIcon || 'null'}</div>
+                            <div>Exp Found: {experiences?.length || 0}</div>
+                            <div>Raw Image: {rawBgImage || 'null'}</div>
+                        </div>
                     )}
 
                     {/* Gradient Overlay */}
