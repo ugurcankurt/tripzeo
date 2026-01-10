@@ -19,14 +19,15 @@ export default async function Image({ params }: { params: { slug: string } }) {
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     )
 
-    // 1. Fetch Category Name
+    // 1. Fetch Category Name and Icon
     const { data: category } = await supabase
         .from('categories')
-        .select('name')
+        .select('name, icon')
         .eq('slug', slug)
         .single()
 
     const categoryName = category?.name || 'Experiences'
+    const categoryIcon = category?.icon
 
     // 2. Fetch a representative background image (Highest rated experience in this category)
     // Note: 'category' column in experiences is text (name) based on analysis
@@ -39,7 +40,8 @@ export default async function Image({ params }: { params: { slug: string } }) {
         .order('rating', { ascending: false })
         .limit(1)
 
-    const bgImage = experiences?.[0]?.images?.[0]
+    // Strategy: Experience Image -> Category Icon -> Fallback Gradient
+    const bgImage = experiences?.[0]?.images?.[0] || categoryIcon
 
     // Gradient overlay to ensure text readability
     const overlayGradient = 'linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.8))'
@@ -77,7 +79,7 @@ export default async function Image({ params }: { params: { slug: string } }) {
                             position: 'absolute',
                             width: '100%',
                             height: '100%',
-                            background: 'linear-gradient(45deg, #FF512F, #DD2476)', // Fallback gradient
+                            background: 'linear-gradient(135deg, #e64d12 0%, #c2410c 100%)', // Brand Primary Gradient
                         }}
                     />
                 )}
