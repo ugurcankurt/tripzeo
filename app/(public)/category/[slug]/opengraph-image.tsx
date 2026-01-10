@@ -74,21 +74,75 @@ export default async function Image({ params }: { params: Promise<{ slug: string
                 return `${baseUrl}${path.startsWith('/') ? '' : '/'}${path}`
             }
 
-            const bgImageUrl = getAbsoluteUrl(rawBgImage)
+            let bgImageUrl = getAbsoluteUrl(rawBgImage)
             console.log(`[OG Info] Background Image URL: ${bgImageUrl || 'None'}`)
 
-            // 3. Fetch Image Buffer
+            // 3. Fetch Image Buffer with WebP handling
             if (bgImageUrl) {
                 try {
-                    // Add timeout to fetch to prevent hanging in Edge
-                    const controller = new AbortController()
-                    const timeoutId = setTimeout(() => controller.abort(), 3000) // 3s timeout
+                    // Try to fetch the image
+                    const fetchImage = async (url: string) => {
+                        const controller = new AbortController()
+                        const timeoutId = setTimeout(() => controller.abort(), 3000) // 3s timeout
+                        const res = await fetch(url, { signal: controller.signal })
+                        clearTimeout(timeoutId)
+                        return res
+                    }
 
-                    const res = await fetch(bgImageUrl, { signal: controller.signal })
-                    clearTimeout(timeoutId)
+                    let res = await fetchImage(bgImageUrl)
 
+                    // Check for WebP
+                    const contentType = res.headers.get('content-type')
+                    if (res.ok && contentType?.includes('webp')) {
+                        console.warn('[OG Warning] Image is WebP, attempting Supabase JPEG transformation...')
+
+                        // Try Supabase Image Transformation
+                        // If it's a supabase storage URL, we can use the 'render' endpoint or query params
+                        // Standard Supabase Storage Public URL: https://[ref].supabase.co/storage/v1/object/public/[bucket]/[path]
+                        // Transform URL: https://[ref].supabase.co/storage/v1/render/image/public/[bucket]/[path]?format=origin (or format=jpeg)
+
+                        // Simple heuristic: Try appending ?format=jpeg if it looks like a supabase URL (has supabase in it)
+                        // Or utilize the render endpoint if we can parse it.
+
+                        // Safer approach for now: Append query param. Many storage implementations ignore it if unsupported, 
+                        // but Supabase Image Transformation service honors it.
+                        // We also need to handle the case where "object" needs to be replaced by "render/image"
+
+                        if (bgImageUrl.includes('supabase.co/storage/v1/object/public')) {
+                            const transformUrl = bgImageUrl
+                                .replace('/object/public/', '/render/image/public/')
+                                + '?width=1200&quality=75&format=jpeg'
+
+                            console.log(`[OG Info] Trying transformation URL: ${transformUrl}`)
+                            const transformRes = await fetchImage(transformUrl)
+
+                            // If transformation works, use it. If not (e.g. 404 or still webp), fallback to skipping or original (will likely fail later but worth a try to see logs)
+                            if (transformRes.ok && !transformRes.headers.get('content-type')?.includes('webp')) {
+                                res = transformRes
+                                console.log('[OG Info] Transformation successful')
+                            } else {
+                                console.warn('[OG Warning] Transformation failed or returned WebP again.')
+                            }
+                        } else {
+                            // Try generic query param for other providers
+                            const transformGenericUrl = `${bgImageUrl}${bgImageUrl.includes('?') ? '&' : '?'}format=jpeg`
+                            console.log(`[OG Info] Trying generic transformation URL: ${transformGenericUrl}`)
+                            const transformRes = await fetchImage(transformGenericUrl)
+                            if (transformRes.ok && !transformRes.headers.get('content-type')?.includes('webp')) {
+                                res = transformRes
+                            }
+                        }
+                    }
+
+                    // Final check before using buffer
+                    const finalContentType = res.headers.get('content-type')
                     if (res.ok) {
-                        bgImageBuffer = await res.arrayBuffer()
+                        if (finalContentType?.includes('webp')) {
+                            console.error('[OG Error] Image is still WebP and Vercel OG on Edge may not support it. Skipping background image.')
+                            bgImageBuffer = null
+                        } else {
+                            bgImageBuffer = await res.arrayBuffer()
+                        }
                     } else {
                         console.error(`[OG Error] Failed to fetch image: ${res.status} ${res.statusText}`)
                     }
