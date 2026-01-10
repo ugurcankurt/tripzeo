@@ -26,13 +26,14 @@ export default async function Image({ params }: { params: { slug: string } }) {
 
     const { data: profile } = await supabase
         .from('profiles')
-        .select('full_name, avatar_url, bio, category_id, categories(name)')
+        .select('full_name, avatar_url, bio, category_id, categories(name, icon)')
         .eq('id', hostId)
         .single()
 
     const name = profile?.full_name || 'Tripzeo Host'
     const bio = profile?.bio ? profile.bio.slice(0, 100) + (profile.bio.length > 100 ? '...' : '') : 'Experiences Host on Tripzeo'
-    let avatar = profile?.avatar_url
+    // @ts-ignore
+    let avatar = profile?.avatar_url || profile?.categories?.icon
     // @ts-ignore
     const category = profile?.categories?.name || 'Local Expert'
 
