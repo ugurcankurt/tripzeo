@@ -16,8 +16,26 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Tripzeo",
-  description: "Tripzeo Experiences Marketplace",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://tripzeo.com"),
+  title: {
+    default: "Tripzeo | Unique Local Experiences",
+    template: "%s | Tripzeo"
+  },
+  description: "Discover and book unique local experiences, tours, and activities hosted by experts.",
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://tripzeo.com',
+    siteName: 'Tripzeo',
+    images: [
+      {
+        url: '/opengraph-image',
+        width: 1200,
+        height: 630,
+        alt: 'Tripzeo Experiences'
+      }
+    ]
+  },
   icons: {
     icon: "/icon.svg",
   },
