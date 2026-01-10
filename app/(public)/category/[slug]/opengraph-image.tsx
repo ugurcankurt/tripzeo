@@ -1,7 +1,8 @@
 import { ImageResponse } from 'next/og'
 import { createClient } from '@supabase/supabase-js'
 
-export const runtime = 'edge'
+// Export runtime as nodejs to avoid Edge limitations with image processing/fonts
+export const runtime = 'nodejs'
 
 export const alt = 'Category Experiences'
 export const size = {
@@ -12,179 +13,191 @@ export const contentType = 'image/png'
 
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params
+    let debugInfo: any = {}
 
-    // Initialize Supabase Client
-    const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
+    try {
+        // Initialize Supabase Client
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+        const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-    // 1. Fetch Category
-    const { data: category } = await supabase
-        .from('categories')
-        .select('name, icon')
-        .eq('slug', slug)
-        .single()
+        if (!supabaseUrl || !supabaseKey) {
+            throw new Error('Supabase Env Vars missing')
+        }
 
-    const categoryName = category?.name || 'Experiences'
+        const supabase = createClient(supabaseUrl, supabaseKey)
 
-    // 2. Fetch recent experiences to find a representative background image
-    // Fetch top 5 to ensure we skip ones with empty image arrays []
-    const { data: experiences } = await supabase
-        .from('experiences')
-        .select('images')
-        .eq('is_active', true)
-        .eq('category', categoryName)
-        .not('images', 'is', null)
-        .order('created_at', { ascending: false })
-        .limit(5)
+        // 1. Fetch Category
+        const { data: category } = await supabase
+            .from('categories')
+            .select('name, icon')
+            .eq('slug', slug)
+            .single()
 
-    // Find the first experience that has a non-empty images array
-    const validExperience = experiences?.find(exp => exp.images && exp.images.length > 0 && typeof exp.images[0] === 'string')
-    const rawBgImage = validExperience?.images?.[0]
+        const categoryName = category?.name || 'Experiences'
 
-    // Ensure absolute URL if it is a relative path (e.g. from storage)
-    // The working example might have absolute URLs in DB, but we want to be safe for category icons
-    const getAbsoluteUrl = (path?: string | null) => {
-        if (!path) return null
-        if (path.startsWith('http')) return path
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.tripzeo.com'
-        return `${baseUrl}${path.startsWith('/') ? '' : '/'}${path}`
-    }
+        // 2. Fetch recent experiences to find a representative background image
+        // Fetch top 5 to ensure we skip ones with empty image arrays []
+        const { data: experiences } = await supabase
+            .from('experiences')
+            .select('images')
+            .eq('is_active', true)
+            .eq('category', categoryName)
+            .not('images', 'is', null)
+            .order('created_at', { ascending: false })
+            .limit(5)
 
-    const bgImage = getAbsoluteUrl(rawBgImage)
-    const categoryIcon = getAbsoluteUrl(category?.icon)
+        // Find the first experience that has a non-empty images array
+        const validExperience = experiences?.find((exp: any) => exp.images && exp.images.length > 0 && typeof exp.images[0] === 'string')
+        const rawBgImage = validExperience?.images?.[0]
 
-    // Fallback: Use category icon or a default gradient if no experience image found
-    // We don't render a default gradient causing "white screen" blindly, 
-    // but we need a background.
+        // Ensure absolute URL if it is a relative path (e.g. from storage)
+        // The working example might have absolute URLs in DB, but we want to be safe for category icons
+        const getAbsoluteUrl = (path?: string | null) => {
+            if (!path) return null
+            if (path.startsWith('http')) return path
+            const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.tripzeo.com'
+            return `${baseUrl}${path.startsWith('/') ? '' : '/'}${path}`
+        }
 
-    return new ImageResponse(
-        (
-            <div
-                style={{
-                    width: '100%',
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    background: '#000',
-                    position: 'relative',
-                }}
-            >
-                {/* Full Background Image */}
-                {bgImage ? (
-                    <img
-                        src={bgImage}
-                        alt=""
-                        style={{
-                            position: 'absolute',
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover',
-                        }}
-                    />
-                ) : categoryIcon ? (
-                    <img
-                        src={categoryIcon}
-                        alt=""
-                        style={{
-                            position: 'absolute',
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover',
-                            filter: 'blur(20px)', // Blur icon if used as background
-                            transform: 'scale(1.2)'
-                        }}
-                    />
-                ) : (
-                    <div
-                        style={{
-                            position: 'absolute',
-                            width: '100%',
-                            height: '100%',
-                            background: 'linear-gradient(135deg, #e64d12 0%, #c2410c 100%)',
-                        }}
-                    />
-                )}
+        const bgImage = getAbsoluteUrl(rawBgImage)
+        const categoryIcon = getAbsoluteUrl(category?.icon)
 
-                {/* Dark Gradient Overlay */}
+        // Fallback: Use category icon or a default gradient if no experience image found
+        // We don't render a default gradient causing "white screen" blindly, 
+        // but we need a background.
+
+        return new ImageResponse(
+            (
                 <div
                     style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0.3) 100%)',
-                    }}
-                />
-
-                {/* Content Container */}
-                <div
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'flex-end',
                         width: '100%',
                         height: '100%',
-                        padding: 60,
-                        zIndex: 10,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        background: '#000',
+                        position: 'relative',
                     }}
                 >
-                    {/* Label */}
+                    {/* Full Background Image */}
+                    {bgImage ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                            src={bgImage}
+                            alt=""
+                            style={{
+                                position: 'absolute',
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                            }}
+                        />
+                    ) : (
+                        <div
+                            style={{
+                                position: 'absolute',
+                                width: '100%',
+                                height: '100%',
+                                background: 'linear-gradient(135deg, #e64d12 0%, #c2410c 100%)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            {/* Fallback pattern if no image */}
+                            <div style={{ color: 'rgba(255,255,255,0.1)', fontSize: 100, fontWeight: 900 }}>TRIPZEO</div>
+                        </div>
+                    )}
+
+                    {/* Dark Gradient Overlay */}
                     <div
                         style={{
-                            color: '#e2e8f0',
-                            fontSize: 24,
-                            fontWeight: 600,
-                            marginBottom: 16,
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0.3) 100%)',
+                        }}
+                    />
+
+                    {/* Content Container */}
+                    <div
+                        style={{
                             display: 'flex',
-                            alignItems: 'center',
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.05em'
+                            flexDirection: 'column',
+                            justifyContent: 'flex-end',
+                            width: '100%',
+                            height: '100%',
+                            padding: 60,
+                            zIndex: 10,
                         }}
                     >
-                        Explore
-                    </div>
+                        {/* Label */}
+                        <div
+                            style={{
+                                color: '#e2e8f0',
+                                fontSize: 24,
+                                fontWeight: 600,
+                                marginBottom: 16,
+                                display: 'flex',
+                                alignItems: 'center',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.05em'
+                            }}
+                        >
+                            Explore
+                        </div>
 
-                    {/* Title */}
-                    <div
-                        style={{
-                            fontSize: 70,
-                            fontWeight: 800,
-                            color: 'white',
-                            lineHeight: 1.1,
-                            maxWidth: '90%',
-                            textShadow: '0 2px 10px rgba(0,0,0,0.5)',
-                            marginBottom: 30,
-                        }}
-                    >
-                        {categoryName}
-                    </div>
+                        {/* Title */}
+                        <div
+                            style={{
+                                fontSize: 70,
+                                fontWeight: 800,
+                                color: 'white',
+                                lineHeight: 1.1,
+                                maxWidth: '90%',
+                                textShadow: '0 2px 10px rgba(0,0,0,0.5)',
+                                marginBottom: 30,
+                            }}
+                        >
+                            {categoryName}
+                        </div>
 
-                    {/* Subtitle / Footer */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-                        <div style={{
-                            padding: '12px 30px',
-                            background: 'white',
-                            color: 'black',
-                            borderRadius: 100,
-                            fontSize: 24,
-                            fontWeight: 700
-                        }}>
-                            View Experiences
+                        {/* Subtitle / Footer */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+                            <div style={{
+                                padding: '12px 30px',
+                                background: 'white',
+                                color: 'black',
+                                borderRadius: 100,
+                                fontSize: 24,
+                                fontWeight: 700
+                            }}>
+                                View Experiences
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                {/* Top Right Logo */}
-                <div style={{ position: 'absolute', top: 60, right: 60, display: 'flex', zIndex: 20 }}>
-                    <div style={{ color: 'white', fontSize: 32, fontWeight: 900, opacity: 0.9 }}>tripzeo</div>
+                    {/* Top Right Logo */}
+                    <div style={{ position: 'absolute', top: 60, right: 60, display: 'flex', zIndex: 20 }}>
+                        <div style={{ color: 'white', fontSize: 32, fontWeight: 900, opacity: 0.9 }}>tripzeo</div>
+                    </div>
                 </div>
-            </div>
-        ),
-        {
-            ...size,
-        }
-    )
+            ),
+            {
+                ...size,
+            }
+        )
+    } catch (e: any) {
+        console.error('OG Generation Error:', e)
+        return new ImageResponse(
+            (
+                <div style={{ width: '100%', height: '100%', background: '#1a1a1a', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 40, color: 'white' }}>
+                    <h1 style={{ color: '#ff4444', fontSize: 48, marginBottom: 20 }}>OG Error</h1>
+                    <pre style={{ fontSize: 24, whiteSpace: 'pre-wrap', textAlign: 'center' }}>{e.message}</pre>
+                </div>
+            ),
+            { ...size }
+        )
+    }
 }
