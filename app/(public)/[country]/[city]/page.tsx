@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: CityPageProps) {
     const formattedCountry = countryName.charAt(0).toUpperCase() + countryName.slice(1)
 
     return {
-        title: `Best Things to Do in ${formattedCity}, ${formattedCountry} | Tripzeo`,
+        title: `Best Things to Do in ${formattedCity}, ${formattedCountry}`, // Suffix handled by layout template
         description: `Book top-rated tours, activities, and experiences in ${formattedCity}. Explore local guides and hidden gems in ${formattedCountry}.`,
         alternates: {
             canonical: `https://tripzeo.com/${country}/${city}`

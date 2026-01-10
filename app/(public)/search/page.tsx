@@ -16,9 +16,9 @@ export async function generateMetadata({ searchParams }: SearchPageProps) {
     const q = params.q
     const category = params.category
 
-    let title = "Search Experiences | Tripzeo"
-    if (q) title = `${q} - Search Results | Tripzeo`
-    if (category) title = `${category} Experiences | Tripzeo`
+    let title = "Search Experiences"
+    if (q) title = `${q} - Search Results`
+    if (category) title = `${category} Experiences`
 
     return {
         title,

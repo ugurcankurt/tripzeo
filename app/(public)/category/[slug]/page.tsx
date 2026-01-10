@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: CategoryPageProps) {
     const title = category ? `${category.name} Experiences & Tours` : 'Experiences'
 
     return {
-        title: `${title} | Tripzeo`,
+        title: title, // Suffix handled by layout template
         description: `Book top-rated ${title} on Tripzeo. Discover unique experiences, services, and local guides.`,
         alternates: {
             canonical: `https://tripzeo.com/category/${slug}`

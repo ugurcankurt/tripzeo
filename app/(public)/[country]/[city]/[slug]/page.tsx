@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: { params: Promise<{ country: 
     }
 
     return {
-        title: `${experience.title} in ${experience.location_city} | Tripzeo`,
+        title: `${experience.title} in ${experience.location_city}`, // Suffix handled by layout template
         description: experience.description?.slice(0, 160) || `Book ${experience.title} in ${experience.location_city}, ${experience.location_country}.`,
         openGraph: {
             title: experience.title,
