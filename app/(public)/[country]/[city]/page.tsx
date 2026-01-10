@@ -213,7 +213,7 @@ export default async function CityPage({ params }: CityPageProps) {
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
                 {experiences && experiences.length > 0 ? (
                     experiences.map((exp: any) => (
                         <ExperienceCard key={exp.id} experience={exp} />
@@ -231,7 +231,7 @@ export default async function CityPage({ params }: CityPageProps) {
 
             {/* SEO Content Section */}
             {experiences && experiences.length > 0 && (
-                <div className="mt-24">
+                <div className="mt-12">
                     <Card className="bg-gradient-to-br from-muted/50 via-muted/30 to-background border-muted/60 shadow-sm overflow-hidden relative">
                         {/* Decorative background element */}
                         <div className="absolute -top-24 -right-24 opacity-[0.03] pointer-events-none">
@@ -252,7 +252,7 @@ export default async function CityPage({ params }: CityPageProps) {
                                 <div className="prose prose-lg text-muted-foreground/90 leading-relaxed">
                                     <p>
                                         Looking for unique things to do in <span className="font-semibold text-foreground">{formattedCity}</span>?
-                                        Tripzeo offers a curated selection of tours and activities hosted by passionate locals.
+                                        Tripzeo offers a curated selection of experiences and activities hosted by passionate locals.
                                     </p>
                                     <p className="mt-4">
                                         Whether you&apos;re planning a weekend getaway or a long vacation, our experiences are designed to show you

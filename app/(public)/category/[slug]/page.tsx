@@ -4,7 +4,9 @@ import { ExperienceCard } from "@/modules/experiences/components/experience-card
 import { notFound } from "next/navigation"
 import Image from "next/image"
 import { Card, CardContent } from "@/components/ui/card"
-import { Sparkles, MapPin } from "lucide-react"
+import { Sparkles, Layers, ShieldCheck, Zap } from "lucide-react"
+import { Separator } from "@/components/ui/separator"
+import { CategoryExperienceList } from "./category-experience-list"
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -160,11 +162,13 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
                 </Breadcrumb>
             </div>
 
-            <div className="mb-12 text-center md:text-left">
-                <h1 className="text-4xl font-bold tracking-tight mb-4">
-                    {categoryData.name} Experiences
+            {/* Header Section matching Experience Detail Page */}
+            <div className="mb-8">
+                <h1 className="text-4xl font-bold mb-4 tracking-tight">
+                    <span className="text-primary">{categoryData.name}</span> Experiences
                 </h1>
-                <p className="text-muted-foreground text-lg max-w-2xl">
+
+                <p className="text-muted-foreground text-lg max-w-3xl leading-relaxed">
                     Discover and book the best {categoryData.name.toLowerCase()} services.
                     Handpicked local experiences for unforgettable memories.
                 </p>
@@ -176,24 +180,15 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {experiences && experiences.length > 0 ? (
-                    experiences.map((exp: any) => (
-                        <ExperienceCard key={exp.id} experience={exp} />
-                    ))
-                ) : (
-                    <div className="col-span-full py-20 text-center bg-muted/30 rounded-xl border border-dashed">
-                        <h3 className="text-2xl font-semibold mb-2">No experiences found in this category yet</h3>
-                        <p className="text-muted-foreground">
-                            We are working on adding more {categoryData.name.toLowerCase()} experiences. Please check back soon!
-                        </p>
-                    </div>
-                )}
-            </div>
+            {/* Client-side Experience List with City Filtering */}
+            <CategoryExperienceList
+                experiences={experiences || []}
+                categoryName={categoryData.name}
+            />
 
             {/* SEO Content Section */}
             {experiences && experiences.length > 0 && (
-                <div className="mt-24">
+                <div className="mt-12">
                     <Card className="bg-muted/40 border-none shadow-sm overflow-visible relative mt-20 rounded-3xl">
                         {/* Decorative background element - Removed MapPin, Added Category Image */}
                         {categoryData.icon && (categoryData.icon.startsWith('http') || categoryData.icon.startsWith('/')) ? (
