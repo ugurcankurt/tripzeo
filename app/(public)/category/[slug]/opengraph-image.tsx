@@ -39,7 +39,13 @@ export default async function Image({ params }: { params: Promise<{ slug: string
         .limit(5)
 
     const validExperience = experiences?.find((exp: any) => exp.images && exp.images.length > 0 && typeof exp.images[0] === 'string')
-    const rawBgImage = validExperience?.images?.[0]
+    let rawBgImage = validExperience?.images?.[0]
+
+    // Ensure absolute URL if it is a relative path (wsrv.nl needs absolute)
+    if (rawBgImage && !rawBgImage.startsWith('http')) {
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.tripzeo.com'
+        rawBgImage = `${baseUrl}${rawBgImage.startsWith('/') ? '' : '/'}${rawBgImage}`
+    }
 
     return new ImageResponse(
         (
@@ -55,10 +61,11 @@ export default async function Image({ params }: { params: Promise<{ slug: string
             >
                 {/* Full Background Image */}
                 {rawBgImage && (
-                    // eslint-disable-next-line @next/next/no-img-element
                     <img
-                        src={rawBgImage}
+                        src={`https://wsrv.nl/?url=${encodeURIComponent(rawBgImage)}&w=1200&h=630&fit=cover&output=jpg`}
                         alt=""
+                        width="1200"
+                        height="630"
                         style={{
                             position: 'absolute',
                             width: '100%',
