@@ -3,6 +3,8 @@ import { ExperienceCard } from "@/modules/experiences/components/experience-card
 import { Hero } from "@/components/hero"
 import { CategoryGrid } from "@/components/home/category-grid"
 import Image from "next/image"
+import Link from "next/link"
+import { slugify } from "@/lib/utils"
 
 export default async function HomePage() {
     const supabase = await createClient()
@@ -195,7 +197,11 @@ export default async function HomePage() {
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                     {POPULAR_CITIES.map((city) => (
-                        <div key={`${city.city}-${city.country}`} className="relative group cursor-pointer overflow-hidden rounded-xl aspect-[3/4] bg-muted">
+                        <Link
+                            key={`${city.city}-${city.country}`}
+                            href={`/${slugify(city.country)}/${slugify(city.city)}`}
+                            className="relative group cursor-pointer overflow-hidden rounded-xl aspect-[3/4] bg-muted block"
+                        >
                             <Image
                                 src={city.image}
                                 alt={city.city}
@@ -211,7 +217,7 @@ export default async function HomePage() {
                                     {city.count} Experiences
                                 </span>
                             </div>
-                        </div>
+                        </Link>
                     ))}
                 </div>
             </section>
