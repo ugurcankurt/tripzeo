@@ -28,7 +28,8 @@ export default async function Image({ params }: { params: Promise<{ slug: string
 
     const categoryName = category?.name || 'Experiences'
 
-    // 2. Fetch a representative background image from the latest experience
+    // 2. Fetch recent experiences to find a representative background image
+    // Fetch top 5 to ensure we skip ones with empty image arrays []
     const { data: experiences } = await supabase
         .from('experiences')
         .select('images')
@@ -36,9 +37,11 @@ export default async function Image({ params }: { params: Promise<{ slug: string
         .eq('category', categoryName)
         .not('images', 'is', null)
         .order('created_at', { ascending: false })
-        .limit(1)
+        .limit(5)
 
-    const rawBgImage = experiences?.[0]?.images?.[0]
+    // Find the first experience that has a non-empty images array
+    const validExperience = experiences?.find(exp => exp.images && exp.images.length > 0 && typeof exp.images[0] === 'string')
+    const rawBgImage = validExperience?.images?.[0]
 
     // Ensure absolute URL if it is a relative path (e.g. from storage)
     // The working example might have absolute URLs in DB, but we want to be safe for category icons
