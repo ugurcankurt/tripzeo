@@ -17,7 +17,7 @@ export default async function Image() {
         (
             <div
                 style={{
-                    background: '#0F172A', // Slate-950 like dark background or Brand Color
+                    background: 'linear-gradient(135deg, #e64d12 0%, #c2410c 100%)', // Primary Color Gradient
                     width: '100%',
                     height: '100%',
                     display: 'flex',
@@ -67,9 +67,9 @@ export default async function Image() {
 
                 <div style={{
                     fontSize: 28,
-                    color: '#94A3B8', // Slate-400
                     marginTop: 40,
                     fontWeight: 500,
+                    color: '#FFF',
                 }}>
                     Discover Unique Local Experiences
                 </div>
