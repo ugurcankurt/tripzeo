@@ -24,22 +24,37 @@ export default async function Image({ params }: { params: Promise<{ slug: string
         .eq('slug', slug)
         .single()
 
-    const categoryName = category?.name || 'Experiences'
-    const categoryIcon = category?.icon
+    // Helper to ensure absolute URLs
+    const getAbsoluteUrl = (path?: string | null) => {
+        if (!path) return null
+        if (path.startsWith('http')) return path
+        // Use processing NEXT_PUBLIC_APP_URL or fall back to verified domain
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.tripzeo.com'
+        return `${baseUrl}${path.startsWith('/') ? '' : '/'}${path}`
+    }
 
-    // 2. Fetch a representative background image (Highest rated experience in this category)
-    // Note: 'category' column in experiences is text (name) based on analysis
+    const categoryName = category?.name || 'Experiences'
+    // Ensure icon is absolute URL
+    const categoryIcon = getAbsoluteUrl(category?.icon)
+
+    // 2. Fetch a representative background image
+    // Switching to created_at to ensure we get *any* valid recent image if ratings are empty
     const { data: experiences } = await supabase
         .from('experiences')
         .select('images')
         .eq('is_active', true)
-        .eq('category', categoryName) // Using name as foreign key equivalent
+        .eq('category', categoryName)
         .not('images', 'is', null)
-        .order('rating', { ascending: false })
+        .order('created_at', { ascending: false }) // Match page.tsx logic
         .limit(1)
 
     // Strategy: Experience Image -> Category Icon -> Fallback Gradient
-    const bgImage = experiences?.[0]?.images?.[0] || categoryIcon
+    // Ensure experience image is absolute
+    const rawBgImage = experiences?.[0]?.images?.[0]
+    const bgImage = getAbsoluteUrl(rawBgImage) || categoryIcon
+
+    console.log(`OpenGraph Debug [${slug}]:`, { categoryName, bgImage, rawBgImage, categoryIcon })
+
 
     // Gradient overlay to ensure text readability
     const overlayGradient = 'linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.8))'
