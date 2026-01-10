@@ -13,7 +13,9 @@ export const contentType = 'image/png'
 
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params
-    let debugInfo: any = {}
+
+    // Log start of generation
+    console.log(`[OG Start] Generating image for category: ${slug}`)
 
     try {
         // Initialize Supabase Client
@@ -21,23 +23,28 @@ export default async function Image({ params }: { params: Promise<{ slug: string
         const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
         if (!supabaseUrl || !supabaseKey) {
+            console.error('[OG Error] Missing Supabase Env Vars')
             throw new Error('Supabase Env Vars missing')
         }
 
         const supabase = createClient(supabaseUrl, supabaseKey)
 
         // 1. Fetch Category
-        const { data: category } = await supabase
+        const { data: category, error: catError } = await supabase
             .from('categories')
             .select('name, icon')
             .eq('slug', slug)
             .single()
 
-        const categoryName = category?.name || 'Experiences'
+        if (catError) {
+            console.error('[OG Error] Category fetch failed:', catError)
+        }
 
-        // 2. Fetch recent experiences to find a representative background image
-        // Fetch top 5 to ensure we skip ones with empty image arrays []
-        const { data: experiences } = await supabase
+        const categoryName = category?.name || 'Experiences'
+        console.log(`[OG Info] Found category: ${categoryName}`)
+
+        // 2. Fetch recent experiences
+        const { data: experiences, error: expError } = await supabase
             .from('experiences')
             .select('images')
             .eq('is_active', true)
@@ -46,12 +53,14 @@ export default async function Image({ params }: { params: Promise<{ slug: string
             .order('created_at', { ascending: false })
             .limit(5)
 
-        // Find the first experience that has a non-empty images array
+        if (expError) {
+            console.error('[OG Error] Experiences fetch failed:', expError)
+        }
+
         const validExperience = experiences?.find((exp: any) => exp.images && exp.images.length > 0 && typeof exp.images[0] === 'string')
         const rawBgImage = validExperience?.images?.[0]
 
-        // Ensure absolute URL if it is a relative path (e.g. from storage)
-        // The working example might have absolute URLs in DB, but we want to be safe for category icons
+        // Helper to get absolute URL
         const getAbsoluteUrl = (path?: string | null) => {
             if (!path) return null
             if (path.startsWith('http')) return path
@@ -59,12 +68,23 @@ export default async function Image({ params }: { params: Promise<{ slug: string
             return `${baseUrl}${path.startsWith('/') ? '' : '/'}${path}`
         }
 
-        const bgImage = getAbsoluteUrl(rawBgImage)
-        const categoryIcon = getAbsoluteUrl(category?.icon)
+        const bgImageUrl = getAbsoluteUrl(rawBgImage)
+        console.log(`[OG Info] Background Image URL: ${bgImageUrl || 'None'}`)
 
-        // Fallback: Use category icon or a default gradient if no experience image found
-        // We don't render a default gradient causing "white screen" blindly, 
-        // but we need a background.
+        // 3. Fetch Image Buffer (More robust than passing URL to Satori)
+        let bgImageBuffer: ArrayBuffer | null = null
+        if (bgImageUrl) {
+            try {
+                const res = await fetch(bgImageUrl)
+                if (res.ok) {
+                    bgImageBuffer = await res.arrayBuffer()
+                } else {
+                    console.error(`[OG Error] Failed to fetch image: ${res.status} ${res.statusText}`)
+                }
+            } catch (fetchError) {
+                console.error('[OG Error] Image fetch threw:', fetchError)
+            }
+        }
 
         return new ImageResponse(
             (
@@ -79,10 +99,10 @@ export default async function Image({ params }: { params: Promise<{ slug: string
                     }}
                 >
                     {/* Full Background Image */}
-                    {bgImage ? (
+                    {bgImageBuffer ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
-                            src={bgImage}
+                            src={bgImageBuffer as any}
                             alt=""
                             style={{
                                 position: 'absolute',
@@ -103,7 +123,6 @@ export default async function Image({ params }: { params: Promise<{ slug: string
                                 justifyContent: 'center',
                             }}
                         >
-                            {/* Fallback pattern if no image */}
                             <div style={{ color: 'rgba(255,255,255,0.1)', fontSize: 100, fontWeight: 900 }}>TRIPZEO</div>
                         </div>
                     )}
