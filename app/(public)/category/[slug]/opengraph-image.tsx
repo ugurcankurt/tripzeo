@@ -146,7 +146,13 @@ export default async function Image({ params }: { params: Promise<{ slug: string
                 </div>
 
                 {/* Top Right Logo */}
-                <div style={{ position: 'absolute', top: 60, right: 60, display: 'flex', zIndex: 20 }}>
+                <div style={{ position: 'absolute', top: 60, right: 60, display: 'flex', alignItems: 'center', gap: 12, zIndex: 20 }}>
+                    <img
+                        src={`${process.env.NEXT_PUBLIC_APP_URL || 'https://www.tripzeo.com'}/tripzeo.svg`}
+                        alt="Tripzeo Logo"
+                        width="50"
+                        height="50"
+                    />
                     <div style={{ color: 'white', fontSize: 32, fontWeight: 900, opacity: 0.9 }}>tripzeo</div>
                 </div>
             </div>
