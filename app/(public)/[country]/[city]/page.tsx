@@ -36,6 +36,9 @@ export async function generateMetadata({ params }: CityPageProps) {
     return {
         title: `Best Things to Do in ${formattedCity}, ${formattedCountry}`, // Suffix handled by layout template
         description: `Book top-rated tours, activities, and experiences in ${formattedCity}. Explore local guides and hidden gems in ${formattedCountry}.`,
+        openGraph: {
+            url: `https://tripzeo.com/${country}/${city}`,
+        },
         alternates: {
             canonical: `https://tripzeo.com/${country}/${city}`
         }

@@ -33,11 +33,14 @@ export async function generateMetadata({ params }: CategoryPageProps) {
         .eq('slug', slug)
         .single()
 
-    const title = category ? `${category.name} Experiences & Tours` : 'Experiences'
+    const title = category ? `${category.name} Experiences & Services` : 'Experiences'
 
     return {
         title: title, // Suffix handled by layout template
         description: `Book top-rated ${title} on Tripzeo. Discover unique experiences, services, and local guides.`,
+        openGraph: {
+            url: `https://tripzeo.com/category/${slug}`,
+        },
         alternates: {
             canonical: `https://tripzeo.com/category/${slug}`
         }
