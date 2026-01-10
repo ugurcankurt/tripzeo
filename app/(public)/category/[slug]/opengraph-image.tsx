@@ -152,6 +152,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
                         alt="Tripzeo Logo"
                         width="30"
                         height="30"
+                        color="white"
                     />
                     <div style={{ color: 'white', fontSize: 32, fontWeight: 900, opacity: 0.9 }}>tripzeo</div>
                 </div>
