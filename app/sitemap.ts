@@ -94,5 +94,33 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         })
     }
 
-    return [...routes, ...experienceRoutes, ...categoryRoutes, ...cityRoutes]
+    // 5. Fetch Active Hosts (who have active experiences)
+    const activeHostIds = [...new Set((experiences || []).map(e => (e as any).host_id).filter(Boolean))] // extract host_ids from fetched experiences if available?
+    // Wait, previous experience fetch didn't select host_id. I should add it to the select or do a separate query.
+    // Doing a separate query to be safe and clean.
+
+    const { data: activeHostsExperiences } = await supabase
+        .from('experiences')
+        .select('host_id')
+        .eq('is_active', true)
+
+    const uniqueHostIds = [...new Set(activeHostsExperiences?.map(e => e.host_id).filter(Boolean) || [])]
+
+    let hostRoutes: MetadataRoute.Sitemap = []
+
+    if (uniqueHostIds.length > 0) {
+        const { data: hosts } = await supabase
+            .from('profiles')
+            .select('id, full_name, updated_at')
+            .in('id', uniqueHostIds)
+
+        hostRoutes = (hosts || []).map((host) => ({
+            url: `${baseUrl}/host/${slugify(host.full_name || 'host')}-${host.id}`,
+            lastModified: new Date(host.updated_at || new Date()),
+            changeFrequency: 'weekly' as const,
+            priority: 0.6,
+        }))
+    }
+
+    return [...routes, ...experienceRoutes, ...categoryRoutes, ...cityRoutes, ...hostRoutes]
 }
