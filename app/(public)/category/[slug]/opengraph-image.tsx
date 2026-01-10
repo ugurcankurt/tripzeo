@@ -1,8 +1,6 @@
 import { ImageResponse } from 'next/og'
 import { createClient } from '@supabase/supabase-js'
 
-export const runtime = 'edge'
-
 export const alt = 'Category Experiences'
 export const size = {
     width: 1200,
@@ -10,7 +8,7 @@ export const size = {
 }
 export const contentType = 'image/png'
 
-export default async function Image({ params }: { params: { slug: string } }) {
+export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params
 
     // Initialize Supabase Client directly (Edge compatible)
