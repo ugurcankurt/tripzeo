@@ -398,7 +398,17 @@ export async function createAutoUser(formData: FormData) {
     // 5. Send Password Reset/Set Link
     // Point to /auth/callback to handle code exchange, then redirect to /reset-password
     const headerList = await headers()
-    const origin = headerList.get('origin') || process.env.NEXT_PUBLIC_SITE_URL || 'https://www.tripzeo.com'
+
+    // Determine protocol and host
+    const host = headerList.get('x-forwarded-host') || headerList.get('host')
+    const protocol = headerList.get('x-forwarded-proto') || 'https'
+
+    let origin = ''
+    if (host) {
+        origin = `${protocol}://${host}`
+    } else {
+        origin = headerList.get('origin') || process.env.NEXT_PUBLIC_SITE_URL || 'https://www.tripzeo.com'
+    }
 
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${origin}/auth/callback?next=/reset-password`,
