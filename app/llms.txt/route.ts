@@ -34,7 +34,7 @@ export async function GET() {
 
     let content = `# Tripzeo AI Context
 
-> Tripzeo is a platform for discovering and booking unique local experiences, tours, and activities hosted by experts.
+> Tripzeo is a platform for discovering and booking unique local experiences, services and activities hosted by experts.
 
 ## Core Pages
 - [Home](${baseUrl}) - The main landing page.

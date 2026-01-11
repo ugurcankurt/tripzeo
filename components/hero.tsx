@@ -44,7 +44,7 @@ export function Hero({ categories = [], userAvatars = [] }: HeroProps) {
                         curated for you.
                     </h1>
                     <p className="text-lg sm:text-lg text-white/90 font-medium drop-shadow max-w-2xl">
-                        Discover and book unique activities, tours, and getaways led by local experts.
+                        Discover and book unique activities, tours and services led by local experts.
                     </p>
                 </div>
 

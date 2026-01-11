@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     default: "Tripzeo | Unique Local Experiences",
     template: "%s | Tripzeo"
   },
-  description: "Discover and book unique local experiences, tours, and activities hosted by experts.",
+  description: "Discover and book unique local experiences, services and activities hosted by experts.",
   openGraph: {
     type: 'website',
     locale: 'en_US',
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Tripzeo | Unique Local Experiences',
-    description: 'Discover and book unique local experiences, tours, and activities hosted by experts.',
+    description: 'Discover and book unique local experiences, services and activities hosted by experts.',
     images: ['/opengraph-image'], // Re-use OG image
   },
   alternates: {

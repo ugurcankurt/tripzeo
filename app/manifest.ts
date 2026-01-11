@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
     return {
         name: 'Tripzeo',
         short_name: 'Tripzeo',
-        description: 'Discover and book unique local experiences, tours, and activities hosted by experts.',
+        description: 'Discover and book unique local experiences, services and activities hosted by experts.',
         start_url: '/',
         display: 'standalone',
         background_color: '#ffffff',
