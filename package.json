@@ -61,7 +61,7 @@
     "tailwindcss": "^4",
     "typescript": "^5"
   },
-  "packageManager": "pnpm@10.27.0+sha256.d3c7c3d12d87d177e32f01748d5994fb20cd5becf11670ee60530c374ffeabb3",
+  "packageManager": "pnpm@10.28.0+sha256.9b0b04e6e79945566917f8411bb6f65fd2f3e1590426904e8500e1acc4b33561",
   "pnpm": {
     "onlyBuiltDependencies": [
       "msw",
