@@ -96,14 +96,27 @@ export const sendPurchase = (transactionId: string, value: number, currency: str
 };
 
 // Generic Event Helper (Restored for backward compatibility)
-export const sendEvent = (action: string, category: string, label: string, value?: number) => {
+export const sendEvent = (
+    action: string,
+    categoryOrParams?: string | Record<string, any>,
+    label?: string,
+    value?: number
+) => {
     if (typeof window !== 'undefined' && window.gtag) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        window.gtag('event', action, {
-            event_category: category,
-            event_label: label,
-            value: value,
-        });
+        if (typeof categoryOrParams === 'object') {
+            // Usage: sendEvent('login', { method: 'email' })
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            window.gtag('event', action, categoryOrParams);
+        } else {
+            // Usage: sendEvent('click', 'Category', 'Label', 1)
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            window.gtag('event', action, {
+                event_category: categoryOrParams,
+                event_label: label,
+                value: value,
+            });
+        }
     }
 };
