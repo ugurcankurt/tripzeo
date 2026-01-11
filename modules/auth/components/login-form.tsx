@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input"
 import { PasswordInput } from "@/components/ui/password-input"
 import { Label } from "@/components/ui/label"
 import { login } from "@/modules/auth/actions"
+import { sendEvent } from "@/lib/analytics"
 
 const loginSchema = z.object({
     email: z.string().email("Invalid email address"),
@@ -46,6 +47,7 @@ export function LoginForm() {
             if (result?.error) {
                 toast.error(result.error)
             } else if (result?.success) {
+                sendEvent('login', { method: 'email' })
                 toast.success("Login successful!")
                 router.refresh()
                 router.push('/')

@@ -28,6 +28,7 @@ import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { isSameDay, parseISO } from "date-fns"
 import { createClient } from "@/lib/supabase/client"
+import { sendEvent } from "@/lib/analytics"
 
 export function BookingForm({ price, capacity, serviceFeeRate, experienceId, blockedDates = [], currentUserId, hostId }: BookingFormProps) {
     const [date, setDate] = React.useState<Date | undefined>(undefined)
@@ -72,6 +73,18 @@ export function BookingForm({ price, capacity, serviceFeeRate, experienceId, blo
             experienceId,
             date: format(date, "yyyy-MM-dd"),
             people: guests.toString()
+        })
+
+        sendEvent('begin_checkout', {
+            currency: 'USD',
+            value: total,
+            items: [
+                {
+                    item_id: experienceId,
+                    quantity: guests,
+                    price: price
+                }
+            ]
         })
 
         router.push(`/book?${params.toString()}`)

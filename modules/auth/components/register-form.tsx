@@ -18,6 +18,7 @@ import { PasswordInput } from "@/components/ui/password-input"
 import { Label } from "@/components/ui/label"
 import { signup } from "@/modules/auth/actions"
 import { VerifyForm } from "./verify-form"
+import { sendEvent } from "@/lib/analytics"
 
 const registerSchema = z.object({
     full_name: z.string().min(2, "Full name must be at least 2 characters"),
@@ -66,6 +67,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
             if (result?.error) {
                 toast.error(result.error)
             } else if (result?.success) {
+                sendEvent('sign_up', { method: 'email' })
                 toast.success("Account created successfully! Please verify your email.")
                 setRegisteredEmail(data.email)
                 setStep('verify')
