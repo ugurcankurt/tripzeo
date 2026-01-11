@@ -33,41 +33,10 @@ export async function generateMetadata({ params }: CityPageProps) {
 }
 
 // Programmatic SEO: Generate static paths for known cities
-export async function generateStaticParams() {
-    // GenerateStaticParams runs at build time and cannot use cookies()
-    const { createClient } = await import("@supabase/supabase-js")
-    const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
 
-    // Fetch unique active cities
-    const { data: experiences } = await supabase
-        .from('experiences')
-        .select('location_country, location_city')
-        .eq('is_active', true)
-
-    if (!experiences) return []
-
-    // Create unique set of country/city pairs
-    const uniqueLocations = new Set<string>()
-    const paths: { country: string, city: string }[] = []
-
-    experiences.forEach(exp => {
-        if (exp.location_country && exp.location_city) {
-            const countrySlug = exp.location_country.toLowerCase().replace(/\s+/g, '-')
-            const citySlug = exp.location_city.toLowerCase().replace(/\s+/g, '-')
-            const key = `${countrySlug}/${citySlug}`
-
-            if (!uniqueLocations.has(key)) {
-                uniqueLocations.add(key)
-                paths.push({ country: countrySlug, city: citySlug })
-            }
-        }
-    })
-
-    return paths
-}
+// Note: generateStaticParams removed to prevent build-time static generation attempt
 
 export default async function CityPage({ params }: CityPageProps) {
     const { country, city } = await params
