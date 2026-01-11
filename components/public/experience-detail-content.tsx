@@ -176,21 +176,54 @@ export async function ExperienceDetailContent({ country, city, slug }: Experienc
                 <div className="lg:col-span-2 space-y-10">
                     <div>
                         <h1 className="text-4xl font-bold mb-4 tracking-tight">{experience.title}</h1>
-                        <div className="flex flex-wrap items-center gap-6 text-muted-foreground text-base">
-                            <span className="flex items-center gap-2"><MapPin className="h-5 w-5 text-primary" /> {experience.location_city}, {experience.location_country}</span>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 py-2">
+                            {/* Location */}
+                            <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/40 border border-border/40">
+                                <div className="p-2.5 bg-background rounded-full shadow-sm shrink-0 text-primary">
+                                    <MapPin className="h-4 w-4" />
+                                </div>
+                                <div className="flex flex-col min-w-0">
+                                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Location</span>
+                                    <span className="text-sm font-medium truncate">{experience.location_city}</span>
+                                </div>
+                            </div>
 
+                            {/* Duration */}
                             {experience.duration_minutes && (
-                                <span className="flex items-center gap-2"><Timer className="h-5 w-5 text-primary" /> {experience.duration_minutes} Mins</span>
+                                <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/40 border border-border/40">
+                                    <div className="p-2.5 bg-background rounded-full shadow-sm shrink-0 text-primary">
+                                        <Timer className="h-4 w-4" />
+                                    </div>
+                                    <div className="flex flex-col min-w-0">
+                                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Duration</span>
+                                        <span className="text-sm font-medium truncate">{experience.duration_minutes} Mins</span>
+                                    </div>
+                                </div>
                             )}
 
+                            {/* Time */}
                             {(experience.start_time && experience.end_time) && (
-                                <span className="flex items-center gap-2">
-                                    <Clock className="h-5 w-5 text-primary" />
-                                    {experience.start_time.slice(0, 5)} - {experience.end_time.slice(0, 5)}
-                                </span>
+                                <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/40 border border-border/40">
+                                    <div className="p-2.5 bg-background rounded-full shadow-sm shrink-0 text-primary">
+                                        <Clock className="h-4 w-4" />
+                                    </div>
+                                    <div className="flex flex-col min-w-0">
+                                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Time</span>
+                                        <span className="text-sm font-medium truncate">{experience.start_time.slice(0, 5)} - {experience.end_time.slice(0, 5)}</span>
+                                    </div>
+                                </div>
                             )}
 
-                            <span className="flex items-center gap-2"><Users className="h-5 w-5 text-primary" /> Max {experience.capacity}</span>
+                            {/* Capacity */}
+                            <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/40 border border-border/40">
+                                <div className="p-2.5 bg-background rounded-full shadow-sm shrink-0 text-primary">
+                                    <Users className="h-4 w-4" />
+                                </div>
+                                <div className="flex flex-col min-w-0">
+                                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Group Size</span>
+                                    <span className="text-sm font-medium truncate">Max {experience.capacity}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
