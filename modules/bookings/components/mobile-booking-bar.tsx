@@ -34,7 +34,7 @@ export function MobileBookingBar(props: MobileBookingBarProps) {
     }).format(price || 0)
 
     return (
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t z-[60] lg:hidden safe-area-bottom">
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t z-40 lg:hidden safe-area-bottom">
             <div className="flex items-center justify-between max-w-7xl mx-auto gap-4">
                 <div className="flex flex-col">
                     <span className="font-bold text-lg">{formattedPrice}</span>
@@ -61,7 +61,7 @@ export function MobileBookingBar(props: MobileBookingBarProps) {
                                 Request to Book
                             </Button>
                         </SheetTrigger>
-                        <SheetContent side="bottom" className="h-[100dvh] rounded-none p-0 overflow-y-auto w-full max-w-none border-none z-50">
+                        <SheetContent side="bottom" className="h-[100dvh] rounded-none p-0 overflow-y-auto w-full max-w-none border-none z-[70]">
                             <div className="h-full flex flex-col max-w-md mx-auto w-full px-4 py-6 pb-32">
                                 <SheetHeader className="mb-6 text-left p-0">
                                     <SheetTitle className="text-2xl font-bold">Complete your booking</SheetTitle>

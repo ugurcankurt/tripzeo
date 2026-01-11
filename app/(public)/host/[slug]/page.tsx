@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const categoryName = profile.category?.name || 'Experience Host'
-    const title = `${profile.full_name} - ${categoryName} | Tripzeo`
+    const title = `${profile.full_name} - ${categoryName}`
     const description = profile.bio?.slice(0, 160) || `Book unique experiences with ${profile.full_name} on Tripzeo.`
 
     return {
