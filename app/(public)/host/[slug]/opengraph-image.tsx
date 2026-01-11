@@ -1,7 +1,6 @@
 import { ImageResponse } from 'next/og'
 import { createClient } from '@supabase/supabase-js'
 
-export const runtime = 'edge'
 
 export const alt = 'Host Profile'
 export const size = {
