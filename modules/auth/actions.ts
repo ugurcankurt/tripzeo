@@ -207,7 +207,35 @@ export async function updateProfile(prevState: any, formData: FormData) {
     const full_name = formData.get('fullName') as string
     const avatar_url = formData.get('avatarUrl') as string
     const phone = formData.get('phone') as string
+    // --- Bio Validation ---
     const bio = formData.get('bio') as string
+    if (bio) {
+        // 1. Check for @ symbol (Emails, handles)
+        if (bio.includes('@')) {
+            return { error: 'Bio cannot contain "@" symbol or email addresses.' }
+        }
+
+        // 2. Check for Phone Numbers (Rough check for 7+ consecutive digits, or common patterns)
+        // Adjust regex as needed to be strict but strictly avoid false positives if possible, 
+        // though user request implies strict blocking.
+        const phoneRegex = /(\d[\s-.]?){7,}/
+        if (phoneRegex.test(bio)) {
+            return { error: 'Bio cannot contain phone numbers.' }
+        }
+
+        // 3. Check for URLs / Domains
+        const urlRegex = /(https?:\/\/[^\s]+)|(www\.[^\s]+)|(\b\w+\.(com|net|org|io|me|tr)\b)/i
+        if (urlRegex.test(bio)) {
+            return { error: 'Bio cannot contain website links.' }
+        }
+
+        // 4. Check for Social Keywords
+        const socialRegex = /\b(instagram|facebook|insta|fb|whatsapp|linkedin|twitter|tiktok)\b/i
+        if (socialRegex.test(bio)) {
+            return { error: 'Bio cannot contain social media names or links.' }
+        }
+    }
+
     const category_id = formData.get('categoryId') as string
     const country = formData.get('country') as string
     const state = formData.get('state') as string
