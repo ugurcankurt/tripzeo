@@ -111,31 +111,59 @@ export async function deleteExperience(experienceId: string) {
     // 2. Delete images from storage if any
     const images = experience.images as string[] | null
     if (images && images.length > 0) {
-        const filesToRemove: string[] = []
+        // Initialize Admin Client for Storage Operations (Bypass RLS)
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+        const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-        for (const urlStr of images) {
-            try {
-                // Parse URL to get file path
-                // Expected format: .../storage/v1/object/public/public_assets/experiences/filename.webp
-                const url = new URL(urlStr)
-                const pathParts = url.pathname.split('/public_assets/')
-                if (pathParts.length > 1) {
-                    const filePath = pathParts[1]
-                    filesToRemove.push(decodeURIComponent(filePath))
+        if (!supabaseServiceKey) {
+            console.error("SUPABASE_SERVICE_ROLE_KEY is missing. Cannot delete images.");
+        } else {
+            const { createClient: createAdminClient } = await import('@supabase/supabase-js');
+            const supabaseAdmin = createAdminClient(supabaseUrl, supabaseServiceKey, {
+                auth: {
+                    autoRefreshToken: false,
+                    persistSession: false
                 }
-            } catch (e) {
-                console.error("Error parsing image URL for deletion:", urlStr, e)
+            });
+
+            const filesToRemove: string[] = []
+
+            for (const urlStr of images) {
+                try {
+                    // Parse URL to get file path
+                    // Expected format: .../storage/v1/object/public/public_assets/experiences/filename.webp
+                    // OR .../public_assets/experiences/filename.webp
+                    const url = new URL(urlStr)
+
+                    // Decode URL to handle spaces/special chars in filenames
+                    const pathname = decodeURIComponent(url.pathname);
+
+                    // We need to extract the path relative to the bucket 'public_assets'
+                    const targetString = '/public_assets/';
+                    const index = pathname.indexOf(targetString);
+
+                    if (index !== -1) {
+                        const filePath = pathname.substring(index + targetString.length);
+                        if (filePath) {
+                            filesToRemove.push(filePath)
+                        }
+                    }
+                } catch (e) {
+                    console.error("Error parsing image URL for deletion:", urlStr, e)
+                }
             }
-        }
 
-        if (filesToRemove.length > 0) {
-            const { error: storageError } = await supabase.storage
-                .from('public_assets')
-                .remove(filesToRemove)
+            if (filesToRemove.length > 0) {
+                console.log("Deleting files from storage (Admin):", filesToRemove);
+                const { error: storageError } = await supabaseAdmin.storage
+                    .from('public_assets')
+                    .remove(filesToRemove)
 
-            if (storageError) {
-                console.error("Error removing images from storage:", storageError)
-                // Proceed with DB delete anyway, orphan files are better than stuck records
+                if (storageError) {
+                    console.error("Error removing images from storage:", storageError)
+                } else {
+                    console.log("Images deleted successfully.");
+                }
             }
         }
     }
