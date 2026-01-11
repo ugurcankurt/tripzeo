@@ -96,6 +96,51 @@ export async function deleteExperience(experienceId: string) {
         return { error: "Unauthorized" }
     }
 
+    // 1. Fetch experience to get images
+    const { data: experience } = await supabase
+        .from('experiences')
+        .select('images')
+        .eq('id', experienceId)
+        .eq('host_id', user.id)
+        .single()
+
+    if (!experience) {
+        return { error: "Experience not found" }
+    }
+
+    // 2. Delete images from storage if any
+    const images = experience.images as string[] | null
+    if (images && images.length > 0) {
+        const filesToRemove: string[] = []
+
+        for (const urlStr of images) {
+            try {
+                // Parse URL to get file path
+                // Expected format: .../storage/v1/object/public/public_assets/experiences/filename.webp
+                const url = new URL(urlStr)
+                const pathParts = url.pathname.split('/public_assets/')
+                if (pathParts.length > 1) {
+                    const filePath = pathParts[1]
+                    filesToRemove.push(decodeURIComponent(filePath))
+                }
+            } catch (e) {
+                console.error("Error parsing image URL for deletion:", urlStr, e)
+            }
+        }
+
+        if (filesToRemove.length > 0) {
+            const { error: storageError } = await supabase.storage
+                .from('public_assets')
+                .remove(filesToRemove)
+
+            if (storageError) {
+                console.error("Error removing images from storage:", storageError)
+                // Proceed with DB delete anyway, orphan files are better than stuck records
+            }
+        }
+    }
+
+    // 3. Delete experience record
     const { error } = await supabase
         .from('experiences')
         .delete()
