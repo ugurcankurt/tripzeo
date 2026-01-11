@@ -11,51 +11,48 @@ export function CheckoutForm({ htmlContent }: CheckoutFormProps) {
     const scriptRef = useRef<HTMLScriptElement | null>(null)
 
     useEffect(() => {
-        if (!htmlContent) {
-            console.warn("Iyzipay: No HTML content received")
-            return
-        }
+        if (!htmlContent) return
 
-        // Debug: Log the received content
-        console.log("Iyzipay: Received HTML Content Length:", htmlContent.length)
-        // console.log("Iyzipay: HTML Content:", htmlContent) // Uncomment if needed deeply
+        // console.log("Iyzipay: Received content length:", htmlContent.length)
 
-        // 1. Find the script content - RELAXED REGEX
-        // Matches <script>, <script type="...">, etc.
-        const scriptMatch = htmlContent.match(/<script[^>]*>([\s\S]*?)<\/script>/i)
-        const scriptContent = scriptMatch ? scriptMatch[1] : null
+        const parser = new DOMParser()
+        const doc = parser.parseFromString(htmlContent, 'text/html')
 
-        if (!scriptContent) {
-            console.error("Iyzipay: No script block found in response!", htmlContent)
-            return
-        }
+        // 1. Inject Styles
+        const styles = doc.querySelectorAll('style')
+        styles.forEach(style => {
+            const styleElement = document.createElement('style')
+            styleElement.textContent = style.textContent
+            document.head.appendChild(styleElement)
+        })
 
-        console.log("Iyzipay: Script extracted successfully")
+        // 2. Inject Scripts
+        const scripts = doc.querySelectorAll('script')
+        const injectedScripts: HTMLScriptElement[] = []
 
-        if (scriptContent) {
-            // Check if script is already running to avoid duplication
-            if (scriptRef.current) return
-
-            const script = document.createElement("script")
-            script.type = "text/javascript"
-            // Wrap in try-catch to prevent crashing if Iyzipay fails
-            script.innerHTML = `try { ${scriptContent} } catch(e) { console.error('Iyzipay Script Error:', e) }`
-
-            document.body.appendChild(script)
-            scriptRef.current = script
-
-            // Force a resize event after a delay to ensure responsive iframe adjusts
-            setTimeout(() => {
-                window.dispatchEvent(new Event('resize'))
-            }, 500)
-        }
-
-        return () => {
-            if (scriptRef.current) {
-                document.body.removeChild(scriptRef.current)
-                scriptRef.current = null
+        scripts.forEach(script => {
+            const scriptElement = document.createElement('script')
+            if (script.src) {
+                scriptElement.src = script.src
+            } else {
+                scriptElement.textContent = script.textContent
             }
-            // Cleanup the iframe div to prevent duplicates on re-renders
+            document.body.appendChild(scriptElement)
+            injectedScripts.push(scriptElement)
+        })
+
+        // Force resize for iframe
+        setTimeout(() => {
+            window.dispatchEvent(new Event('resize'))
+        }, 500)
+
+        // Cleanup
+        return () => {
+            injectedScripts.forEach(s => {
+                if (document.body.contains(s)) {
+                    document.body.removeChild(s)
+                }
+            })
             const formDiv = document.getElementById("iyzipay-checkout-form")
             if (formDiv) formDiv.innerHTML = ""
         }

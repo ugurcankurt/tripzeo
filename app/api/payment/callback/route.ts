@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.redirect(new URL(`/reset-password`, request.url), { status: 303 })
         }
 
-        return NextResponse.redirect(new URL(`/account/orders?payment=success`, request.url), { status: 303 })
+        return NextResponse.redirect(new URL(`/account/orders?payment=success&booking_id=${bookingId}`, request.url), { status: 303 })
 
     } catch (error: any) {
         console.error('Callback error:', error)
