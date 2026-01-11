@@ -29,7 +29,7 @@ import { toast } from "sonner"
 import { isSameDay, parseISO } from "date-fns"
 import { createClient } from "@/lib/supabase/client"
 
-export function BookingForm({ price, serviceFeeRate, experienceId, blockedDates = [], currentUserId, hostId }: BookingFormProps) {
+export function BookingForm({ price, capacity, serviceFeeRate, experienceId, blockedDates = [], currentUserId, hostId }: BookingFormProps) {
     const [date, setDate] = React.useState<Date | undefined>(undefined)
     const [guests, setGuests] = React.useState<number>(1)
     const [isCalendarOpen, setIsCalendarOpen] = React.useState(false)
@@ -276,7 +276,7 @@ export function BookingForm({ price, serviceFeeRate, experienceId, blockedDates 
                                         variant="outline"
                                         size="icon"
                                         className="h-8 w-8 rounded-full"
-                                        disabled={guests >= (10)} // simple max cap
+                                        disabled={guests >= (capacity || 10)}
                                         onClick={() => setGuests(guests + 1)}
                                     >
                                         +
