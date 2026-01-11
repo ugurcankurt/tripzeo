@@ -28,7 +28,7 @@ export function useFavorite(experienceId: string, initialIsFavorited: boolean = 
                 .select('id')
                 .eq('user_id', user.id)
                 .eq('experience_id', experienceId)
-                .single()
+                .maybeSingle()
 
             setIsFavorited(!!data)
         } else {
