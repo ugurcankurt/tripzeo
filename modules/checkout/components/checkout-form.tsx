@@ -34,8 +34,14 @@ export function CheckoutForm({ htmlContent }: CheckoutFormProps) {
             const scriptElement = document.createElement('script')
             if (script.src) {
                 scriptElement.src = script.src
+                scriptElement.async = false // Ensure sequential execution order
             } else {
-                scriptElement.textContent = script.textContent
+                // Wrap in try-catch to ensure errors (like Sentry/Network issues) don't stop execution
+                scriptElement.textContent = `try {
+                    ${script.textContent}
+                } catch (e) {
+                    console.error('Iyzipay Inline Script Error:', e)
+                }`
             }
             document.body.appendChild(scriptElement)
             injectedScripts.push(scriptElement)

@@ -2,8 +2,8 @@ import { createClient } from "@/lib/supabase/server"
 import { notFound, redirect } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { initializePayment } from "@/modules/checkout/actions"
-import { CheckoutForm } from "@/modules/checkout/components/checkout-form"
+import { CustomPaymentForm } from "@/modules/checkout/components/custom-payment-form"
+import { Lock } from "lucide-react"
 
 export default async function PaymentPage({ params }: { params: { id: string } }) {
     const supabase = await createClient()
@@ -16,7 +16,7 @@ export default async function PaymentPage({ params }: { params: { id: string } }
         .from('bookings')
         .select(`
         *,
-        experience:experiences(title, price, location_city)
+        experience:experiences(title, price, location_city, currency)
     `)
         .eq('id', id)
         .single()
@@ -31,20 +31,7 @@ export default async function PaymentPage({ params }: { params: { id: string } }
         redirect('/account/orders')
     }
 
-    // Ödeme başlat
-    let paymentFormHtml = null
-    let error = null
-
-    try {
-        const result = await initializePayment(id) as any
-        if (result.error) {
-            error = result.error
-        } else {
-            paymentFormHtml = result.htmlContent
-        }
-    } catch (err: any) {
-        error = err.error || 'Payment could not be initialized.'
-    }
+    // Custom form renders directly, no pre-initialization needed.
 
     return (
         <div className="container mx-auto px-4 py-12 max-w-4xl">
@@ -88,22 +75,26 @@ export default async function PaymentPage({ params }: { params: { id: string } }
 
                 {/* Sağ: Ödeme Formu (Iyzipay) */}
                 <div>
-                    {error ? (
-                        <div className="bg-red-50 p-4 border border-red-200 rounded text-red-600">
-                            <p>Error: {error}</p>
-                        </div>
-                    ) : (
-                        <Card>
-                            <CardHeader>
+                    <Card>
+                        <CardHeader>
+                            <div className="flex items-center justify-between">
                                 <CardTitle>Card Details</CardTitle>
-                                <CardDescription>Pay securely with Iyzipay infrastructure.</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                {/* Iyzipay Scripti Client Side'da çalışmalı */}
-                                <CheckoutForm htmlContent={paymentFormHtml} />
-                            </CardContent>
-                        </Card>
-                    )}
+                                <div className="flex items-center gap-1.5 text-muted-foreground">
+                                    <Lock className="h-3.5 w-3.5" />
+                                    <span className="text-xs font-medium">Secure</span>
+                                </div>
+                            </div>
+                            <CardDescription>Pay securely with Iyzipay infrastructure.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            {/* Custom Payment Form (Direct API) */}
+                            <CustomPaymentForm
+                                bookingId={id}
+                                price={booking.total_amount}
+                                currency={booking.experience?.currency || 'USD'}
+                            />
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
         </div>
