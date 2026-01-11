@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from "react"
-import { sendEvent } from "@/lib/analytics"
+import { sendPurchase } from "@/lib/analytics"
 import { useRouter, useSearchParams } from "next/navigation"
 
 interface PurchaseTrackerProps {
@@ -24,14 +24,7 @@ export function PurchaseTracker({ bookingId, transactionId, value, currency, ite
 
     useEffect(() => {
         // Fire the event
-        sendEvent('purchase', {
-            transaction_id: transactionId,
-            value: value,
-            currency: currency,
-            tax: 0,
-            shipping: 0,
-            items: items
-        })
+        sendPurchase(transactionId, value, currency, items)
 
         // Optional: Clean up URL to prevent duplicate tracking on refresh
         // For now, we rely on the fact that GA4 usually dedupes same transaction_id

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Star, Heart, MapPin, ArrowUpRight } from "lucide-react"
+import { sendSelectItem } from "@/lib/analytics"
 
 import type { ExperienceCardData } from "@/types/experiences"
 import { getExperienceUrl } from "@/lib/utils"
@@ -38,7 +39,22 @@ export function ExperienceCard({ experience, className }: ExperienceCardProps) {
         }
     }, [])
 
+
+
     const handleCardClick = () => {
+        // Track click
+        sendSelectItem({
+            item_id: experience.id,
+            item_name: title,
+            price: price,
+            currency: currency || 'USD',
+            item_brand: 'Tripzeo Host', // simplified
+            item_category: 'Experience', // simplified
+            location_id: location_city,
+            item_list_name: 'Experience List',
+            item_list_id: 'experience_list'
+        })
+
         router.push(experienceUrl)
     }
 

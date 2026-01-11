@@ -39,10 +39,28 @@ export const metadata: Metadata = {
       }
     ]
   },
-  icons: {
-    icon: "/icon.svg",
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Tripzeo | Unique Local Experiences',
+    description: 'Discover and book unique local experiences, tours, and activities hosted by experts.',
+    images: ['/opengraph-image'], // Re-use OG image
+  },
+  alternates: {
+    canonical: './',
   },
 };
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Tripzeo",
+  "url": process.env.NEXT_PUBLIC_APP_URL || "https://tripzeo.com",
+  "logo": "https://tripzeo.com/icon.svg",
+  "sameAs": [
+    "https://twitter.com/tripzeo",
+    "https://instagram.com/tripzeo"
+  ]
+}
 
 export default function RootLayout({
   children,
@@ -65,6 +83,10 @@ export default function RootLayout({
               });
             `,
           }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
       <body

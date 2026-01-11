@@ -1,21 +1,8 @@
 import { MetadataRoute } from 'next'
 import { createClient } from '@/lib/supabase/server'
+import { slugify } from '@/lib/utils'
 
-const baseUrl = 'https://tripzeo.com'
-
-// Replicating slugify here to avoid importing client-side dependencies from lib/utils
-function slugify(text: string): string {
-    if (!text) return ''
-    return text
-        .toString()
-        .toLowerCase()
-        .trim()
-        .replace(/\s+/g, '-')        // Replace spaces with -
-        .replace(/[^\w\-]+/g, '')    // Remove all non-word chars
-        .replace(/\-\-+/g, '-')      // Replace multiple - with single -
-        .replace(/^-+/, '')          // Trim - from start of text
-        .replace(/-+$/, '')          // Trim - from end of text
-}
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://tripzeo.com'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const supabase = await createClient()

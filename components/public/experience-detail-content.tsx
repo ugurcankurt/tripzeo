@@ -19,6 +19,7 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { ExperienceDetailData, ReviewData } from "@/types/experiences"
+import { ViewItemTracker } from "@/components/analytics/view-item-tracker"
 
 // Define props for the content wrapper
 interface ExperienceDetailContentProps {
@@ -144,6 +145,15 @@ export async function ExperienceDetailContent({ country, city, slug }: Experienc
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
+            <ViewItemTracker item={{
+                item_id: experience.id,
+                item_name: experience.title,
+                price: experience.price,
+                item_brand: experience.host?.full_name || 'Tripzeo Host',
+                item_category: typeof experience.category === 'string' ? experience.category : 'Experience',
+                location_id: experience.location_city,
+                quantity: 1
+            }} />
 
             {/* Visual Breadcrumbs */}
             <div className="mb-6">

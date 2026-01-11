@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { ExperienceCard } from "@/modules/experiences/components/experience-card"
 import { CategoryGrid } from "@/components/home/category-grid"
 import { redirect } from "next/navigation"
+import { ViewItemListTracker } from "@/components/analytics/view-item-list-tracker"
 
 interface SearchResultsProps {
     q?: string
@@ -82,11 +83,28 @@ export async function SearchResults({ q, category }: SearchResultsProps) {
             )}
 
             {experiences && experiences.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {experiences.map((exp: any) => (
-                        <ExperienceCard key={exp.id} experience={exp} />
-                    ))}
-                </div>
+                <>
+                    <ViewItemListTracker
+                        items={experiences.map((exp: any, index: number) => ({
+                            item_id: exp.id,
+                            item_name: exp.title,
+                            index: index,
+                            price: exp.price,
+                            item_brand: exp.host?.full_name || 'Tripzeo Host',
+                            item_category: exp.category || 'General',
+                            item_list_name: q ? 'Search Results' : category ? 'Category Results' : 'All Experiences',
+                            item_list_id: q ? 'search_results' : category ? 'category_results' : 'all_experiences',
+                            location_id: exp.location_city
+                        }))}
+                        listName={q ? 'Search Results' : category ? 'Category Results' : 'All Experiences'}
+                    />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+                        {experiences.map((exp: any) => (
+                            <ExperienceCard key={exp.id} experience={exp} />
+                        ))}
+                    </div>
+                </>
             ) : (
                 <div className="text-center py-20 bg-muted/30 rounded-lg border border-dashed">
                     <p className="text-muted-foreground text-lg mb-4">No experiences found matching your criteria.</p>

@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Loader2, CreditCard, Lock, ShieldCheck } from "lucide-react"
 import { processDirectPayment } from "@/modules/checkout/actions"
+import { sendAddPaymentInfo } from "@/lib/analytics"
 
 // Schema
 const paymentSchema = z.object({
@@ -115,6 +116,15 @@ export function CustomPaymentForm({ bookingId, price, currency }: CustomPaymentF
 
     const onSubmit = async (data: PaymentFormData) => {
         setIsLoading(true)
+
+        // Track Add Payment Info
+        sendAddPaymentInfo([{
+            item_id: bookingId, // We use booking ID as item ID here since we don't have full item details in this component easily without props drill
+            item_name: 'Experience Booking',
+            price: price,
+            quantity: 1
+        }], price, currency, 'Credit Card')
+
         try {
             const result = await processDirectPayment(bookingId, {
                 cardHolderName: data.cardHolderName,

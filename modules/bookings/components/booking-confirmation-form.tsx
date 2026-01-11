@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { createBooking } from "@/modules/bookings/actions"
@@ -27,15 +27,19 @@ interface BookingConfirmationFormProps {
     hostId?: string
 }
 
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+
+import { sendBeginCheckout } from "@/lib/analytics"
 
 export function BookingConfirmationForm({
     experienceId,
     date,
     people,
     currentUser,
-    userProfile
+    userProfile,
+    experienceTitle, // ensure passed
+    totalAmount,
+    duration
 }: BookingConfirmationFormProps) {
     // Location Hook
     const {
@@ -62,6 +66,18 @@ export function BookingConfirmationForm({
     const [zipCode, setZipCode] = useState(userProfile?.zip_code || "")
     const [isLoading, setIsLoading] = useState(false)
     const router = useRouter()
+
+    useEffect(() => {
+        // Fire begin_checkout when this form mounts (since it is the checkout step)
+        if (experienceId && totalAmount) {
+            sendBeginCheckout([{
+                item_id: experienceId,
+                item_name: experienceTitle || 'Experience',
+                price: totalAmount / (people || 1), // approximate unit price if total is passed
+                quantity: people || 1
+            }], totalAmount, 'USD')
+        }
+    }, [experienceId, totalAmount, people, experienceTitle])
 
     const handleCreateBooking = async () => {
         setIsLoading(true)
