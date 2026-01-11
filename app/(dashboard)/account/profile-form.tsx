@@ -193,7 +193,7 @@ export function ProfileForm({ profile, userEmail, categories }: ProfileFormProps
 
             <div className="flex items-center gap-4 mb-6">
                 <Avatar className="h-20 w-20">
-                    <AvatarImage src={avatarUrl || selectedCategoryData?.icon || ''} className="object-contain" />
+                    <AvatarImage src={avatarUrl || selectedCategoryData?.icon || ''} className="object-cover object-top" />
                     <AvatarFallback>{profile?.full_name?.charAt(0) || 'U'}</AvatarFallback>
                 </Avatar>
                 <div className="relative">

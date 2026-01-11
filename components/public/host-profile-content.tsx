@@ -138,7 +138,7 @@ export async function HostProfileContent({ hostId }: { hostId: string }) {
                         <CardContent className="pt-6 flex flex-col items-center text-center space-y-4">
                             <Avatar className="h-32 w-32 border-4 border-background shadow-md">
                                 {/* @ts-ignore - Supabase join type inference */}
-                                <AvatarImage src={profile.avatar_url || profile.category?.icon || ''} className="object-contain" />
+                                <AvatarImage src={profile.avatar_url || profile.category?.icon || ''} className="object-cover object-top" />
                                 <AvatarFallback className="text-2xl">{profile.full_name?.charAt(0) || 'H'}</AvatarFallback>
                             </Avatar>
 

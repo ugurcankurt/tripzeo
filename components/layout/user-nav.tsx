@@ -48,7 +48,7 @@ export function UserNav({ user }: UserNavProps) {
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                     <Avatar className="h-10 w-10 border border-muted">
-                        <AvatarImage src={user.avatar_url || user.category?.icon || ''} alt={user.full_name || ''} className="object-contain" />
+                        <AvatarImage src={user.avatar_url || user.category?.icon || ''} alt={user.full_name || ''} className="object-cover object-top" />
                         <AvatarFallback className="bg-primary/10 text-primary font-medium">
                             {user.full_name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
                         </AvatarFallback>

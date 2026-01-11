@@ -234,7 +234,7 @@ export async function ExperienceDetailContent({ country, city, slug }: Experienc
                         <Link href={`/host/${slugify(experience.host?.full_name || 'host')}-${experience.host_id}`}>
                             <Avatar className="h-16 w-16 border hover:opacity-80 transition-opacity">
                                 {/* @ts-ignore - nested join type inference */}
-                                <AvatarImage src={experience.host?.avatar_url || experience.host?.category?.icon || ''} className="object-contain" />
+                                <AvatarImage src={experience.host?.avatar_url || experience.host?.category?.icon || ''} className="object-cover object-top" />
                                 <AvatarFallback>{experience.host?.full_name?.charAt(0) || 'U'}</AvatarFallback>
                             </Avatar>
                         </Link>
