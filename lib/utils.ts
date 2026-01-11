@@ -32,45 +32,42 @@ export function getExperienceUrl(experience: {
 export async function compressImage(file: File): Promise<Blob> {
   return new Promise((resolve, reject) => {
     const img = new window.Image();
-    img.src = URL.createObjectURL(file);
+    const objectUrl = URL.createObjectURL(file);
+    img.src = objectUrl;
+
     img.onload = () => {
+      // Clean up the object URL after loading
+      URL.revokeObjectURL(objectUrl);
+
       const canvas = document.createElement('canvas');
-      let width = img.width;
-      let height = img.height;
-
-      // Initial Resize Strategy
-      // 1200px is usually enough for web viewing, but if user wants strictly < 500kb, we might need to go lower effectively.
-      let MAX_WIDTH = 1200;
-      const MAX_HEIGHT = 1200;
-
-      // Maintain aspect ratio
-      if (width > height) {
-        if (width > MAX_WIDTH) {
-          height = Math.round((height *= MAX_WIDTH / width));
-          width = MAX_WIDTH;
-        }
-      } else {
-        if (height > MAX_HEIGHT) {
-          width = Math.round((width *= MAX_HEIGHT / height));
-          height = MAX_HEIGHT;
-        }
-      }
-
-      canvas.width = width;
-      canvas.height = height;
       const ctx = canvas.getContext('2d');
       if (!ctx) {
         reject(new Error('Canvas context not supported'));
         return;
       }
-      ctx.drawImage(img, 0, 0, width, height);
 
-      // Iterative Compression Strategy
-      // Target: < 500KB
-      const TARGET_SIZE_BYTES = 500 * 1024; // 500KB
-      let quality = 0.8; // Start high-ish
+      let width = img.width;
+      let height = img.height;
+
+      // Start with a reasonable max dimension to avoid processing massive images
+      // 1920px is a good balance for full-screen web quality
+      const MAX_START_DIMENSION = 1920;
+      if (width > MAX_START_DIMENSION || height > MAX_START_DIMENSION) {
+        const ratio = Math.min(MAX_START_DIMENSION / width, MAX_START_DIMENSION / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+
+      const TARGET_SIZE_BYTES = 500 * 1024; // 500KB strict limit
+      let quality = 0.9;
+      let iteration = 0;
+      const MAX_ITERATIONS = 10;
 
       const compress = () => {
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+
         canvas.toBlob(
           (blob) => {
             if (!blob) {
@@ -78,29 +75,38 @@ export async function compressImage(file: File): Promise<Blob> {
               return;
             }
 
-            // Check size
-            if (blob.size <= TARGET_SIZE_BYTES || quality <= 0.2) {
-              // Verify final size just to be sure we don't return something massive if quality floor hit
-              // If still > 500kb at 0.1, we could resize again, but 0.2 webp at 1200px is usually tiny.
-              // If it is still huge, we brute force resize down.
-              if (blob.size > TARGET_SIZE_BYTES && quality <= 0.2) {
-                // Emergency Resize: Cut dimensions in half
-                const factor = 0.7;
-                canvas.width = canvas.width * factor;
-                canvas.height = canvas.height * factor;
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                quality = 0.5; // Reset quality for new size
-                compress(); // Retry
-                return;
-              }
+            console.log(`Compression iteration ${iteration + 1}: ${Math.round(blob.size / 1024)}KB | ${width}x${height} | Q=${quality.toFixed(2)}`);
 
-              console.log(`Compressed image: ${Math.round(blob.size / 1024)}KB at Q=${quality.toFixed(1)}`);
+            // Success condition
+            if (blob.size <= TARGET_SIZE_BYTES) {
               resolve(blob);
-            } else {
-              // Reduce quality and try again
-              quality -= 0.1;
-              compress();
+              return;
             }
+
+            iteration++;
+
+            // Safety break
+            if (iteration >= MAX_ITERATIONS) {
+              console.warn("Max compression iterations reached. Returning best effort.");
+              resolve(blob);
+              return;
+            }
+
+            // Strategy:
+            // 1. If quality is decent (> 0.5), reduce quality.
+            // 2. If quality is already low, reduce dimensions and reset quality to keep image looking okay (just smaller).
+            if (quality > 0.5) {
+              quality -= 0.15;
+            } else {
+              // Aggressive resize
+              const SCALE_FACTOR = 0.75;
+              width = Math.round(width * SCALE_FACTOR);
+              height = Math.round(height * SCALE_FACTOR);
+              // Reset quality to avoid "deep fried" look, trust that size reduction will help
+              quality = 0.8;
+            }
+
+            compress();
           },
           'image/webp',
           quality
@@ -109,7 +115,11 @@ export async function compressImage(file: File): Promise<Blob> {
 
       compress();
     };
-    img.onerror = (e: any) => reject(e);
+
+    img.onerror = (e: any) => {
+      URL.revokeObjectURL(objectUrl);
+      reject(e);
+    };
   });
 }
 
