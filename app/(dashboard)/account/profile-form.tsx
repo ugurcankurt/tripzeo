@@ -360,6 +360,13 @@ export function ProfileForm({ profile, userEmail, categories }: ProfileFormProps
                         placeholder="Tell us about yourself. If you want to be a host, describe your skills."
                         className="h-32"
                     />
+                    <div className="text-[0.8rem] text-muted-foreground mt-2 space-y-1">
+                        <p>Tell us about yourself and your expertise.</p>
+                        <p className="text-amber-600 font-medium">
+                            Warning: Do not include contact details (email, phone, website) or social media links.
+                            Profiles violating this rule will be suspended.
+                        </p>
+                    </div>
                 </div>
 
                 <div className="space-y-4 pt-4 border-t">
