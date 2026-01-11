@@ -1,8 +1,6 @@
 import { ImageResponse } from 'next/og'
 import { createClient } from '@supabase/supabase-js'
 
-export const runtime = 'edge'
-
 export const alt = 'City Travel Guide'
 export const size = {
     width: 1200,
