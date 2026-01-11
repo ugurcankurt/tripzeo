@@ -83,7 +83,7 @@ export default async function BookPage({ searchParams }: { searchParams: Promise
     const total = subtotal + serviceFee
 
     return (
-        <div className="container mx-auto px-4 py-12 max-w-6xl">
+        <div className="container mx-auto px-4 py-12 max-w-7xl">
             {/* Visual Breadcrumbs */}
             <div className="mb-6">
                 <Breadcrumb>
