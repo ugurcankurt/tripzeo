@@ -1,6 +1,5 @@
 import { Suspense } from "react"
 import { createClient } from "@/lib/supabase/server"
-import { notFound } from "next/navigation"
 import type { Metadata } from 'next'
 import { HostProfileContent } from "@/components/public/host-profile-content"
 import { HostProfileSkeleton } from "@/components/skeletons/host-profile-skeleton"

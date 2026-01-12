@@ -38,7 +38,7 @@ export function CookieBanner() {
 
     return (
         <div className="fixed bottom-0 left-0 right-0 z-[100] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t border-border p-4 shadow-lg animate-in slide-in-from-bottom duration-300">
-            <div className="container mx-auto max-w-7xl flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="text-sm text-muted-foreground text-center sm:text-left">
                     <p>
                         We use cookies to improve your experience and analyze site traffic.

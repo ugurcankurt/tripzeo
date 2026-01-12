@@ -35,7 +35,7 @@ export function MobileBookingBar(props: MobileBookingBarProps) {
 
     return (
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t z-40 lg:hidden safe-area-bottom">
-            <div className="flex items-center justify-between max-w-7xl mx-auto gap-4">
+            <div className="flex items-center justify-between mx-auto gap-4">
                 <div className="flex flex-col">
                     <span className="font-bold text-lg">{formattedPrice}</span>
                     <span className="text-xs text-muted-foreground font-medium">/ guest</span>

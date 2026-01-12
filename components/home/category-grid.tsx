@@ -57,9 +57,9 @@ export async function CategoryGrid() {
 
                                     {/* Text Content - Bottom Aligned */}
                                     <div className="p-5 w-full relative z-10 flex flex-col gap-1">
-                                        <h3 className="font-bold text-lg text-card-foreground leading-none">
+                                        <div className="font-bold text-lg text-card-foreground leading-none">
                                             {cat.name}
-                                        </h3>
+                                        </div>
                                     </div>
                                 </Card>
                             </Link>

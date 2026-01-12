@@ -1,7 +1,4 @@
 import { Suspense } from "react"
-import { createClient } from "@/lib/supabase/server"
-import { CategoryGrid } from "@/components/home/category-grid"
-import { redirect } from "next/navigation"
 import { SearchResults } from "@/components/public/search-results"
 import { SearchResultsSkeleton } from "@/components/skeletons/search-results-skeleton"
 

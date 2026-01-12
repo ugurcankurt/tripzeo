@@ -3,6 +3,7 @@ import { Hero } from "@/components/hero"
 import { CategoryGrid } from "@/components/home/category-grid"
 import { NewArrivals } from "@/components/home/new-arrivals"
 import { PopularDestinations } from "@/components/home/popular-destinations"
+import { CTABanner } from "@/components/home/cta-banner"
 import { CategoryGridSkeleton } from "@/components/skeletons/category-grid-skeleton"
 import { ExperienceGridSkeleton } from "@/components/skeletons/experience-grid-skeleton"
 import { PopularCitiesSkeleton } from "@/components/skeletons/popular-cities-skeleton"
@@ -43,6 +44,9 @@ export default function HomePage() {
             <Suspense fallback={<ExperienceGridSkeleton count={8} />}>
                 <NewArrivals />
             </Suspense>
+
+            {/* CTA Banner */}
+            <CTABanner />
 
             {/* Popular Cities Section */}
             <Suspense fallback={<PopularCitiesSkeleton />}>

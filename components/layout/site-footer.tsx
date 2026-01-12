@@ -132,7 +132,7 @@ export async function SiteFooter() {
 
                     {/* Desktop Columns */}
                     <div className="hidden md:block">
-                        <h3 className="font-semibold text-lg mb-4">Discover</h3>
+                        <p className="font-semibold text-lg mb-4">Discover</p>
                         <ul className="space-y-3 text-sm text-muted-foreground">
                             <li>
                                 <Link href="/search" className="hover:text-primary transition-colors">
@@ -154,7 +154,7 @@ export async function SiteFooter() {
 
                     {/* Hosting Column */}
                     <div className="hidden md:block">
-                        <h3 className="font-semibold text-lg mb-4">Hosting</h3>
+                        <p className="font-semibold text-lg mb-4">Hosting</p>
                         <ul className="space-y-3 text-sm text-muted-foreground">
                             <li>
                                 <Link href="/become-a-host" className="hover:text-primary transition-colors flex items-center gap-2">
@@ -181,7 +181,7 @@ export async function SiteFooter() {
 
                     {/* Support Column */}
                     <div className="hidden md:block">
-                        <h3 className="font-semibold text-lg mb-4">Support</h3>
+                        <p className="font-semibold text-lg mb-4">Support</p>
                         <ul className="space-y-3 text-sm text-muted-foreground">
                             <li>
                                 <Link href="/help" className="hover:text-primary transition-colors">
