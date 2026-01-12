@@ -467,7 +467,7 @@ export function ProfileForm({ profile, userEmail, categories }: ProfileFormProps
                     </div>
                 </div>
 
-                {(profile?.role === 'host' || profile?.role === 'admin') && (
+                {(profile?.role === 'host' || profile?.role === 'admin' || profile?.role === 'partner') && (
                     <div className="pt-4 border-t space-y-4">
                         <h3 className="font-medium">Bank Details for Payouts</h3>
                         <p className="text-sm text-muted-foreground">Select where your bank account is located to see the required fields. For Wise payouts, use your local bank details.</p>
