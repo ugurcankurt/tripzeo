@@ -102,6 +102,16 @@ export async function SiteFooter() {
                                                 Sign up as Host
                                             </Link>
                                         </li>
+                                        <li>
+                                            <Link href="/become-a-partner" className="hover:text-primary transition-colors flex items-center gap-2">
+                                                Become a Partner
+                                            </Link>
+                                        </li>
+                                        <li>
+                                            <Link href="/partner" className="hover:text-primary transition-colors">
+                                                Partner Dashboard
+                                            </Link>
+                                        </li>
                                     </ul>
                                 </AccordionContent>
                             </AccordionItem>
@@ -174,6 +184,16 @@ export async function SiteFooter() {
                             <li>
                                 <Link href="/register?role=host" className="hover:text-primary transition-colors">
                                     Sign up as Host
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/become-a-partner" className="hover:text-primary transition-colors flex items-center gap-2">
+                                    Become a Partner
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/partner" className="hover:text-primary transition-colors">
+                                    Partner Dashboard
                                 </Link>
                             </li>
                         </ul>

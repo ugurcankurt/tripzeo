@@ -4,7 +4,6 @@ import { Gauge, User, ShoppingBag, LogOut, Briefcase, CreditCard, FileText, Cale
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname, useRouter } from "next/navigation"
-import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import {
@@ -20,9 +19,7 @@ import {
 } from "@/components/ui/sidebar"
 import { signout } from "@/modules/auth/actions"
 
-
-
-export function AppSidebar({ userRole = 'user' }: { userRole?: 'user' | 'host' | 'admin' }) {
+export function AppSidebar({ userRole = 'user' }: { userRole?: 'user' | 'host' | 'admin' | 'partner' }) {
     const pathname = usePathname()
     const router = useRouter()
 
@@ -140,7 +137,7 @@ export function AppSidebar({ userRole = 'user' }: { userRole?: 'user' | 'host' |
                             </SidebarMenuItem>
                         </>
                     ) : (
-                        /* NORMAL USER / HOST SIDEBAR MODE */
+                        /* NORMAL USER / HOST / PARTNER SIDEBAR MODE */
                         <>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild isActive={pathname === "/account"} className="w-full justify-start">
@@ -151,7 +148,7 @@ export function AppSidebar({ userRole = 'user' }: { userRole?: 'user' | 'host' |
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
 
-                            {!pathname.startsWith('/vendor') && (
+                            {!pathname.startsWith('/vendor') && !pathname.startsWith('/partner') && (
                                 <>
                                     <SidebarMenuItem>
                                         <SidebarMenuButton asChild isActive={pathname === "/account/orders"} className="w-full justify-start">
@@ -169,8 +166,6 @@ export function AppSidebar({ userRole = 'user' }: { userRole?: 'user' | 'host' |
                                             </Link>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
-
-                                    {/* Messages link removed - Replaced by Global Widget */}
                                 </>
                             )}
 
@@ -196,7 +191,6 @@ export function AppSidebar({ userRole = 'user' }: { userRole?: 'user' | 'host' |
                                             </Link>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
-                                    {/* Messages link removed - Replaced by Global Widget */}
                                     <SidebarMenuItem>
                                         <SidebarMenuButton asChild isActive={pathname === "/vendor/calendar"} className="w-full justify-start">
                                             <Link href="/vendor/calendar" onClick={handleLinkClick}>
@@ -210,6 +204,23 @@ export function AppSidebar({ userRole = 'user' }: { userRole?: 'user' | 'host' |
                                             <Link href="/vendor/finance" onClick={handleLinkClick}>
                                                 <CreditCard className="mr-2 h-4 w-4" />
                                                 Finance & Earnings
+                                            </Link>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                </>
+                            )}
+
+                            {/* PARTNER MENU */}
+                            {userRole === 'partner' && (
+                                <>
+                                    <div className="mt-8 mb-2 px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                                        Partner Program
+                                    </div>
+                                    <SidebarMenuItem>
+                                        <SidebarMenuButton asChild isActive={pathname === "/partner"} className="w-full justify-start">
+                                            <Link href="/partner" onClick={handleLinkClick}>
+                                                <ChartLine className="mr-2 h-4 w-4" />
+                                                Dashboard
                                             </Link>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>

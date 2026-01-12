@@ -3,6 +3,7 @@
 
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
+import { headers, cookies } from "next/headers" // Added cookies
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { Database } from '@/types/supabase'
 import { createNotification } from "@/modules/notifications/actions"
@@ -57,8 +58,27 @@ export async function createBooking(prevState: unknown, formData: FormData) {
         const subtotal = Number(experience.price) * guests
         const serviceFee = subtotal * serviceFeeRate
         const totalAmount = subtotal + serviceFee
-        const commissionAmount = subtotal * commissionRate
-        const hostEarnings = subtotal - commissionAmount
+        const platformCommissionAmount = subtotal * commissionRate // Renamed to avoid confusion
+        const hostEarnings = subtotal - platformCommissionAmount
+
+        // 4.x Partner Commission Logic
+        const cookieStore = await cookies()
+        const referralCode = cookieStore.get('tripzeo_ref')?.value
+        let partnerId: string | null = null
+        let partnerCommission = 0
+
+        if (referralCode) {
+            const { data: partnerProfile } = await supabase
+                .from('profiles')
+                .select('id')
+                .eq('referral_code', referralCode)
+                .single()
+
+            if (partnerProfile && partnerProfile.id !== user.id) { // Prevent self-referral
+                partnerId = partnerProfile.id
+                partnerCommission = totalAmount * 0.10 // 10% of TOTAL (including service fee?) or Subtotal? Plan said "Booking Amount". Usually Total.
+            }
+        }
 
         // 4.1 Update User Profile with Address Info if provided
         const address = formData.get("address") as string
@@ -109,7 +129,11 @@ export async function createBooking(prevState: unknown, formData: FormData) {
                     total_amount: totalAmount,
                     host_earnings: hostEarnings,
                     service_fee: serviceFee,
-                    commission_amount: commissionAmount,
+                    commission_amount: platformCommissionAmount,
+                    // metadata: { partner_id: partnerId, partner_commission: partnerCommission }, // If no column yet
+                    // But we are adding partner_commission column
+                    partner_commission: partnerCommission,
+                    partner_id: partnerId, // Update partner if relevant? Usually partner is set on creation.
                     // Update metadata in case it changed (though unlikely for same exp)
                     duration_minutes: experience.duration_minutes,
                     start_time: experience.start_time,
@@ -135,7 +159,9 @@ export async function createBooking(prevState: unknown, formData: FormData) {
                     total_amount: totalAmount,
                     host_earnings: hostEarnings,
                     service_fee: serviceFee,
-                    commission_amount: commissionAmount,
+                    commission_amount: platformCommissionAmount,
+                    partner_commission: partnerCommission,
+                    partner_id: partnerId,
                     status: 'pending_payment',
                     duration_minutes: experience.duration_minutes,
                     start_time: experience.start_time,
@@ -313,6 +339,26 @@ export async function approveBooking(bookingId: string) {
             })
         }
     }
+
+    // 5. Record Partner Commission (if applicable)
+    // Cast to any because generated types are not updated with new columns yet
+    const bookingWithPartner = booking as any
+    if (bookingWithPartner.partner_id && bookingWithPartner.partner_commission && Number(bookingWithPartner.partner_commission) > 0) {
+        const { error: commissionError } = await adminSupabase
+            .from('financial_transactions')
+            .insert({
+                user_id: bookingWithPartner.partner_id,
+                amount: bookingWithPartner.partner_commission,
+                type: 'commission',
+                status: 'pending', // Pending payout
+                booking_id: bookingId,
+                currency: booking.experience?.currency || 'USD',
+                description: `Commission for booking #${bookingId.slice(0, 8)}`
+            })
+
+        if (commissionError) console.error("Failed to record partner commission:", commissionError)
+    }
+
     return { success: "Booking approved and payment captured" }
 }
 
