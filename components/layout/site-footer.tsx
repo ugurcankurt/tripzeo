@@ -23,12 +23,12 @@ export async function SiteFooter() {
 
     return (
         <footer className="bg-muted/30 border-t items-center mt-auto">
-            <div className="container mx-auto px-4 py-12 md:py-16">
+            <div className="container mx-auto px-4 py-8 md:py-12">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
                     {/* Brand Column */}
                     <div className="space-y-4">
-                        <Link href="/" className="flex items-center gap-2 font-semibold text-2xl tracking-tighter text-primary">
-                            <div className="relative w-8 h-8">
+                        <Link href="/" className="flex items-center gap-1 font-semibold text-2xl tracking-tighter text-primary">
+                            <div className="relative w-6 h-6">
                                 <Image
                                     src="/tripzeo.svg"
                                     alt="Tripzeo Logo"

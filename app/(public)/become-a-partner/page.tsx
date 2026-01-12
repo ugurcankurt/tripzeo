@@ -14,7 +14,7 @@ export default function BecomePartnerPage() {
                         <span>Earn with</span>
                         <div className="flex items-center gap-1">
                             <Image src="/tripzeo.svg" alt="Tripzeo" width={32} height={32} className="h-8 w-auto md:h-10" />
-                            <span className="text-[#FF4F30]">Tripzeo</span>
+                            <span className="text-[#FF4F30] font-semibold">tripzeo</span>
                         </div>
                     </h1>
                     <p className="text-xl text-gray-600 mb-12 leading-relaxed">
