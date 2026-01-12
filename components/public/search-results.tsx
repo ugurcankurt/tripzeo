@@ -108,7 +108,7 @@ export async function SearchResults({ q, category }: SearchResultsProps) {
                 <div className="text-center py-20 bg-muted/30 rounded-lg border border-dashed">
                     <p className="text-muted-foreground text-lg mb-4">No experiences found matching your criteria.</p>
                     <p className="text-sm text-muted-foreground">Try a different search term or browse our categories.</p>
-                    <div className="mt-8 max-w-4xl mx-auto">
+                    <div className="mx-auto mt-8 pb-8 max-w-7xl">
                         <CategoryGrid />
                     </div>
                 </div>
