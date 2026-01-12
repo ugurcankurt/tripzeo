@@ -18,7 +18,7 @@ interface HeroProps {
 export function Hero({ categories = [], userAvatars = [] }: HeroProps) {
 
     return (
-        <div className="relative w-full h-[65vh] min-h-[450px] lg:h-[85vh] lg:min-h-[600px] flex items-start justify-center overflow-hidden bg-black text-white rounded-b-[2.5rem]">
+        <div className="relative w-full h-[60vh] min-h-[450px] lg:h-[85vh] lg:min-h-[600px] flex items-start justify-center overflow-hidden bg-black text-white rounded-b-[2.5rem]">
             {/* 1. Background Image Layer */}
             <div className="absolute inset-0 z-0">
                 <Image

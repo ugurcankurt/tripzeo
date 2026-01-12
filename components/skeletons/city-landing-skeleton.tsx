@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card"
 
 export function CityLandingSkeleton() {
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-4">
             {/* Breadcrumb */}
             <div className="mb-6 flex gap-2 items-center">
                 <Skeleton className="h-4 w-12" />

@@ -70,7 +70,7 @@ export async function SearchResults({ q, category }: SearchResultsProps) {
     if (error) console.error('Search Error:', error)
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-4">
             <h1 className="text-3xl font-bold mb-8">
                 {q ? `Results for "${q}"` : category ? `${category} Experiences` : "All Experiences"}
             </h1>

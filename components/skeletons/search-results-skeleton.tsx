@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card"
 
 export function SearchResultsSkeleton() {
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-4">
             <Skeleton className="h-10 w-64 mb-8" />
 
 

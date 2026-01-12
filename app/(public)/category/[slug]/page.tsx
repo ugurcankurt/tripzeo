@@ -1,11 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createClient } from "@/lib/supabase/server"
-import { ExperienceCard } from "@/modules/experiences/components/experience-card"
 import { notFound } from "next/navigation"
 import Image from "next/image"
 import { Card, CardContent } from "@/components/ui/card"
-import { Sparkles, Layers, ShieldCheck, Zap } from "lucide-react"
-import { Separator } from "@/components/ui/separator"
+import { Sparkles } from "lucide-react"
 import { CategoryExperienceList } from "./category-experience-list"
 import {
     Breadcrumb,
@@ -146,7 +144,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     }
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-4">
             {/* Visual Breadcrumbs */}
             <div className="mb-6">
                 <Breadcrumb>

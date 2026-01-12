@@ -4,7 +4,7 @@ import { Separator } from "@/components/ui/separator"
 
 export function HostProfileSkeleton() {
     return (
-        <div className="container mx-auto px-4 py-8 pb-24 lg:pb-8">
+        <div className="container mx-auto px-4 py-4 pb-24 lg:pb-8">
             {/* Visual Breadcrumbs */}
             <div className="mb-6 flex gap-2 items-center">
                 <Skeleton className="h-4 w-12" />
