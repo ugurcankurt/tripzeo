@@ -23,7 +23,7 @@ interface UserNavProps {
         email: string
         full_name?: string | null
         avatar_url?: string | null
-        role?: 'user' | 'host' | 'admin' | null
+        role?: 'user' | 'host' | 'admin' | 'partner' | null
         category?: { icon: string | null } | any
     }
 }
@@ -90,6 +90,15 @@ export function UserNav({ user }: UserNavProps) {
                             <Link href="/vendor" className="font-medium text-primary">
                                 <LayoutDashboard className="mr-2 h-4 w-4" />
                                 <span>Host Panel</span>
+                            </Link>
+                        </DropdownMenuItem>
+                    )}
+                    {/* Eğer Partner ise Partner Paneli linkini göster */}
+                    {(user.role === 'partner' || user.role === 'admin') && (
+                        <DropdownMenuItem asChild className="bg-green-50 focus:bg-green-100 text-green-700 focus:text-green-800 mt-1">
+                            <Link href="/partner" className="font-medium">
+                                <LayoutDashboard className="mr-2 h-4 w-4" />
+                                <span>Partner Dashboard</span>
                             </Link>
                         </DropdownMenuItem>
                     )}
