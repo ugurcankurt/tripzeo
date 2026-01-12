@@ -2,7 +2,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { Tables } from "@/types/supabase"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { DollarSign, Wallet, TrendingUp, ArrowUpRight } from "lucide-react"
+import { DollarSign, Wallet, TrendingUp, ArrowUpRight, Users } from "lucide-react"
 import { FinanceCharts, MonthlyData } from "@/modules/finance/components/finance-charts"
 import { AdminPageHeader } from "@/components/admin/page-header"
 
@@ -10,12 +10,13 @@ export default async function AdminFinancePage() {
     const supabase = await createClient()
 
     // Fetch all relevant bookings (confirmed, completed, paid_out)
+    // Fetch all relevant bookings (confirmed, completed, paid_out)
     const { data: bookings } = await supabase
         .from('bookings')
-        .select('booking_date, total_amount, commission_amount, service_fee, host_earnings, status')
+        .select('booking_date, total_amount, commission_amount, service_fee, host_earnings, status, partner_commission')
         .in('status', ['confirmed', 'completed', 'paid_out'])
         .order('booking_date', { ascending: true })
-        .returns<Pick<Tables<'bookings'>, 'booking_date' | 'total_amount' | 'commission_amount' | 'service_fee' | 'host_earnings' | 'status'>[]>()
+        .returns<Pick<Tables<'bookings'>, 'booking_date' | 'total_amount' | 'commission_amount' | 'service_fee' | 'host_earnings' | 'status' | 'partner_commission'>[]>()
 
     // Process data for charts
     // Group by month
@@ -31,6 +32,7 @@ export default async function AdminFinancePage() {
             revenue: 0,
             commission: 0,
             payout: 0,
+            partnerEarnings: 0
         }
     }
 
@@ -42,8 +44,11 @@ export default async function AdminFinancePage() {
         // Only count if it falls within our tracked months
         if (monthlyStats[monthKey]) {
             monthlyStats[monthKey].revenue += booking.total_amount
-            monthlyStats[monthKey].commission += (booking.commission_amount + (booking.service_fee || 0))
+            // Net Income = (Commission + Service Fee) - Partner Commission
+            const netIncome = (booking.commission_amount + (booking.service_fee || 0)) - (booking.partner_commission || 0)
+            monthlyStats[monthKey].commission += netIncome
             monthlyStats[monthKey].payout += booking.host_earnings
+            monthlyStats[monthKey].partnerEarnings += (booking.partner_commission || 0)
         }
     })
 
@@ -51,8 +56,12 @@ export default async function AdminFinancePage() {
 
     // Calculate Summary Stats
     const totalVolume = bookings?.reduce((acc, curr) => acc + curr.total_amount, 0) || 0
-    const totalCommission = bookings?.reduce((acc, curr) => acc + (curr.commission_amount + (curr.service_fee || 0)), 0) || 0
+    // Net Income Summary
+    const totalCommission = bookings?.reduce((acc, curr) => acc + ((curr.commission_amount + (curr.service_fee || 0)) - (curr.partner_commission || 0)), 0) || 0
     const totalPayouts = bookings?.reduce((acc, curr) => acc + curr.host_earnings, 0) || 0
+    // Partner Earnings Summary
+    const totalPartnerEarnings = bookings?.reduce((acc, curr) => acc + (curr.partner_commission || 0), 0) || 0
+
     // Pending payouts -> Confirmed/Completed but NOT paid_out
     const pendingPayouts = bookings
         ?.filter(b => b.status !== 'paid_out')
@@ -95,6 +104,17 @@ export default async function AdminFinancePage() {
                     <CardContent>
                         <div className="text-2xl font-bold text-blue-600">${(totalPayouts - pendingPayouts).toLocaleString('en-US')}</div>
                         <p className="text-xs text-muted-foreground">Completed transfers</p>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Partner Earnings</CardTitle>
+                        <Users className="h-4 w-4 text-purple-600" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold text-purple-600">${totalPartnerEarnings.toLocaleString('en-US')}</div>
+                        <p className="text-xs text-muted-foreground">Commission distributions</p>
                     </CardContent>
                 </Card>
 

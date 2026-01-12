@@ -21,7 +21,7 @@ export default async function AdminDashboardPage() {
 
     const { data: bookings } = await supabase
         .from('bookings')
-        .select('total_amount, status, commission_amount')
+        .select('total_amount, status, commission_amount, partner_commission')
         .returns<DashboardBookingSummary[]>()
 
     // 2. Son 5 Kullanıcıyı Çek
@@ -56,7 +56,8 @@ export default async function AdminDashboardPage() {
     bookings?.forEach(b => {
         if (b.status === 'confirmed' || b.status === 'completed' || b.status === 'paid_out') {
             totalRevenue += b.total_amount
-            totalCommission += b.commission_amount
+            // Net Income = (Commission) - (Partner Payout)
+            totalCommission += (b.commission_amount - (b.partner_commission || 0))
         }
     })
 
@@ -73,9 +74,9 @@ export default async function AdminDashboardPage() {
                 />
 
                 <StatsCard
-                    title="Tripzeo Revenue"
+                    title="Net Revenue (Tripzeo)"
                     value={`$${totalCommission.toLocaleString('en-US')}`}
-                    description="Commission earnings"
+                    description="Net earnings after partner payouts"
                     icon={TrendingUp}
                     iconClassName="text-green-600"
                     valueClassName="text-green-600"

@@ -9,6 +9,7 @@ export type MonthlyData = {
     commission: number
     payout: number
     revenue: number
+    partnerEarnings: number
     month?: string
 }
 
@@ -22,8 +23,12 @@ const chartConfig = {
         color: "var(--color-chart-2)",
     },
     payout: {
-        label: "Payouts",
+        label: "Host Payouts",
         color: "var(--color-chart-3)",
+    },
+    partnerEarnings: {
+        label: "Partner Earnings",
+        color: "var(--color-chart-4)",
     },
 }
 
@@ -97,7 +102,15 @@ export function FinanceCharts({ data }: { data: MonthlyData[] }) {
                                     stroke="var(--color-payout)"
                                     strokeWidth={2}
                                     dot={false}
-                                    name="Payouts"
+                                    name="Host Payouts"
+                                />
+                                <Line
+                                    type="monotone"
+                                    dataKey="partnerEarnings"
+                                    stroke="var(--color-partnerEarnings)"
+                                    strokeWidth={2}
+                                    dot={false}
+                                    name="Partner Earnings"
                                 />
                             </LineChart>
                         </ChartContainer>
