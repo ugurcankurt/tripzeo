@@ -29,9 +29,9 @@ export async function SiteHeader() {
                         <Image
                             src="/tripzeo.svg"
                             alt="tripzeo logo"
-                            width={28}
-                            height={28}
-                            className="w-7 h-7"
+                            width={24}
+                            height={24}
+                            className="w-6 h-6"
                         />
                         tripzeo
                     </Link>
