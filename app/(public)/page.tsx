@@ -33,25 +33,29 @@ export default function HomePage() {
             </section>
 
             {/* Categories Grid */}
-            <section className="mb-16">
-                <h2 className="text-2xl font-bold mb-6">Browse by Service</h2>
+            <section className="mb-16" aria-labelledby="browse-heading">
+                <h2 id="browse-heading" className="text-2xl font-bold mb-6">Browse by Service</h2>
                 <Suspense fallback={<CategoryGridSkeleton />}>
                     <CategoryGrid />
                 </Suspense>
             </section>
 
             {/* New Arrivals Grid */}
-            <Suspense fallback={<ExperienceGridSkeleton count={8} />}>
-                <NewArrivals />
-            </Suspense>
+            <section className="mb-16" aria-labelledby="new-arrivals-heading">
+                <Suspense fallback={<ExperienceGridSkeleton count={8} />}>
+                    <NewArrivals />
+                </Suspense>
+            </section>
 
             {/* CTA Banner */}
             <CTABanner />
 
             {/* Popular Cities Section */}
-            <Suspense fallback={<PopularCitiesSkeleton />}>
-                <PopularDestinations />
-            </Suspense>
+            <section aria-labelledby="popular-heading">
+                <Suspense fallback={<PopularCitiesSkeleton />}>
+                    <PopularDestinations />
+                </Suspense>
+            </section>
         </div>
     )
 }
