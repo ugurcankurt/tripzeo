@@ -77,7 +77,6 @@ export async function SearchResults({ q, category }: SearchResultsProps) {
 
             {!q && !category && (
                 <div className="mb-12">
-                    <h2 className="text-xl font-semibold mb-4">Browse Categories</h2>
                     <CategoryGrid />
                 </div>
             )}
