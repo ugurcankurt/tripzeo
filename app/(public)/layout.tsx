@@ -1,4 +1,5 @@
 import { SiteHeader } from "@/components/layout/site-header"
+import { SiteFooter } from "@/components/layout/site-footer"
 
 export default function PublicLayout({
     children,
@@ -13,11 +14,7 @@ export default function PublicLayout({
             <main className="flex-1">
                 {children}
             </main>
-            <footer className="border-t py-12 bg-muted/30 print:hidden">
-                <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-                    © {new Date().getFullYear()} Tripzeo Experiences Marketplace. All rights reserved.
-                </div>
-            </footer>
+            <SiteFooter />
         </div>
     )
 }

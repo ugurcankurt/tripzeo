@@ -28,7 +28,7 @@ export default function HomePage() {
             />
             {/* Hero Section - Static content, no suspense needed for data */}
             <section className="mb-12">
-                <Hero categories={[]} userAvatars={[]} />
+                <Hero categories={[]} />
             </section>
 
             {/* Categories Grid */}
