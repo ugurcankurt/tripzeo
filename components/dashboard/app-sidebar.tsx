@@ -115,7 +115,15 @@ export function AppSidebar({ userRole = 'user' }: { userRole?: 'user' | 'host' |
                                 <SidebarMenuButton asChild isActive={pathname === "/admin/payouts"} className="w-full justify-start">
                                     <Link href="/admin/payouts" onClick={handleLinkClick}>
                                         <CreditCard className="mr-2 h-4 w-4" />
-                                        Payouts & Payments
+                                        Payouts (Hosts)
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild isActive={pathname === "/admin/payouts/partners"} className="w-full justify-start">
+                                    <Link href="/admin/payouts/partners" onClick={handleLinkClick}>
+                                        <Users className="mr-2 h-4 w-4" />
+                                        Payouts (Partners)
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
