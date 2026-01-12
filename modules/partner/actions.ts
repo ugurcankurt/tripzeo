@@ -50,12 +50,24 @@ export async function getPartnerData() {
         .select('*', { count: 'exact', head: true })
         .eq('partner_id', user.id)
 
+    // Check if bank info is complete (basic check for TR/EU/US common fields)
+    // We check if at least bank_name and account_holder are present, 
+    // and either iban OR (routing_number AND account_number) is present.
+    // Explicit casting to any to access properties safely if typescript complains about nulls, though profile is typed.
+    const p = profile as any
+    const hasBasicInfo = !!(p.bank_name && p.account_holder)
+    const hasIban = !!p.iban
+    const hasUSAccount = !!(p.routing_number && p.account_number)
+
+    const isBankInfoComplete = hasBasicInfo && (hasIban || hasUSAccount)
+
     return {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         referralCode: (profile as any).referral_code,
         totalEarnings,
         pendingEarnings,
         conversionCount: conversionCount || 0,
-        transactions: transactions || []
+        transactions: transactions || [],
+        isBankInfoComplete
     }
 }

@@ -1,8 +1,10 @@
 import { getPartnerData } from "@/modules/partner/actions"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Copy, CreditCard, DollarSign, TrendingUp, Users } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Copy, CreditCard, DollarSign, TrendingUp, Users, AlertCircle } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import Link from "next/link"
 
 // Simple Copy Component (Server Component wrapper limitation, so using client inline logic or separate component)
 // For simplicity, I'll make a small client component for the copy button logic if needed, 
@@ -32,6 +34,19 @@ export default async function PartnerDashboardPage() {
                 <h2 className="text-3xl font-bold tracking-tight">Partner Dashboard</h2>
                 <p className="text-muted-foreground">Track your referrals and earnings.</p>
             </div>
+
+            {!data.isBankInfoComplete && (
+                <Alert variant="destructive" className="border-orange-200 bg-orange-50 text-orange-900 [&>svg]:text-orange-900">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>Missing Bank Details</AlertTitle>
+                    <AlertDescription>
+                        You have not set up your payout information yet. You will not be able to receive payments until you add your bank details.
+                        <Link href="/account" className="font-semibold underline ml-2">
+                            Go to Profile Settings
+                        </Link>
+                    </AlertDescription>
+                </Alert>
+            )}
 
             {/* Stats Overview */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
