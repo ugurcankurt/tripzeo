@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { Database } from '@/types/supabase'
+import { sendPartnerWelcomeEmail } from '@/lib/email'
 
 export async function login(formData: FormData) {
     const supabase = await createClient()
@@ -77,6 +78,9 @@ export async function registerPartner(formData: FormData) {
     if (error) {
         return { error: error.message }
     }
+
+    // Send Welcome Email
+    await sendPartnerWelcomeEmail(email, full_name)
 
     revalidatePath('/', 'layout')
     return { success: true, email }
