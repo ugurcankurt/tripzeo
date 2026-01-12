@@ -14,7 +14,7 @@ export async function getPartnerData() {
     // 1. Get Profile (Referral Code + Role)
     const { data: profile } = await supabase
         .from('profiles')
-        .select('referral_code, role')
+        .select('referral_code, role, bank_name, account_holder, iban, routing_number, account_number')
         .eq('id', user.id)
         .single()
 
