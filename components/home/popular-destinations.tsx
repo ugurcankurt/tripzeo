@@ -48,9 +48,9 @@ export async function PopularDestinations() {
         .slice(0, 5)
 
     return (
-        <section>
+        <section aria-labelledby="popular-heading">
             <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold">Popular Destinations</h2>
+                <h2 id="popular-heading" className="text-2xl font-bold">Popular Destinations</h2>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 {POPULAR_CITIES.map((city) => (

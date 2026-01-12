@@ -122,9 +122,9 @@ export function ExperienceCard({ experience, className }: ExperienceCardProps) {
                     </span>
                 </div>
 
-                <h3 className="text-[15px] font-semibold leading-tight text-foreground line-clamp-2 transition-colors duration-200 group-hover:text-primary capitalize">
+                <h2 className="text-[15px] font-semibold leading-tight text-foreground line-clamp-2 transition-colors duration-200 group-hover:text-primary capitalize">
                     {title}
-                </h3>
+                </h2>
 
                 <div className="flex items-baseline gap-1 pt-1">
                     <span className="text-lg font-bold text-foreground">{formattedPrice}</span>

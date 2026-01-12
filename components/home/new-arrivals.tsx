@@ -28,10 +28,10 @@ export async function NewArrivals() {
         .limit(4)
 
     return (
-        <section className="mb-16">
+        <section className="mb-16" aria-labelledby="new-arrivals-heading">
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h2 className="text-2xl font-bold">New Arrivals</h2>
+                    <h2 id="new-arrivals-heading" className="text-2xl font-bold">New Arrivals</h2>
                     <p className="text-muted-foreground mt-1">Check out the latest experiences added in the last 5 days</p>
                 </div>
             </div>

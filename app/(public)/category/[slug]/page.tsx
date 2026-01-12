@@ -210,9 +210,9 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
                                     <span>Curated Experience</span>
                                 </div>
 
-                                <h2 className="text-3xl md:text-4xl font-extrabold mb-6 tracking-tight text-foreground">
+                                <h4 className="text-3xl md:text-4xl font-extrabold mb-6 tracking-tight text-foreground">
                                     Why Book <span className="text-primary">{categoryData.name}</span> with Tripzeo?
-                                </h2>
+                                </h4>
 
                                 <div className="prose prose-lg text-muted-foreground leading-relaxed">
                                     <p>

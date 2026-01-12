@@ -145,7 +145,7 @@ export async function CityLandingContent({ country, city }: CityLandingContentPr
                     ))
                 ) : (
                     <div className="col-span-full py-16 text-center bg-muted/30 rounded-xl border border-dashed">
-                        <h3 className="text-2xl font-semibold mb-2">No experiences found in {formattedCity} yet</h3>
+                        <h2 className="text-2xl font-semibold mb-2">No experiences found in {formattedCity} yet</h2>
                         <p className="text-muted-foreground mb-8">
                             We are currently expanding to {formattedCity}. Check back soon or browse other destinations.
                         </p>
@@ -167,12 +167,12 @@ export async function CityLandingContent({ country, city }: CityLandingContentPr
                             <div className="max-w-3xl">
                                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
                                     <Sparkles className="w-4 h-4" />
-                                    <span>Travel Guide</span>
+                                    <span>Experience Guide</span>
                                 </div>
 
-                                <h2 className="text-3xl font-bold mb-6 tracking-tight">
+                                <h3 className="text-3xl font-bold mb-6 tracking-tight">
                                     Explore the Best of <span className="text-primary">{formattedCity}</span>
-                                </h2>
+                                </h3>
 
                                 <div className="prose prose-lg text-muted-foreground/90 leading-relaxed">
                                     <p>

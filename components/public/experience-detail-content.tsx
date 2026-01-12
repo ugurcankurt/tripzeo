@@ -250,7 +250,7 @@ export async function ExperienceDetailContent({ country, city, slug }: Experienc
                         </Link>
                         <div>
                             <Link href={`/host/${slugify(experience.host?.full_name || 'host')}-${experience.host_id}`} className="hover:underline">
-                                <h3 className="font-semibold text-lg">{experience.host?.full_name}</h3>
+                                <h2 className="font-semibold text-lg">{experience.host?.full_name}</h2>
                             </Link>
                             <p className="text-muted-foreground text-sm line-clamp-3">
                                 {experience.host?.bio || "This host hasn't written a bio yet, but they're great at what they do!"}
@@ -270,7 +270,7 @@ export async function ExperienceDetailContent({ country, city, slug }: Experienc
 
                     {/* Reviews */}
                     <div>
-                        <h3 className="text-xl font-semibold mb-6">Guest Reviews</h3>
+                        <h4 className="text-xl font-semibold mb-6">Guest Reviews</h4>
                         <ReviewList experienceId={experience.id} initialReviews={reviews} />
                     </div>
                 </div>
