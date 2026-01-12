@@ -170,9 +170,9 @@ export async function CityLandingContent({ country, city }: CityLandingContentPr
                                     <span>Experience Guide</span>
                                 </div>
 
-                                <h3 className="text-3xl font-bold mb-6 tracking-tight">
+                                <h2 className="text-3xl font-bold mb-6 tracking-tight">
                                     Explore the Best of <span className="text-primary">{formattedCity}</span>
-                                </h3>
+                                </h2>
 
                                 <div className="prose prose-lg text-muted-foreground/90 leading-relaxed">
                                     <p>
