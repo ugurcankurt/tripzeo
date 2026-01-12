@@ -133,3 +133,208 @@ export async function fetchReceiptData(transferId: string) {
         return { error: "Failed to fetch receipt" }
     }
 }
+
+export async function getPartnerPayouts(status: 'pending' | 'completed' = 'pending') {
+    const supabase = await createClient()
+
+    // Explicitly cast to match database enum type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const statusFilter = (status === 'pending' ? ['pending', 'failed'] : ['completed']) as any
+
+    // Fetch pending commission transactions with partner profile details
+    const { data: payouts, error } = await supabase
+        .from('financial_transactions')
+        .select(`
+            *,
+            partner:profiles!financial_transactions_user_id_fkey(
+                id,
+                full_name,
+                email,
+                bank_name,
+                account_holder,
+                iban,
+                bank_code,
+                bank_country,
+                routing_number,
+                account_number
+            )
+        `)
+        .eq('type', 'commission')
+        .in('status', statusFilter)
+        .order('created_at', { ascending: false })
+
+    if (error) {
+        console.error("Error fetching partner payouts:", error)
+        return []
+    }
+
+    return payouts
+}
+
+export async function markCommissionAsPaid(transactionId: string) {
+    const supabase = await createClient()
+
+    // 1. Verify Admin (Optional but good practice if not trusted context)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { error: "Unauthorized" }
+
+    // 2. Update Transaction Status
+    const { data: transaction, error: updateError } = await supabase
+        .from('financial_transactions')
+        .update({ status: 'completed' }) // Using 'completed' as per enum, effectively 'paid_out' for this context
+        .eq('id', transactionId)
+        .select()
+        .single()
+
+    if (updateError) {
+        console.error("Error updating commission status:", updateError)
+        return { error: "Failed to update status." }
+    }
+
+    // 3. Notify Partner
+    if (transaction && transaction.user_id) {
+        const formattedAmount = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: transaction.currency || 'USD'
+        }).format(Number(transaction.amount))
+
+        await createNotification({
+            userId: transaction.user_id,
+            title: "Commission Paid",
+            message: `Good news! Your commission of ${formattedAmount} has been paid out to your bank account.`,
+            link: "/partner", // Partner dashboard
+            type: "success"
+        })
+    }
+
+    revalidatePath('/admin/payouts/partners')
+    return { success: true }
+}
+
+export async function getPartnerBalances() {
+    const supabase = await createClient()
+
+    // Fetch all pending commissions
+    const { data: transactions, error } = await supabase
+        .from('financial_transactions')
+        .select(`
+            amount,
+            currency,
+            user_id,
+            partner:profiles!financial_transactions_user_id_fkey(
+                id,
+                full_name,
+                email,
+                bank_name,
+                account_holder,
+                iban,
+                bank_code,
+                bank_country,
+                routing_number,
+                account_number
+            )
+        `)
+        .eq('type', 'commission')
+        .eq('status', 'pending')
+
+    if (error) {
+        console.error("Error fetching partner balances:", error)
+        return []
+    }
+
+    // specific type for the partner profile from the join
+    type PartnerProfile = {
+        id: string
+        full_name: string | null
+        email: string
+        bank_name: string | null
+        account_holder: string | null
+        iban: string | null
+        bank_code: string | null
+        bank_country: string | null
+        routing_number: string | null
+        account_number: string | null
+    }
+
+    // Aggregate by partner
+    const balances: Record<string, {
+        partner: PartnerProfile
+        amount: number
+        currency: string
+        transactionCount: number
+    }> = {}
+
+    transactions.forEach(tx => {
+        if (!tx.user_id || !tx.partner) return
+
+        if (!balances[tx.user_id]) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const partner = tx.partner as any
+            balances[tx.user_id] = {
+                partner: partner,
+                amount: 0,
+                currency: tx.currency || 'USD',
+                transactionCount: 0
+            }
+        }
+
+        balances[tx.user_id].amount += tx.amount
+        balances[tx.user_id].transactionCount += 1
+    })
+
+    return Object.values(balances).sort((a, b) => b.amount - a.amount)
+}
+
+export async function payoutPartner(partnerId: string) {
+    const supabase = await createClient()
+
+    // 1. Verify Admin
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { error: "Unauthorized" }
+
+    // 2. Validate Threshold Server-Side
+    const { data: transactions, error: fetchError } = await supabase
+        .from('financial_transactions')
+        .select('amount')
+        .eq('user_id', partnerId)
+        .eq('type', 'commission')
+        .eq('status', 'pending')
+
+    if (fetchError || !transactions) return { error: "Could not fetch balance." }
+
+    const totalBalance = transactions.reduce((sum, tx) => sum + tx.amount, 0)
+
+    if (totalBalance < 150) {
+        return { error: `Balance (${totalBalance}) is below the $150 threshold.` }
+    }
+
+    // 3. Perform Bulk Update
+    const { error: updateError } = await supabase
+        .from('financial_transactions')
+        .update({ status: 'completed' })
+        .eq('user_id', partnerId)
+        .eq('type', 'commission')
+        .eq('status', 'pending')
+
+    if (updateError) {
+        console.error("Bulk payout error:", updateError)
+        return { error: "Failed to process payout." }
+    }
+
+    // 4. Notify Partner
+    const formattedAmount = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+    }).format(totalBalance)
+
+    await createNotification({
+        userId: partnerId,
+        title: "Payout Sent",
+        message: `Your total balance of ${formattedAmount} has been paid out.`,
+        link: "/partner",
+        type: "success"
+    })
+
+    revalidatePath('/admin/payouts/partners')
+    return { success: true }
+}
