@@ -223,7 +223,7 @@ export async function SiteFooter() {
                     </div>
                 </div>
 
-                <Separator className="my-8" />
+                <Separator className="my-6" />
 
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
                     <p>© {new Date().getFullYear()} Tripzeo. All rights reserved.</p>
