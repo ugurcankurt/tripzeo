@@ -68,7 +68,7 @@ export async function PopularDestinations() {
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
                         <div className="absolute bottom-4 left-4 z-20 text-white">
-                            <div className="font-bold text-lg">{city.city}</div>
+                            <h3 className="font-bold text-lg">{city.city}</h3>
                             <p className="text-sm opacity-80">{city.country}</p>
                             <span className="inline-block mt-2 px-2 py-0.5 bg-primary/20 backdrop-blur-sm rounded text-xs font-medium border border-primary/30 text-primary-foreground">
                                 {city.count} Experiences

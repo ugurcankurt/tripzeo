@@ -36,9 +36,9 @@ export function CTABanner() {
 
         {/* Content - Left Side */}
         <div className="relative z-20 mr-auto w-full md:w-1/2 px-6 md:px-12 lg:px-16 flex flex-col text-left">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight">
+          <p className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight">
             Expert services, wherever you go.
-          </h2>
+          </p>
           <p className="text-white/90 text-lg mb-0 max-w-md">
             From beauty & wellness to unique local experiences.
           </p>

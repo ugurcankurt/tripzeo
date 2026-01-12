@@ -39,19 +39,21 @@ function AccordionTrigger({
   ...props
 }: React.ComponentProps<typeof AccordionPrimitive.Trigger>) {
   return (
-    <AccordionPrimitive.Header className="flex">
-      <AccordionPrimitive.Trigger
-        data-slot="accordion-trigger"
-        className={cn(
-          "**:data-[slot=accordion-trigger-icon]:text-muted-foreground gap-6 p-4 text-left text-sm font-medium hover:underline **:data-[slot=accordion-trigger-icon]:ml-auto **:data-[slot=accordion-trigger-icon]:size-4 group/accordion-trigger relative flex flex-1 items-start justify-between border border-transparent transition-all outline-none disabled:pointer-events-none disabled:opacity-50",
-          className
-        )}
-        {...props}
-      >
-        {children}
-        <HugeiconsIcon icon={ArrowDown01Icon} strokeWidth={2} data-slot="accordion-trigger-icon" className="pointer-events-none shrink-0 group-aria-expanded/accordion-trigger:hidden" />
-        <HugeiconsIcon icon={ArrowUp01Icon} strokeWidth={2} data-slot="accordion-trigger-icon" className="pointer-events-none hidden shrink-0 group-aria-expanded/accordion-trigger:inline" />
-      </AccordionPrimitive.Trigger>
+    <AccordionPrimitive.Header className="flex" asChild>
+      <div className="flex">
+        <AccordionPrimitive.Trigger
+          data-slot="accordion-trigger"
+          className={cn(
+            "**:data-[slot=accordion-trigger-icon]:text-muted-foreground gap-6 p-4 text-left text-sm font-medium hover:underline **:data-[slot=accordion-trigger-icon]:ml-auto **:data-[slot=accordion-trigger-icon]:size-4 group/accordion-trigger relative flex flex-1 items-start justify-between border border-transparent transition-all outline-none disabled:pointer-events-none disabled:opacity-50",
+            className
+          )}
+          {...props}
+        >
+          {children}
+          <HugeiconsIcon icon={ArrowDown01Icon} strokeWidth={2} data-slot="accordion-trigger-icon" className="pointer-events-none shrink-0 group-aria-expanded/accordion-trigger:hidden" />
+          <HugeiconsIcon icon={ArrowUp01Icon} strokeWidth={2} data-slot="accordion-trigger-icon" className="pointer-events-none hidden shrink-0 group-aria-expanded/accordion-trigger:inline" />
+        </AccordionPrimitive.Trigger>
+      </div>
     </AccordionPrimitive.Header>
   )
 }
