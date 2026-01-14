@@ -306,7 +306,7 @@ export function BookingForm({ price, capacity, serviceFeeRate, experienceId, blo
                     disabled={!date}
                     onClick={handleBook}
                 >
-                    Request to Book
+                    Book Now
                 </Button>
 
                 <p className="text-center text-xs text-muted-foreground mt-2">

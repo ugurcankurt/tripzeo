@@ -58,7 +58,7 @@ export function MobileBookingBar(props: MobileBookingBarProps) {
                                 size="lg"
                                 className="font-semibold px-8 shadow-sm"
                             >
-                                Request to Book
+                                Book Now
                             </Button>
                         </SheetTrigger>
                         <SheetContent side="bottom" className="h-[100dvh] rounded-none p-0 overflow-y-auto w-full max-w-none border-none z-[70]">

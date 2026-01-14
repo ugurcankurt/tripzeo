@@ -166,6 +166,7 @@ export default async function BookPage({ searchParams }: { searchParams: Promise
                                         src={experience.images?.[0] || '/images/placeholders/experience-placeholder.jpg'}
                                         alt={experience.title}
                                         fill
+                                        sizes="112px"
                                         className="object-cover group-hover:scale-105 transition-transform duration-300"
                                     />
                                 </div>

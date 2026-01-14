@@ -40,11 +40,11 @@ export async function SiteHeader() {
                 </div>
 
                 <div className="flex items-center gap-4">
-                    {(!userProfile || userProfile.role === 'user') && (
-                        <Button variant="outline" size="sm" className="flex gap-2 border-primary/20 hover:bg-primary/5 hover:text-primary" asChild>
+                    {!userProfile && (
+                        <Button variant="outline" size="sm" className="hidden md:flex gap-2 border-primary/20 hover:bg-primary/5 hover:text-primary" asChild>
                             <Link href="/vendor">
                                 <Briefcase className="h-4 w-4" />
-                                <span className="hidden md:inline">Become a Host</span>
+                                <span>Become a Host</span>
                             </Link>
                         </Button>
                     )}

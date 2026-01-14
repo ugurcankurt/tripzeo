@@ -33,6 +33,7 @@ export async function SiteFooter() {
                                     src="/tripzeo.svg"
                                     alt="Tripzeo Logo"
                                     fill
+                                    sizes="24px"
                                     className="object-contain"
                                 />
                             </div>

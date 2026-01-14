@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Link from "next/link"
-import { CreditCard, LayoutDashboard, LogOut, Settings, User, ShoppingBag, Heart } from "lucide-react"
+import { CreditCard, LayoutDashboard, LogOut, Settings, User, ShoppingBag, Heart, Briefcase } from "lucide-react"
 import { signout } from "@/modules/auth/actions"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
@@ -84,6 +84,16 @@ export function UserNav({ user }: UserNavProps) {
                             <span>My Favorites</span>
                         </Link>
                     </DropdownMenuItem>
+
+                    {/* Show Become a Host only for "user" role */}
+                    {user.role === 'user' && (
+                        <DropdownMenuItem asChild className="bg-primary/5 focus:bg-primary/10 mt-1">
+                            <Link href="/vendor" className="font-medium text-primary">
+                                <Briefcase className="mr-2 h-4 w-4" />
+                                <span>Become a Host</span>
+                            </Link>
+                        </DropdownMenuItem>
+                    )}
                     {/* Eğer Host ise Panel linkini göster */}
                     {(user.role === 'host' || user.role === 'admin') && (
                         <DropdownMenuItem asChild className="bg-primary/5 focus:bg-primary/10 mt-1">
