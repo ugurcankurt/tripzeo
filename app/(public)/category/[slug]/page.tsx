@@ -43,14 +43,6 @@ export async function generateMetadata({ params }: CategoryPageProps) {
             description: `Book top-rated ${title} on Tripzeo. Discover unique experiences, services, and local guides.`,
             url: `https://tripzeo.com/category/${slug}`,
             siteName: 'Tripzeo',
-            images: [
-                {
-                    url: `/category/${slug}/opengraph-image`,
-                    width: 1200,
-                    height: 675,
-                    alt: `Browse ${title}`
-                }
-            ]
         },
         alternates: {
             canonical: `/category/${slug}`

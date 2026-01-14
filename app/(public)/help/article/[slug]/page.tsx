@@ -34,14 +34,6 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
             description: item.answer.substring(0, 160),
             url: `https://tripzeo.com/help/article/${resolvedParams.slug}`,
             siteName: 'Tripzeo',
-            images: [
-                {
-                    url: '/opengraph-image',
-                    width: 1200,
-                    height: 675,
-                    alt: item.question
-                }
-            ]
         },
     }
 }

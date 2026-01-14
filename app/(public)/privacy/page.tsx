@@ -13,14 +13,6 @@ export const metadata: Metadata = {
         description: "Learn how Tripzeo collects, uses, and protects your personal data.",
         url: "https://tripzeo.com/privacy",
         siteName: 'Tripzeo',
-        images: [
-            {
-                url: '/opengraph-image',
-                width: 1200,
-                height: 675,
-                alt: 'Privacy Policy | Tripzeo'
-            }
-        ]
     }
 };
 

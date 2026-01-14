@@ -31,14 +31,6 @@ export async function generateMetadata({ params }: CityPageProps) {
             description: `Book top-rated tours, activities, and experiences in ${formattedCity}. Explore local guides and hidden gems in ${formattedCountry}.`,
             url: `https://tripzeo.com/${countrySlug}/${citySlug}`,
             siteName: 'Tripzeo',
-            images: [
-                {
-                    url: `/${countrySlug}/${citySlug}/opengraph-image`,
-                    width: 1200,
-                    height: 675,
-                    alt: `Experiences in ${formattedCity}`
-                }
-            ]
         },
         alternates: {
             canonical: `/${countrySlug}/${citySlug}`

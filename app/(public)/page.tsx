@@ -20,14 +20,6 @@ export const metadata: Metadata = {
         description: "Discover and book unique local experiences, services and activities hosted by experts.",
         url: "https://tripzeo.com",
         siteName: "Tripzeo",
-        images: [
-            {
-                url: "/opengraph-image",
-                width: 1200,
-                height: 675,
-                alt: "Tripzeo Experiences"
-            }
-        ]
     }
 }
 

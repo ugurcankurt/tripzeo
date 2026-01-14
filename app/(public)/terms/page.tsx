@@ -13,14 +13,6 @@ export const metadata: Metadata = {
         description: "Read our Terms, including rules for Hosts and Guests, booking policies, and fees.",
         url: "https://tripzeo.com/terms",
         siteName: 'Tripzeo',
-        images: [
-            {
-                url: '/opengraph-image',
-                width: 1200,
-                height: 675,
-                alt: 'Terms of Service | Tripzeo'
-            }
-        ]
     }
 };
 

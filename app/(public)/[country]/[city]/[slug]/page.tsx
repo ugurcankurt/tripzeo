@@ -32,14 +32,6 @@ export async function generateMetadata({ params }: { params: Promise<{ country: 
             description: experience.description?.slice(0, 160),
             url: `https://tripzeo.com/${countrySlug}/${citySlug}/${slug}`,
             siteName: 'Tripzeo',
-            images: [
-                {
-                    url: `/${countrySlug}/${citySlug}/${slug}/opengraph-image`,
-                    width: 1200,
-                    height: 675,
-                    alt: experience.title,
-                }
-            ]
         },
         alternates: {
             canonical: `/${countrySlug}/${citySlug}/${slug}`,
