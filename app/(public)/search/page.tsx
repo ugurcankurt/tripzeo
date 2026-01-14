@@ -22,6 +22,20 @@ export async function generateMetadata({ searchParams }: SearchPageProps) {
     return {
         title,
         description: `Find the best ${category || "local"} experiences on Tripzeo.`,
+        openGraph: {
+            title,
+            description: `Find the best ${category || "local"} experiences on Tripzeo.`,
+            url: "https://tripzeo.com/search",
+            siteName: 'Tripzeo',
+            images: [
+                {
+                    url: "/search/opengraph-image",
+                    width: 1200,
+                    height: 675,
+                    alt: title,
+                }
+            ]
+        },
         alternates: {
             canonical: "/search",
         }

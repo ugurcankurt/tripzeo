@@ -34,6 +34,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
             title,
             description,
             url: `https://tripzeo.com/host/${slug}`,
+            siteName: 'Tripzeo',
+            images: [
+                {
+                    url: `/host/${slug}/opengraph-image`,
+                    width: 1200,
+                    height: 675,
+                    alt: title,
+                }
+            ]
         },
         alternates: {
             canonical: `/host/${slug}`,
