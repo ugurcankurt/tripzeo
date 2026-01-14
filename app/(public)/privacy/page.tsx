@@ -5,6 +5,9 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
     title: "Privacy Policy | Tripzeo",
     description: "Learn how Tripzeo collects, uses, and protects your personal data.",
+    alternates: {
+        canonical: "/privacy",
+    },
 };
 
 export default function PrivacyPage() {

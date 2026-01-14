@@ -26,6 +26,9 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
     return {
         title: `${item.question} | Tripzeo Help`,
         description: item.answer.substring(0, 160),
+        alternates: {
+            canonical: `/help/article/${resolvedParams.slug}`,
+        },
     }
 }
 

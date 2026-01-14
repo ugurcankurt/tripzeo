@@ -33,7 +33,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         openGraph: {
             title,
             description,
-            // Images are automatically handled by opengraph-image.tsx
+            url: `https://tripzeo.com/host/${slug}`,
+        },
+        alternates: {
+            canonical: `/host/${slug}`,
         },
     }
 }

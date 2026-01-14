@@ -45,9 +45,6 @@ export const metadata: Metadata = {
     description: 'Discover and book unique local experiences, services and activities hosted by experts.',
     images: ['/opengraph-image'], // Re-use OG image
   },
-  alternates: {
-    canonical: './',
-  },
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },

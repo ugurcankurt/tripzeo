@@ -1,7 +1,15 @@
 import { PartnerRegisterForm } from "@/modules/auth/components/partner-register-form";
 import { CheckCircle2, TrendingUp, Users } from "lucide-react";
-import Link from "next/link";
 import Image from "next/image";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Become a Partner | Tripzeo Affiliate Program",
+    description: "Join the Tripzeo Partner Program and earn 10% commission on every booking. Partner with us and grow your business.",
+    alternates: {
+        canonical: "/become-a-partner",
+    },
+};
 
 export default function BecomePartnerPage() {
     return (

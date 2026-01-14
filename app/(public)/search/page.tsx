@@ -22,9 +22,8 @@ export async function generateMetadata({ searchParams }: SearchPageProps) {
     return {
         title,
         description: `Find the best ${category || "local"} experiences on Tripzeo.`,
-        robots: {
-            index: true,
-            follow: true,
+        alternates: {
+            canonical: "/search",
         }
     }
 }

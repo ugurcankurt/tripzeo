@@ -21,15 +21,21 @@ export async function generateMetadata({ params }: { params: Promise<{ country: 
         }
     }
 
+    const countrySlug = experience.location_country?.toLowerCase() || 'turkey'
+    const citySlug = experience.location_city.toLowerCase()
+
     return {
         title: `${experience.title} in ${experience.location_city}`, // Suffix handled by layout template
         description: experience.description?.slice(0, 160) || `Book ${experience.title} in ${experience.location_city}, ${experience.location_country}.`,
         openGraph: {
             title: experience.title,
             description: experience.description?.slice(0, 160),
-            url: `https://tripzeo.com/${experience.location_country}/${experience.location_city}/${slug}`,
+            url: `https://tripzeo.com/${countrySlug}/${citySlug}/${slug}`,
             images: experience.images && experience.images.length > 0 ? [experience.images[0]] : [],
         },
+        alternates: {
+            canonical: `/${countrySlug}/${citySlug}/${slug}`,
+        }
     }
 }
 

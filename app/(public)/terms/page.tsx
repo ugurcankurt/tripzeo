@@ -5,6 +5,9 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
     title: "Terms of Service | Tripzeo",
     description: "Read our Terms, including rules for Hosts and Guests, booking policies, and fees.",
+    alternates: {
+        canonical: "/terms",
+    },
 };
 
 export default function TermsPage() {

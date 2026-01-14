@@ -9,6 +9,9 @@ import { Metadata } from "next"
 export const metadata: Metadata = {
     title: "Become a Host | Tripzeo",
     description: "Share your passion, host experiences, and earn money on Tripzeo. Join our global community of hosts today.",
+    alternates: {
+        canonical: "/become-a-host",
+    },
 }
 
 export default function BecomeHostPage() {

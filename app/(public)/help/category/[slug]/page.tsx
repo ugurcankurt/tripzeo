@@ -23,6 +23,9 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
     return {
         title: `${category.title} Help | Tripzeo`,
         description: category.description,
+        alternates: {
+            canonical: `/help/category/${resolvedParams.slug}`,
+        },
     }
 }
 

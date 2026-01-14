@@ -42,7 +42,7 @@ export async function SiteHeader() {
                 <div className="flex items-center gap-4">
                     {!userProfile && (
                         <Button variant="outline" size="sm" className="hidden md:flex gap-2 border-primary/20 hover:bg-primary/5 hover:text-primary" asChild>
-                            <Link href="/vendor">
+                            <Link href="/become-a-host">
                                 <Briefcase className="h-4 w-4" />
                                 <span>Become a Host</span>
                             </Link>
