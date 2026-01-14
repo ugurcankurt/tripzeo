@@ -29,6 +29,20 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
         alternates: {
             canonical: `/help/article/${resolvedParams.slug}`,
         },
+        openGraph: {
+            title: `${item.question} | Tripzeo Help`,
+            description: item.answer.substring(0, 160),
+            url: `https://tripzeo.com/help/article/${resolvedParams.slug}`,
+            siteName: 'Tripzeo',
+            images: [
+                {
+                    url: '/opengraph-image',
+                    width: 1200,
+                    height: 675,
+                    alt: item.question
+                }
+            ]
+        },
     }
 }
 

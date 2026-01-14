@@ -26,6 +26,20 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
         alternates: {
             canonical: `/help/category/${resolvedParams.slug}`,
         },
+        openGraph: {
+            title: `${category.title} Help | Tripzeo`,
+            description: category.description,
+            url: `https://tripzeo.com/help/category/${resolvedParams.slug}`,
+            siteName: 'Tripzeo',
+            images: [
+                {
+                    url: '/opengraph-image',
+                    width: 1200,
+                    height: 675,
+                    alt: category.title
+                }
+            ]
+        },
     }
 }
 

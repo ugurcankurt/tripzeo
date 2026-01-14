@@ -14,6 +14,20 @@ export const metadata: Metadata = {
     description: "Discover and book unique local experiences, services and activities hosted by experts. From hair styling to tour guiding, find local professionals on Tripzeo.",
     alternates: {
         canonical: "/",
+    },
+    openGraph: {
+        title: "Tripzeo | Discover Unique Local Experiences & Services",
+        description: "Discover and book unique local experiences, services and activities hosted by experts.",
+        url: "https://tripzeo.com",
+        siteName: "Tripzeo",
+        images: [
+            {
+                url: "/opengraph-image",
+                width: 1200,
+                height: 675,
+                alt: "Tripzeo Experiences"
+            }
+        ]
     }
 }
 

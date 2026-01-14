@@ -8,6 +8,20 @@ export const metadata: Metadata = {
     alternates: {
         canonical: "/privacy",
     },
+    openGraph: {
+        title: "Privacy Policy | Tripzeo",
+        description: "Learn how Tripzeo collects, uses, and protects your personal data.",
+        url: "https://tripzeo.com/privacy",
+        siteName: 'Tripzeo',
+        images: [
+            {
+                url: '/opengraph-image',
+                width: 1200,
+                height: 675,
+                alt: 'Privacy Policy | Tripzeo'
+            }
+        ]
+    }
 };
 
 export default function PrivacyPage() {

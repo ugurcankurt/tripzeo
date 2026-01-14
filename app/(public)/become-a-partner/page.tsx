@@ -9,6 +9,20 @@ export const metadata: Metadata = {
     alternates: {
         canonical: "/become-a-partner",
     },
+    openGraph: {
+        title: "Become a Partner | Tripzeo Affiliate Program",
+        description: "Join the Tripzeo Partner Program and earn 10% commission on every booking. Partner with us and grow your business.",
+        url: "https://tripzeo.com/become-a-partner",
+        siteName: 'Tripzeo',
+        images: [
+            {
+                url: '/opengraph-image',
+                width: 1200,
+                height: 675,
+                alt: 'Become a Partner | Tripzeo'
+            }
+        ]
+    }
 };
 
 export default function BecomePartnerPage() {

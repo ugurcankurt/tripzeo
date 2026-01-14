@@ -12,6 +12,20 @@ export const metadata: Metadata = {
     alternates: {
         canonical: "/become-a-host",
     },
+    openGraph: {
+        title: "Become a Host | Tripzeo",
+        description: "Share your passion, host experiences, and earn money on Tripzeo. Join our global community of hosts today.",
+        url: "https://tripzeo.com/become-a-host",
+        siteName: 'Tripzeo',
+        images: [
+            {
+                url: '/opengraph-image',
+                width: 1200,
+                height: 675,
+                alt: 'Become a Host | Tripzeo'
+            }
+        ]
+    }
 }
 
 export default function BecomeHostPage() {
