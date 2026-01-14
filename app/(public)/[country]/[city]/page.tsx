@@ -20,14 +20,17 @@ export async function generateMetadata({ params }: CityPageProps) {
     const formattedCity = cityName.charAt(0).toUpperCase() + cityName.slice(1)
     const formattedCountry = countryName.charAt(0).toUpperCase() + countryName.slice(1)
 
+    const countrySlug = country.toLowerCase()
+    const citySlug = city.toLowerCase()
+
     return {
         title: `Best Things to Do in ${formattedCity}, ${formattedCountry}`, // Suffix handled by layout template
         description: `Book top-rated tours, activities, and experiences in ${formattedCity}. Explore local guides and hidden gems in ${formattedCountry}.`,
         openGraph: {
-            url: `https://tripzeo.com/${country}/${city}`,
+            url: `https://tripzeo.com/${countrySlug}/${citySlug}`,
         },
         alternates: {
-            canonical: `https://tripzeo.com/${country}/${city}`
+            canonical: `/${countrySlug}/${citySlug}`
         }
     }
 }

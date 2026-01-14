@@ -1,3 +1,4 @@
+import { Metadata } from "next"
 import { Suspense } from "react"
 import { Hero } from "@/components/hero"
 import { CategoryGrid } from "@/components/home/category-grid"
@@ -7,6 +8,14 @@ import { CTABanner } from "@/components/home/cta-banner"
 import { CategoryGridSkeleton } from "@/components/skeletons/category-grid-skeleton"
 import { ExperienceGridSkeleton } from "@/components/skeletons/experience-grid-skeleton"
 import { PopularCitiesSkeleton } from "@/components/skeletons/popular-cities-skeleton"
+
+export const metadata: Metadata = {
+    title: "Tripzeo | Discover Unique Local Experiences & Services",
+    description: "Discover and book unique local experiences, services and activities hosted by experts. From hair styling to tour guiding, find local professionals on Tripzeo.",
+    alternates: {
+        canonical: "/",
+    }
+}
 
 export default function HomePage() {
     const jsonLd = {

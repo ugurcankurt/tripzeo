@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: CategoryPageProps) {
             url: `https://tripzeo.com/category/${slug}`,
         },
         alternates: {
-            canonical: `https://tripzeo.com/category/${slug}`
+            canonical: `/category/${slug}`
         }
     }
 }

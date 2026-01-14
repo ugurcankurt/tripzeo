@@ -12,8 +12,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const routes = [
         { url: '', priority: 1, changeFrequency: 'daily' as const },
         { url: '/search', priority: 0.8, changeFrequency: 'daily' as const },
-        { url: '/vendor', priority: 0.9, changeFrequency: 'weekly' as const }, // High priority for host acquisition
-        { url: '/login', priority: 0.5, changeFrequency: 'yearly' as const },  // Utility pages
+        { url: '/become-a-host', priority: 0.9, changeFrequency: 'weekly' as const },
+        { url: '/become-a-partner', priority: 0.7, changeFrequency: 'weekly' as const },
+        { url: '/login', priority: 0.5, changeFrequency: 'yearly' as const },
         { url: '/register', priority: 0.5, changeFrequency: 'yearly' as const },
         { url: '/privacy', priority: 0.3, changeFrequency: 'yearly' as const },
         { url: '/terms', priority: 0.3, changeFrequency: 'yearly' as const },

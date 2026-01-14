@@ -20,7 +20,7 @@ export default function robots(): MetadataRoute.Robots {
             },
             // Explicitly welcome AI Crawlers
             {
-                userAgent: ['GPTBot', 'Google-Extended', 'CCBot', 'ClaudeBot', 'Applebot-Extended'],
+                userAgent: ['Googlebot', 'GPTBot', 'Google-Extended', 'CCBot', 'ClaudeBot', 'Applebot-Extended'],
                 allow: '/',
             }
         ],
