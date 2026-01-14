@@ -4,11 +4,11 @@ import { createClient } from '@supabase/supabase-js'
 export const alt = 'City Travel Guide'
 export const size = {
     width: 1200,
-    height: 630,
+    height: 675,
 }
 export const contentType = 'image/png'
 
-export default async function Image({ params }: { params: { city: string, country: string } }) {
+export default async function Image({ params }: { params: Promise<{ city: string, country: string }> }) {
     const { city, country } = await params
 
     // Helper to format text (slug to title case roughly)
@@ -77,10 +77,10 @@ export default async function Image({ params }: { params: { city: string, countr
                 {/* Background Image */}
                 {bgImage ? (
                     <img
-                        src={`https://wsrv.nl/?url=${encodeURIComponent(bgImage)}&w=1200&h=630&fit=cover&output=jpg`}
+                        src={`https://wsrv.nl/?url=${encodeURIComponent(bgImage)}&w=1200&h=675&fit=cover&output=jpg`}
                         alt=""
                         width="1200"
-                        height="630"
+                        height="675"
                         style={{
                             position: 'absolute',
                             width: '100%',

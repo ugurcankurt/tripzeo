@@ -4,7 +4,7 @@ import { ImageResponse } from 'next/og'
 export const alt = 'Tripzeo - Discover Unique Experiences'
 export const size = {
     width: 1200,
-    height: 630,
+    height: 675,
 }
 export const contentType = 'image/png'
 

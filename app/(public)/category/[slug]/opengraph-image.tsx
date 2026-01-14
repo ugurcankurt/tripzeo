@@ -5,7 +5,7 @@ import { createClient } from '@supabase/supabase-js'
 export const alt = 'Category Experiences'
 export const size = {
     width: 1200,
-    height: 630,
+    height: 675,
 }
 export const contentType = 'image/png'
 
@@ -61,10 +61,10 @@ export default async function Image({ params }: { params: Promise<{ slug: string
                 {/* Full Background Image */}
                 {rawBgImage && (
                     <img
-                        src={`https://wsrv.nl/?url=${encodeURIComponent(rawBgImage)}&w=1200&h=630&fit=cover&output=jpg`}
+                        src={`https://wsrv.nl/?url=${encodeURIComponent(rawBgImage)}&w=1200&h=675&fit=cover&output=jpg`}
                         alt=""
                         width="1200"
-                        height="630"
+                        height="675"
                         style={{
                             position: 'absolute',
                             width: '100%',

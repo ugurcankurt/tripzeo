@@ -5,11 +5,11 @@ import { createClient } from '@supabase/supabase-js'
 export const alt = 'Experience Details'
 export const size = {
     width: 1200,
-    height: 630,
+    height: 675,
 }
 export const contentType = 'image/png'
 
-export default async function Image({ params }: { params: { slug: string } }) {
+export default async function Image({ params }: { params: Promise<{ country: string, city: string, slug: string }> }) {
     const { slug } = await params
     const experienceId = slug.slice(-36) // Extract ID from slug
 

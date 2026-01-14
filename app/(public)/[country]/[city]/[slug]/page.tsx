@@ -31,7 +31,6 @@ export async function generateMetadata({ params }: { params: Promise<{ country: 
             title: experience.title,
             description: experience.description?.slice(0, 160),
             url: `https://tripzeo.com/${countrySlug}/${citySlug}/${slug}`,
-            images: experience.images && experience.images.length > 0 ? [experience.images[0]] : [],
         },
         alternates: {
             canonical: `/${countrySlug}/${citySlug}/${slug}`,
