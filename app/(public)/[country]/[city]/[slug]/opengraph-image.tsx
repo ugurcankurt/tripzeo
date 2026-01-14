@@ -34,14 +34,32 @@ export default async function Image({ params }: { params: Promise<{ country: str
         .eq('id', experienceId)
         .single()
 
-    const bgImage = experience?.images?.[0]
+    let bgImage = experience?.images?.[0]
     const title = experience?.title || 'Amazing Experience'
     const price = experience?.price ? `$${experience.price}` : 'Book Now'
     // @ts-ignore
     const hostName = experience?.host?.full_name
     // @ts-ignore
-    const hostAvatar = experience?.host?.avatar_url
+    let hostAvatar = experience?.host?.avatar_url
     const location = experience?.location_city ? `${experience.location_city}, ${experience.location_country}` : ''
+
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.tripzeo.com'
+
+    // Ensure absolute URL and Apply Proxy for Background
+    if (bgImage) {
+        if (!bgImage.startsWith('http')) {
+            bgImage = `${baseUrl}${bgImage.startsWith('/') ? '' : '/'}${bgImage}`
+        }
+        bgImage = `https://wsrv.nl/?url=${encodeURIComponent(bgImage)}&w=1200&h=675&fit=cover&output=jpg&q=80`
+    }
+
+    // Ensure absolute URL and Apply Proxy for Avatar
+    if (hostAvatar) {
+        if (!hostAvatar.startsWith('http')) {
+            hostAvatar = `${baseUrl}${hostAvatar.startsWith('/') ? '' : '/'}${hostAvatar}`
+        }
+        hostAvatar = `https://wsrv.nl/?url=${encodeURIComponent(hostAvatar)}&w=100&h=100&fit=cover&output=jpg&mask=circle`
+    }
 
     return new ImageResponse(
         (
