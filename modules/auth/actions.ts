@@ -162,9 +162,9 @@ export async function forgotPassword(formData: FormData) {
         return { error: "Email address not found." }
     }
 
-    // We'll rely on NEXT_PUBLIC_SITE_URL or similar if available, or just hardcode for this context as requested.
+    // We'll rely on NEXT_PUBLIC_APP_URL or similar if available, or just hardcode for this context as requested.
     const headerList = await headers()
-    const origin = headerList.get('origin') || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+    const origin = headerList.get('origin') || process.env.NEXT_PUBLIC_APP_URL
     // const redirectTo = `${origin}/auth/callback?next=/reset-password`
 
     // Use signInWithOtp to trigger the "Magic Link" template as requested by the user.
@@ -439,7 +439,7 @@ export async function createAutoUser(formData: FormData) {
     if (host) {
         origin = `${protocol}://${host}`
     } else {
-        origin = headerList.get('origin') || process.env.NEXT_PUBLIC_SITE_URL || 'https://www.tripzeo.com'
+        origin = headerList.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'https://www.tripzeo.com'
     }
 
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {

@@ -8,7 +8,6 @@ import { Spinner } from "@/components/ui/spinner"
 import { PhoneInput } from "@/components/ui/phone-input"
 import Link from "next/link"
 import { toast } from "sonner"
-import Image from "next/image"
 
 import { useRouter } from "next/navigation"
 

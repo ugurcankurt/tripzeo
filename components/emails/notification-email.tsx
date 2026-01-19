@@ -4,7 +4,6 @@ import {
     Section,
     Text,
 } from "@react-email/components";
-import * as React from "react";
 import TripZeoEmailLayout from "./layout";
 
 interface NotificationEmailProps {
