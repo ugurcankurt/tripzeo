@@ -4,6 +4,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { experienceSchema } from "./schema"
 import { revalidatePath } from "next/cache"
+import { generateAdAction } from "../marketing/actions"
 
 export async function createExperience(data: any) {
     const supabase = await createClient()
@@ -30,20 +31,16 @@ export async function createExperience(data: any) {
         return { error: "Invalid fields", details: validatedFields.error.flatten().fieldErrors }
     }
 
-    const { error } = await supabase
+    const { data: newExperience, error } = await supabase
         .from('experiences')
         .insert({
             ...validatedFields.data,
             images: validatedFields.data.images as string[], // Cast to match DB type (files are uploaded by client)
             host_id: user.id,
-
             category: profile.categories?.name || 'Uncategorized', // Fallback for legacy text column if needed
-            // New fields are automatically included via spread if they match schema/DB
-            // ensure category_id is NOT inserted if it doesnt exist in DB, but plan says check if it exists.
-            // Based on schema.sql read earlier, experiences table DOES NOT have category_id column.
-            // It has 'category' text column.
-            // So we use profile category name.
         })
+        .select('id')
+        .single()
 
     if (error) {
         console.error("Create experience error:", error)
@@ -51,6 +48,12 @@ export async function createExperience(data: any) {
     }
 
     revalidatePath('/vendor')
+
+    // Trigger Google Ads Generation (Background)
+    if (newExperience?.id) {
+        generateAdAction(newExperience.id).catch(err => console.error("Ads Generation Failed:", err))
+    }
+
     return { success: true }
 }
 
@@ -85,6 +88,10 @@ export async function updateExperience(experienceId: string, data: any) {
 
     revalidatePath('/vendor')
     revalidatePath(`/vendor/products/${experienceId}/edit`)
+
+    // Trigger Google Ads Regeneration (Background)
+    generateAdAction(experienceId).catch(err => console.error("Ads Generation Failed:", err))
+
     return { success: true }
 }
 
