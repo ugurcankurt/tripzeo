@@ -5,6 +5,7 @@ import "./globals.css";
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { Toaster } from "@/components/ui/sonner";
 import { CookieBanner } from "@/components/privacy/cookie-banner";
+import { MetaPixel } from "@/components/analytics/meta-pixel";
 
 const notoSans = Noto_Sans({ variable: '--font-sans' });
 
@@ -106,6 +107,7 @@ export default function RootLayout({
         <CookieBanner />
         <Toaster />
         <SpeedInsights />
+        <MetaPixel />
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID || "G-FCW9K3D22J"} />
       </body>
     </html>

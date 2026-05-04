@@ -123,7 +123,7 @@ export async function oauthLogin(provider: 'google' | 'github') {
     // In server actions, we might need a different way to construct URL if request headers aren't available easily
     // But typically for OAuth in server actions we redirect to the provider
     // Using default localhost for now if origin not found, should be configured in env
-    const redirectUrl = `https://tripzeo.com/auth/callback`; // Replace with actual env var or logic
+    const redirectUrl = `https://www.tripzeo.com/auth/callback`; // Replace with actual env var or logic
 
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider,

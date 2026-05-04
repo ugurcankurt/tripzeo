@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { iyzipayClient } from '@/lib/iyzipay-client'
 import { Database } from '@/types/supabase'
+import { sendServerEvent } from '@/lib/meta-capi'
 
 export async function POST(request: NextRequest) {
     try {
@@ -54,6 +55,50 @@ export async function POST(request: NextRequest) {
         if (error) {
             console.error('Booking update error:', error)
             return NextResponse.redirect(new URL(`/checkout/${bookingId}?error=DatabaseUpdateError`, request.url), { status: 303 })
+        }
+
+        // Fetch booking details for Meta CAPI
+        const { data: bookingData } = await supabase
+            .from('bookings')
+            .select(`
+                total_amount,
+                experience:experiences(currency),
+                user:profiles!user_id(email, phone, city, country, zip_code)
+            `)
+            .eq('id', bookingId)
+            .single()
+
+        if (bookingData && bookingData.user) {
+            const forwardedFor = request.headers.get('x-forwarded-for')
+            const realIp = forwardedFor ? forwardedFor.split(',')[0].trim() : '127.0.0.1'
+            const userAgent = request.headers.get('user-agent') || ''
+            
+            // Fbp and fbc might be in cookies
+            const fbp = request.cookies.get('_fbp')?.value
+            const fbc = request.cookies.get('_fbc')?.value
+
+            await sendServerEvent(
+                'Purchase',
+                Math.floor(Date.now() / 1000),
+                {
+                    email: bookingData.user.email,
+                    phone: bookingData.user.phone || undefined,
+                    city: bookingData.user.city || undefined,
+                    country: bookingData.user.country || undefined,
+                    zip: bookingData.user.zip_code || undefined,
+                    client_ip_address: realIp,
+                    client_user_agent: userAgent,
+                    fbp,
+                    fbc
+                },
+                {
+                    value: bookingData.total_amount,
+                    currency: bookingData.experience?.currency || 'USD',
+                    content_name: 'Experience Booking',
+                    content_ids: [bookingId],
+                },
+                bookingId // Use booking ID as event_id for deduplication
+            )
         }
 
         // FİNANSAL KAYIT: ŞİMDİLİK EKLENMİYOR

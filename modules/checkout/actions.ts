@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use server'
 
 import { createClient } from "@/lib/supabase/server"
 import { iyzipayClient } from "@/lib/iyzipay-client"
-import { headers } from "next/headers"
+import { headers, cookies } from "next/headers"
+import { sendServerEvent } from "@/lib/meta-capi"
 
 export async function initializePayment(bookingId: string) {
     const supabase = await createClient()
@@ -255,6 +255,39 @@ export async function processDirectPayment(bookingId: string, cardData: {
         if (updateError) {
             console.error('Booking update error:', updateError)
             return { error: 'Payment successful but failed to update booking status.' }
+        }
+
+        // Trigger Meta CAPI Purchase Event
+        try {
+            const cookieStore = await cookies()
+            const fbp = cookieStore.get('_fbp')?.value
+            const fbc = cookieStore.get('_fbc')?.value
+            const userAgent = headersList.get('user-agent') || ''
+
+            await sendServerEvent(
+                'Purchase',
+                Math.floor(Date.now() / 1000),
+                {
+                    email: booking.user.email,
+                    phone: booking.user.phone || undefined,
+                    city: booking.user.city || undefined,
+                    country: booking.user.country || undefined,
+                    zip: booking.user.zip_code || undefined,
+                    client_ip_address: realIp,
+                    client_user_agent: userAgent,
+                    fbp,
+                    fbc
+                },
+                {
+                    value: booking.total_amount,
+                    currency: booking.experience?.currency || 'USD',
+                    content_name: 'Experience Booking',
+                    content_ids: [bookingId],
+                },
+                bookingId // Use booking ID as event_id for deduplication
+            )
+        } catch (capiError) {
+            console.error('Meta CAPI trigger error:', capiError)
         }
 
         return {
